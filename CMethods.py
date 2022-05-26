@@ -417,6 +417,7 @@ class CMethods(object):
             (1.)    X^{*LS}_{sim,p}(i) = X_{sim,p}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
             Mult ('*'):
             (2.)    X^{*LS}_{sim,h}(i) = X_{sim,h}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
+        
         ----- R E F E R E N C E S -----
 
             Based on the equations of Teutschbein, Claudia and Seibert, Jan (2012) Bias correction of regional climate model simulations for hydrological climate-change impact studies: Review and evaluation of different methods
@@ -471,9 +472,9 @@ class CMethods(object):
             (3.) X^{VS(1)}_{sim,h}(i) = X^{*LS}_{sim,h}(i) - \mu_{m}(X^{*LS}_{sim,h}(i))
             (4.) X^{VS(1)}_{sim,p}(i) = X^{*LS}_{sim,p}(i) - \mu_{m}(X^{*LS}_{sim,p}(i))
 
-            (6.) X^{VS(2)}_{sim,p}(i) = X^{VS(1)}_{sim,p}(i) \cdot \left[\frac{\sigma_{m}(X_{obs,h}(i))}{\sigma_{m}(X^{VS(1)}_{sim,h}(i))}\right]
+            (5.) X^{VS(2)}_{sim,p}(i) = X^{VS(1)}_{sim,p}(i) \cdot \left[\frac{\sigma_{m}(X_{obs,h}(i))}{\sigma_{m}(X^{VS(1)}_{sim,h}(i))}\right]
 
-            (8.) X^{*VS}_{sim,p}(i) = X^{VS(2)}_{sim,p}(i) + \mu_{m}(X^{*LS}_{sim,p}(i))
+            (6.) X^{*VS}_{sim,p}(i) = X^{VS(2)}_{sim,p}(i) + \mu_{m}(X^{*LS}_{sim,p}(i))
         
         ----- R E F E R E N C E S -----
 
@@ -489,9 +490,9 @@ class CMethods(object):
             VS_1_simh = LS_simh - np.nanmean(LS_simh)                   # Eq. 3 
             VS_1_simp = LS_simp - np.nanmean(LS_simp)                   # Eq. 4
 
-            VS_2_simp = VS_1_simp * (np.std(obs) / np.std(VS_1_simh))   # Eq. 6
+            VS_2_simp = VS_1_simp * (np.std(obs) / np.std(VS_1_simh))   # Eq. 5
 
-            return VS_2_simp + np.nanmean(LS_simp)                      # Eq. 8
+            return VS_2_simp + np.nanmean(LS_simp)                      # Eq. 6
             
     # ? -----========= D E L T A - M E T H O D =========------ 
     @classmethod
