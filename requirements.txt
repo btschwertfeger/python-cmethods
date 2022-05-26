@@ -1,0 +1,5 @@
+numpy
+xarray
+xclim
+scipy
+tqdm
