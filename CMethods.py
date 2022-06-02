@@ -16,24 +16,24 @@ __author__ = 'Benjamin Thomas Schwertfeger'
 __copyright__ = __author__
 __email__ = 'development@b-schwertfeger.de'
 __link__ = 'https://b-schwertfeger.de'
-__github__ = 'https://github.com/btschwertfeger/Bias-Adjustment-Python';
-__description__ = ' \
-    Class / Script / Methods to apply bias corrections on temperature climate data   \
-                                                                                     \
-    T = Temperatures ($T$)\
-    X = Some climate variable ($X$)\
-    h = historical \
-    p = scenario; future; predicted \
-    obs = observed data ($T_{obs,h}$) \
-    simh = modeled data with same time period as obs ($T_{sim,h}$) \
-    simp = data to correct (predicted simulated data) ($T_{sim,p}$) \
-    \
-    \
-    F = Cummulative Distribution Function\
-    \mu = mean\
-    \sigma = standard deviation\
-    i = index\
-    _{m} = long-term monthly interval\
+__github__ = 'https://github.com/btschwertfeger/Bias-Adjustment-Python'
+__description__ = '                                                                     \
+    Class / Script / Methods to apply bias corrections on temperature climate data      \
+                                                                                        \
+    T = Temperatures ($T$)                                                              \
+    X = Some climate variable ($X$)                                                     \
+    h = historical                                                                      \
+    p = scenario; future; predicted                                                     \
+    obs = observed data ($T_{obs,h}$)                                                   \
+    simh = modeled data with same time period as obs ($T_{sim,h}$)                      \
+    simp = data to correct (predicted simulated data) ($T_{sim,p}$)                     \
+                                                                                        \
+                                                                                        \
+    F = Cummulative Distribution Function                                               \
+    \mu = mean                                                                          \
+    \sigma = standard deviation                                                         \
+    i = index                                                                           \
+    _{m} = long-term monthly interval                                                   \
 '
 
 class CMethods(object):
@@ -227,11 +227,7 @@ class CMethods(object):
         
         func_adjustment = None
         if method in cls.XCLIM_SDBA_METHODS:
-            if method == 'xclim_dqm': func_adjustment = sdba.adjustment.DetrendedQuantileMapping.train
-            elif method == 'xclim_eqm': func_adjustment = sdba.adjustment.EmpiricalQuantileMapping.train
-            elif method == 'xclim_qdm': func_adjustment = sdba.adjustment.QuantileDeltaMapping.train
-            else: raise ValueError(f'Method {method} not implemented yet.')
-
+            func_adjustment = cls.get_function(method)
             for lon in range(len_lon):
                 result[lon] = cls.xclim_sdba_adjustment(
                     method = func_adjustment, 
@@ -249,14 +245,7 @@ class CMethods(object):
             return result
             
         elif method in cls.CUSTOM_METHODS:
-            if method == 'linear_scaling': func_adjustment = cls.linear_scaling
-            elif method == 'variance_scaling': func_adjustment = cls.variance_scaling
-            elif method == 'delta_method': func_adjustment = cls.delta_method
-            elif method == 'quantile_mapping': func_adjustment = cls.quantile_mapping
-            elif method == 'empirical_quantile_mapping': func_adjustment = cls.empirical_quantile_mapping
-            elif method == 'quantile_delta_mapping': func_adjustment = cls.quantile_delta_mapping
-            else: raise ValueError(f'Method {method} not implemented yet.')
-                
+            func_adjustment = cls.get_function(method)                
             kwargs['n_quantiles'] = n_quantiles
             kwargs['kind'] = kind
             for lon in range(len_lon):
@@ -342,35 +331,25 @@ class CMethods(object):
             xarray.core.dataarray.DataArray: Adjusted data 
             
        '''
-        
-        def compute(
-            method: str,
-            obs: xr.core.dataarray.DataArray, 
-            simh: xr.core.dataarray.DataArray, 
-            simp: xr.core.dataarray.DataArray, 
-            kind: str='+',
-            **kwargs
-        ):
-            # TODO: (maybe) match case for python3.10
-            if method == 'linear_scaling': return cls.linear_scaling(obs=obs, simh=simh, simp=simp, kind=kind, **kwargs)
-            elif method == 'variance_scaling': return cls.variance_scaling(obs=obs, simh=simh, simp=simp, **kwargs)
-            elif method == 'delta_method': return cls.delta_method(obs=obs, simh=simh, simp=simp, kind=kind, **kwargs)
-            elif method == 'quantile_mapping': return cls.quantile_mapping(obs=obs, simh=simh, simp=simp, **kwargs)
-            elif method == 'empirical_quantile_mapping': return cls.empirical_quantile_mapping(obs=obs, simh=simh, simp=simp, **kwargs)
-            elif method == 'quantile_delta_mapping': return cls.quantile_delta_mapping(obs=obs, simh=simh, simp=simp, **kwargs)
-            else: raise UnknownMethodError(method, cls.METHODS)
-                
+                        
+        func_adjustment = cls.get_function(method)
         result = simp.copy(deep=True).load()
         groups = simh.groupby(group).groups
-        scen_groups = simp.groupby(group).groups
-        
-        for group, scen_group in zip(groups.keys(), scen_groups.keys()):
-            obs_values_by_group = np.array([obs[i] for i in groups[group]])
-            contr_values_by_group = np.array([simh[i] for i in groups[group]])
-            scen_values_by_group = np.array([simp[i] for i in scen_groups[group]])                
+        simp_groups = simp.groupby(group).groups
+
+        for month, simp_group in zip(groups.keys(), simp_groups.keys()):
+            m_obs, m_simh, m_simp = [], [], []
+
+            for i in groups[month]:
+                m_obs.append(obs[i])
+                m_simh.append(simh[i])
+                m_simp.append(simp[i])
+            # m_obs = np.array([obs[i] for i in groups[group]])
+            # m_simh = np.array([simh[i] for i in groups[group]])
+            # m_simp = np.array([simp[i] for i in scen_groups[group]])                
                 
-            computed_result = compute(method=method, obs=obs_values_by_group, simh=contr_values_by_group, simp=scen_values_by_group, kind=kind, **kwargs)
-            for i, index in enumerate(scen_groups[group]): result[index] = computed_result[i]
+            computed_result = func_adjustment(obs=m_obs, simh=m_simh, simp=m_simp, kind=kind, **kwargs)
+            for i, index in enumerate(simp_groups[month]): result[index] = computed_result[i]
 
         return result
                   
@@ -579,7 +558,7 @@ class CMethods(object):
             
             cdf_obs = cls.get_cdf(obs, xbins)
             cdf_simh = cls.get_cdf(simh, xbins)
-            epsilon = np.interp(simp, xbins, cdf_simh)                                # Eq. 1
+            epsilon = np.interp(simp, xbins, cdf_simh)                                 # Eq. 1
             
             return cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)                     # Eq. 1
         elif kind == '*': 
