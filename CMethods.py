@@ -330,26 +330,22 @@ class CMethods(object):
             
             xarray.core.dataarray.DataArray: Adjusted data 
             
-       '''
-                        
+        '''
+
         func_adjustment = cls.get_function(method)
         result = simp.copy(deep=True).load()
         groups = simh.groupby(group).groups
-        simp_groups = simp.groupby(group).groups
 
-        for month, simp_group in zip(groups.keys(), simp_groups.keys()):
+        for month in groups.keys():
             m_obs, m_simh, m_simp = [], [], []
 
             for i in groups[month]:
                 m_obs.append(obs[i])
                 m_simh.append(simh[i])
-                m_simp.append(simp[i])
-            # m_obs = np.array([obs[i] for i in groups[group]])
-            # m_simh = np.array([simh[i] for i in groups[group]])
-            # m_simp = np.array([simp[i] for i in scen_groups[group]])                
+                m_simp.append(simp[i])           
                 
-            computed_result = func_adjustment(obs=m_obs, simh=m_simh, simp=m_simp, kind=kind, **kwargs)
-            for i, index in enumerate(simp_groups[month]): result[index] = computed_result[i]
+            computed_result = func_adjustment(obs=m_obs, simh=m_simh, simp=m_simp, kind=kind, group=None, **kwargs)
+            for i, index in enumerate(groups[month]): result[index] = computed_result[i]
 
         return result
                   
@@ -359,7 +355,7 @@ class CMethods(object):
         obs: xr.core.dataarray.DataArray, 
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
-        group: str=None,
+        group: str='time.month',
         kind: str='+',
         **kwargs
     ) -> xr.core.dataarray.DataArray:
@@ -416,7 +412,7 @@ class CMethods(object):
         obs: xr.core.dataarray.DataArray, 
         simh: xr.core.dataarray.DataArray, 
         simp: xr.core.dataarray.DataArray, 
-        group: str=None,
+        group: str='time.month',
         kind: str='+',
         **kwargs
     ) -> xr.core.dataarray.DataArray:
@@ -479,7 +475,7 @@ class CMethods(object):
         obs: xr.core.dataarray.DataArray, 
         simh: xr.core.dataarray.DataArray, 
         simp: xr.core.dataarray.DataArray, 
-        group: str=None,
+        group: str='time.month',
         kind: str='+',
         **kwargs
     ) -> xr.core.dataarray.DataArray: 
