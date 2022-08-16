@@ -1,17 +1,11 @@
 #!/bin/python3
 
 import multiprocessing
-import xclim as xc
-from xclim import sdba
 import xarray as xr
 import numpy as np
-from scipy.stats.mstats import mquantiles
-from scipy.interpolate import interp1d
-
 from tqdm import tqdm
 
-
-__descrption__ = 'Script to adjust climate biases in 3D Climate data'
+__descrption__ = 'Script to adjust climate bias in climate data'
 __author__ = 'Benjamin Thomas Schwertfeger'
 __copyright__ = __author__
 __email__ = 'development@b-schwertfeger.de'
@@ -52,10 +46,9 @@ class CMethods(object):
     
     CUSTOM_METHODS = [
         'linear_scaling', 'variance_scaling', 'delta_method', 
-        'quantile_mapping', 'empirical_quantile_mapping', 'quantile_delta_mapping'
+        'quantile_mapping', 'quantile_delta_mapping'
     ]
-    XCLIM_SDBA_METHODS = ['xclim_eqm', 'xclim_dqm', 'xclim_qdm']
-    METHODS = CUSTOM_METHODS + XCLIM_SDBA_METHODS
+    METHODS = CUSTOM_METHODS #+ XCLIM_SDBA_METHODS
     
     def __init__(self):
         pass
@@ -67,10 +60,7 @@ class CMethods(object):
     
     @classmethod
     def get_function(cls, method: str):
-        if method == 'xclim_dqm': return sdba.adjustment.DetrendedQuantileMapping.train 
-        elif method == 'xclim_eqm': return sdba.adjustment.EmpiricalQuantileMapping.train        
-        elif method == 'xclim_qdm': return sdba.adjustment.QuantileDeltaMapping.train 
-        elif method == 'linear_scaling': return cls.linear_scaling        
+        if method == 'linear_scaling': return cls.linear_scaling        
         elif method == 'variance_scaling': return cls.variance_scaling        
         elif method == 'delta_method':  return cls.delta_method
         elif method == 'quantile_mapping': return cls.quantile_mapping
@@ -140,40 +130,7 @@ class CMethods(object):
         result = simp.copy(deep=True).load()
         len_lat, len_lon = len(obs.lat), len(obs.lon)
         
-        if method in cls.XCLIM_SDBA_METHODS:
-            if n_jobs == 1:
-                method = cls.get_function(method)   
-                for lat in tqdm(range(len_lat)):
-                    for lon in range(len_lon):
-                        result[lat,lon] = method(
-                            obs = obs[lat,lon], 
-                            simh = simh[lat,lon], 
-                            simp = simp[lat,lon],
-                            tslice_adjust = tslice_adjust, 
-                            n_quantiles = n_quantiles, 
-                            kind = kind, 
-                            group = group, 
-                            window = window,
-                            **kwargs
-                        ) 
-            else:
-                with multiprocessing.Pool(processes=n_jobs) as pool:
-                    params: [dict] = [{
-                        'method': method, 
-                        'obs': obs[lat], 
-                        'simh': simh[lat], 
-                        'simp': simp[lat], 
-                        'tslice_adjust': tslice_adjust, 
-                        'kind': kind, 
-                        'group': group, 
-                        'window': window,
-                        'kwargs': kwargs
-                    } for lat in range(len_lat)]
-                    for lat, corrected in enumerate(pool.map(cls.pool_adjust, params)):
-                        result[lat] = corrected
-            return result.transpose('time', 'lat', 'lon')
-        
-        elif method in cls.CUSTOM_METHODS:
+        if method in cls.CUSTOM_METHODS:
             if n_jobs == 1:
                 method = cls.get_function(method)
                 for lat in tqdm(range(len_lat)):
@@ -226,25 +183,7 @@ class CMethods(object):
         len_lon = len(obs.lon)
         
         func_adjustment = None
-        if method in cls.XCLIM_SDBA_METHODS:
-            func_adjustment = cls.get_function(method)
-            for lon in range(len_lon):
-                result[lon] = cls.xclim_sdba_adjustment(
-                    method = func_adjustment, 
-                    method_name = method, 
-                    obs = obs, 
-                    simh = simh, 
-                    simp = simp, 
-                    tslice_adjust = tslice_adjust,
-                    n_quantiles = n_quantiles, 
-                    group = group, 
-                    window = window,
-                    save_model = save_model,
-                    **kwargs
-                )
-            return result
-            
-        elif method in cls.CUSTOM_METHODS:
+        if method in cls.CUSTOM_METHODS:
             func_adjustment = cls.get_function(method)                
             kwargs['n_quantiles'] = n_quantiles
             kwargs['kind'] = kind
@@ -255,57 +194,7 @@ class CMethods(object):
             return result
         
         else: raise UnknownMethodError(method, cls.METHODS)       
-            
-    @staticmethod
-    def xclim_sdba_adjustment(
-        method,
-        method_name: str,
-        obs: xr.core.dataarray.DataArray, 
-        simh: xr.core.dataarray.DataArray, 
-        simp: xr.core.dataarray.DataArray,
-        tslice_adjust: slice=None,
-        n_quantiles: int=100, 
-        kind: str='+', 
-        group: str='time.month', 
-        window: int=1,
-        save_model: bool=False
-    ) -> xr.core.dataarray.DataArray:
-        '''Method to adjust 1 dimensional climate data using the xclim.sdba library
-        
-        Note: This Method should only be called by the method adjust_2d.
-        
-        ----- P A R A M E T E R S -----
-        
-            method (method): adjustment method (once of the xclim.sdba library)
-            method_name (str): Name of the method to use in filename of the model
-    
-            obs (xarray.core.dataarray.DataArray): observed / obserence Data
-            simh (xarray.core.dataarray.DataArray): simulated historical Data
-            simp (xarray.core.dataarray.DataArray): future simulated Data to adjust
-            
-            tslice_adjust (slice): Timespan to adjust, default: None
-            n_quantiles (int): Number of quantiles to involve
-            kind (str): Kind of adjustment ('+' or '*'), default: '+'
-            group (str): Group data by, default: 'time.month'
-            window (int): Grouping window, default: 1
-            
-        ----- R E T U R N -----
-            
-            xarray.core.dataarray.DataArray: Adjusted data 
-                  
-        '''
-        
-        grouper = xc.sdba.Grouper(group=group, window=window) 
-        model = method(obs, simh, nquantiles=n_quantiles, kind=kind, group=grouper)
-        
-        if save_model: model.ds.to_netcdf(f'{method_name}_model_nquantiles-{n_quantiles}_kind-{kind}_group-{group}_window-{window}.nc')
-        if tslice_adjust != None: simp = simp.sel(time=tslice_adjust)
-
-        bias = model.adjust(simp)
-        bias.attrs = simp.attrs
-        
-        return bias 
-    
+                
     @classmethod 
     def grouped_correction(cls,
         method: str,
@@ -458,7 +347,6 @@ class CMethods(object):
         '''
         if group != None: return cls.grouped_correction(method='variance_scaling', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
         else:
-            obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
             LS_simh = cls.linear_scaling(obs, simh, simh)               # Eq. 1
             LS_simp = cls.linear_scaling(obs, simh, simp)               # Eq. 2
 
@@ -544,12 +432,12 @@ class CMethods(object):
 
         if group != None: return cls.grouped_correction(method='quantile_mapping', obs=obs, simh=simh, simp=simp, group=group, n_quantiles=n_quantiles, kind=kind, **kwargs)
         elif kind == '+':
-            # make np.array to achieve higher accuracy (idk why)
+            # create np.array to achieve higher accuracy (idk why)
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
-            # define quantile boundaries (xbins)
+            
             global_max = max(np.amax(obs), np.amax(simh))
-            global_min = min(np.amin(obs), np.amin(simh)) # change to 0.0 if precipitation
-            wide = abs(global_max - global_min) / n_quantiles # change to global_max/n_quantiles if precipitation
+            global_min = min(np.amin(obs), np.amin(simh)) 
+            wide = abs(global_max - global_min) / n_quantiles 
             xbins = np.arange(global_min, global_max + wide, wide)
             
             cdf_obs = cls.get_cdf(obs, xbins)
@@ -557,6 +445,7 @@ class CMethods(object):
             epsilon = np.interp(simp, xbins, cdf_simh)                                 # Eq. 1
             
             return cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)                     # Eq. 1
+            
         elif kind == '*': 
             ''' Inspired by Adrian Tompkins tompkins@ictp.it posted here: 
                 https://www.researchgate.net/post/Does-anyone-know-about-bias-correction-and-quantile-mapping-in-PYTHON
@@ -625,7 +514,7 @@ class CMethods(object):
             https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py
             
         '''
-        raise ValueError('idk if it is allowed to use this so please have a look at:https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py ')
+        raise ValueError('idk if it is allowed to use this so please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py ')
         # if group != None:
         #     return cls.grouped_correction(
         #         method = 'empirical_quantile_mapping', 
@@ -689,7 +578,6 @@ class CMethods(object):
             # calculate exact cdf values of $F_{sim,p}[T_{sim,p}(t)]$
             epsilon = np.interp(simp, xbins, cdf_simp)                            # Eq. 1
             
-            # invert F_{obs,h}
             QDM1 = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)                # Eq. 2
             delta = simp - cls.get_inverse_of_cdf(cdf_simh, epsilon, xbins)       # Eq. 3 
 
@@ -712,7 +600,7 @@ class CMethods(object):
     
     @staticmethod    
     def get_inverse_of_cdf(base_cdf, insert_cdf, xbins) -> np.array:
-        ''' returns the inverse cummulative distribution function of base_cdf ($$F_{base_cdf}\left[insert_cdf\right])$$'''
+        ''' returns the inverse cummulative distribution function of base_cdf ($F_{base_cdf}\left[insert_cdf\right])$'''
         return np.interp(insert_cdf, base_cdf, xbins)
 
     @staticmethod

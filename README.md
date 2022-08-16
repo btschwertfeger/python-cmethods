@@ -1,10 +1,9 @@
 # Bias-Adjustment-Python
 
-Collection of different scale- and distribution-based bias adjustments for climatic research. This methods are part of the bachelor thesis of Benjamin T. Schwertfeger.
-During this thesis, many of these methods have also been implemented in C++.
-This can be found here: [https://github.com/btschwertfeger/Bias-Adjustment-Cpp](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
+Collection of different scale- and distribution-based bias adjustment techniques for climatic research. (see `examples.ipynb` for help)
 
-There is also a Jupyter Notebook that serves as example.
+Bias adjustment procedures in Python are very slow, so they should not be used on large data sets.
+A C++ Implementation that works way faster can be found here: [https://github.com/btschwertfeger/Bias-Adjustment-Cpp](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
 ____
 ## Run adjustment:
 ```bash
@@ -27,14 +26,6 @@ ____
 |Delta Method|delta_method|
 |Quantile Mapping|quantile_mapping|
 |Quantile Delta Mapping|quantile_delta_mapping|
-
-## Methods adapted from [xclim](https://xclim.readthedocs.io/en/stable/sdba.html):
-|Method| `--method` parameter|
-|-----|-----|
-|Empirical Quantile Mapping|xclim_eqm|
-|Detrended Quantile Mapping|xclim_dqm|
-|Quantile Delta Mapping|xclime_qdm|
-
 
 ____
 # Notes:

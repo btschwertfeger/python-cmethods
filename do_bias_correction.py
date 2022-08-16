@@ -11,7 +11,7 @@ import argparse
 import logging, sys
 import xarray as xr
 
-from CMethods import CMethods
+from cmethods.CMethods import CMethods
 
 # * ----- L O G G I N G -----
 formatter = logging.Formatter(
