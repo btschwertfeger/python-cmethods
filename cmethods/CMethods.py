@@ -423,7 +423,8 @@ class CMethods(object):
                 Add (+):
                     (1.) X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h} \left\{F_{sim,h}\left[X_{sim,p}(i)\right]\right\}
                 Mult (*):
-                    maybe the same
+                    (1.) --//--
+
                 ----- R E F E R E N C E S -----
                 
                 Multiplicative implementeation by 'deleted profile' OR Adrian Tompkins tompkins@ictp.it, posted on November 8, 2016 at 
@@ -442,15 +443,12 @@ class CMethods(object):
             
             cdf_obs = cls.get_cdf(obs, xbins)
             cdf_simh = cls.get_cdf(simh, xbins)
-            epsilon = np.interp(simp, xbins, cdf_simh)                                 # Eq. 1
-            
+            epsilon = np.interp(simp, xbins, cdf_simh)                                 # Eq. 1            
             return cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)                     # Eq. 1
-            
+
         elif kind == '*': 
             ''' Inspired by Adrian Tompkins tompkins@ictp.it posted here: 
                 https://www.researchgate.net/post/Does-anyone-know-about-bias-correction-and-quantile-mapping-in-PYTHON
-                - note that values exceeding the range of the training set
-                  are set to -999 at the moment - possibly could leave unchanged?
             '''
 
             obs, simh, simp = np.sort(obs), np.sort(simh), np.array(simp)
@@ -545,27 +543,38 @@ class CMethods(object):
             ------ E Q U A T I O N S -----
             
             Add (+):
-                (1) \varepsilon(i) = F_{sim,p}\left[X_{sim,p}(i)\right], \hspace{1em} \varepsilon(i)\in\{0,1\}
+                (1.1) \varepsilon(i) = F_{sim,p}\left[X_{sim,p}(i)\right], \hspace{1em} \varepsilon(i)\in\{0,1\}
 
-                (2) X^{QDM(1)}_{sim,p}(i) = F^{-1}_{obs,h}\left[\varepsilon(i)\right]
+                (1.2) X^{QDM(1)}_{sim,p}(i) = F^{-1}_{obs,h}\left[\varepsilon(i)\right]
 
-                (3) \Delta(i) & = F^{-1}_{sim,p}\left[\varepsilon(i)\right] - F^{-1}_{sim,h}\left[\varepsilon(i)\right] \\[1pt]
+                (1.3) \Delta(i) & = F^{-1}_{sim,p}\left[\varepsilon(i)\right] - F^{-1}_{sim,h}\left[\varepsilon(i)\right] \\[1pt]
                               & = X_{sim,p}(i) - F^{-1}_{sim,h}\left\{F^{}_{sim,p}\left[X_{sim,p}(i)\right]\right\}
 
-                (4) X^{*QDM}_{sim,p}(i) = X^{QDM(1)}_{sim,p}(i) + \Delta(i)
+                (1.4) X^{*QDM}_{sim,p}(i) = X^{QDM(1)}_{sim,p}(i) + \Delta(i)
             
             Mult (*):
+                (1.1) --//--
+
+                (1.2) --//--
+
+                (2.3) \Delta(i) & = \frac{ F^{-1}_{sim,p}\left[\varepsilon(i)\right] }{ F^{-1}_{sim,h}\left[\varepsilon(i)\right] } \\[1pt]
+                              & = \frac{ X_{sim,p}(i) }{ F^{-1}_{sim,h}\left\{F^{}_{sim,p}\left[X_{sim,p}(i)\right]\right\} }
+
+                (2.4) X^{*QDM}_{sim,p}(i) = X^{QDM(1)}_{sim,p}(i) \cdot \Delta(i)
 
             ----- R E F E R E N C E S -----
                 Tong, Y., Gao, X., Han, Z. et al. Bias correction of temperature and precipitation over China for RCM simulations using the QM and QDM methods. Clim Dyn 57, 1425–1443 (2021). 
                 https://doi.org/10.1007/s00382-020-05447-4
+
+            ----- N O T E S -----
+
+            @param global_min: float | this parameter can be set when kind == '*' to define a custom lower limit. Otherwise 0.0 is used.
             
         '''
         
         if group != None: return cls.grouped_correction(method='quantile_delta_mapping', obs=obs, simh=simh, simp=simp, group=group, n_quantiles=n_quantiles, kind=kind, **kwargs)
         elif kind == '+':
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp) # to achieve higher accuracy
-
             global_max = max(np.amax(obs), np.amax(simh))
             global_min = min(np.amin(obs), np.amin(simh))
             wide = abs(global_max - global_min) / n_quantiles    
@@ -576,14 +585,27 @@ class CMethods(object):
             cdf_simp = cls.get_cdf(simp, xbins)                                 
 
             # calculate exact cdf values of $F_{sim,p}[T_{sim,p}(t)]$
-            epsilon = np.interp(simp, xbins, cdf_simp)                            # Eq. 1
-            
-            QDM1 = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)                # Eq. 2
-            delta = simp - cls.get_inverse_of_cdf(cdf_simh, epsilon, xbins)       # Eq. 3 
+            epsilon = np.interp(simp, xbins, cdf_simp)                            # Eq. 1.1            
+            QDM1 = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)                # Eq. 1.2
+            delta = simp - cls.get_inverse_of_cdf(cdf_simh, epsilon, xbins)       # Eq. 1.3
+            return QDM1 + delta                                                   # Eq. 1.4
 
-            return QDM1 + delta                                                   # Eq. 4
-        elif kind == '*': raise ValueError('Only "+" is implemented!')
-        else: raise ValueError('Only "+" is implemented!')
+        elif kind == '*': 
+            obs, simh, simp = np.array(obs), np.array(simh), np.array(simp) 
+            global_max = max(np.amax(obs), np.amax(simh))
+            wide = global_max / n_quantiles    
+            xbins = np.arange(kwargs.get('global_min', 0.0), global_max + wide, wide)
+
+            cdf_obs = cls.get_cdf(obs,xbins) 
+            cdf_simh = cls.get_cdf(simh,xbins)
+            cdf_simp = cls.get_cdf(simp, xbins)           
+
+            epsilon = np.interp(simp, xbins, cdf_simp)                            # Eq. 1.1
+            QDM1 = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)                # Eq. 1.2
+            delta = simp / cls.get_inverse_of_cdf(cdf_simh, epsilon, xbins)       # Eq. 2.3
+            return QDM1 * delta                                                   # Eq. 2.4
+            
+        else: raise ValueError(f'Unknown kind {kind}!')
             
     # * -----========= G E N E R A L  =========------ 
     @staticmethod
