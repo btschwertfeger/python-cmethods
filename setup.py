@@ -17,7 +17,7 @@ VERSION = None
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-   'xarray', 'numpy', 'tqdm' # <- always conflicts on install
+   'xarray', 'tqdm' # <- always conflicts on install with tqdm
 ]
 
 # What packages are optional?
@@ -27,8 +27,7 @@ EXTRAS = {
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-# Import the README and use it as the long-description.
-# Note: this will only work if 'README.md' is present in your MANIFEST.in file!
+# only works if 'README.md' is present in your MANIFEST.in file!
 try:
     with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
         long_description = f'\n{f.read()}'
@@ -72,11 +71,6 @@ class UploadCommand(Command):
 
         self.status('Uploading the package to PyPI via Twine…')
         os.system('twine upload dist/*')
-
-        # self.status('Pushing git tags…')
-        # os.system(f'git tag v{about["__version__"]}')
-        # os.system('git push --tags')
-
         sys.exit()
 
 class TestUploadCommand(Command):
@@ -106,7 +100,7 @@ class TestUploadCommand(Command):
         os.system(f'{sys.executable} setup.py sdist bdist_wheel --universal')
 
         self.status('Uploading the package to PyPI via Twine…')
-        os.system('twine upload -r testpypi dist/*')#--repository-url https://test.pypi.org/legacy/ dist/*')
+        os.system('twine upload -r testpypi dist/*')
 
         sys.exit()
 
@@ -121,12 +115,6 @@ setup(
     python_requires=REQUIRES_PYTHON,
     url=URL,
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
-    # If your package is a single module, use this instead of 'packages':
-    # py_modules=['mypackage'],
-
-    # entry_points={
-    #     'console_scripts': ['mycli=mymodule:cli'],
-    # },
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,

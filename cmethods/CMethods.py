@@ -433,18 +433,35 @@ class CMethods(object):
 
         if group != None: return cls.grouped_correction(method='quantile_mapping', obs=obs, simh=simh, simp=simp, group=group, n_quantiles=n_quantiles, kind=kind, **kwargs)
         elif kind == '+':
-            # create np.array to achieve higher accuracy (idk why)
+            res = simp.copy(deep=True)
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
-            
+    
             global_max = max(np.amax(obs), np.amax(simh))
             global_min = min(np.amin(obs), np.amin(simh)) 
             wide = abs(global_max - global_min) / n_quantiles 
             xbins = np.arange(global_min, global_max + wide, wide)
-            
+
             cdf_obs = cls.get_cdf(obs, xbins)
-            cdf_simh = cls.get_cdf(simh, xbins)
-            epsilon = np.interp(simp, xbins, cdf_simh)                                 # Eq. 1            
-            return cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)                     # Eq. 1
+            cdf_simh = cls.get_cdf(simh, xbins)            
+            
+            if kwargs.get('detrended', False):    
+                '''detrended => shift mean of $T_{sim,p}$ to range of $T_{sim,h}$ to adjust extremes'''
+                for month, idxs in res.groupby('time.month').groups.items():
+                    m_simh, m_simp = [], []
+                    for idx in idxs:
+                        m_simh.append(simh[idx])
+                        m_simp.append(simp[idx])
+                    
+                    m_simh_mean = np.nanmean(m_simh)     
+                    m_simp_mean = np.nanmean(m_simp) 
+
+                    epsilon = np.interp((m_simp - m_simp_mean) + m_simh_mean, xbins, cdf_simh)
+                    X = (cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins) + m_simp_mean) - m_simh_mean
+                    for i, idx in enumerate(idxs): res.values[idx] = X[i]
+            else:    
+                epsilon = np.interp(simp, xbins, cdf_simh)                                  # Eq. 1            
+                res.values = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)                # Eq. 1      
+            return res
 
         elif kind == '*': 
             ''' Inspired by Adrian Tompkins tompkins@ictp.it posted here: 

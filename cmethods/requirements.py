@@ -1,4 +1,3 @@
 xarray
 numpy
 tqdm
-matplotlib
