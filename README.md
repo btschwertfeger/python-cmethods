@@ -1,5 +1,7 @@
 # Bias-Adjustment-Python
-
+[![Generic badge](https://img.shields.io/badge/license-MIT-green.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/python-3.7+-blue.svg)](https://shields.io/)
+[![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/btschwertfeger/Bias-Adjustment-Python)
 Collection of different scale- and distribution-based bias adjustment techniques for climatic research. (see `examples.ipynb` for help)
 
 Bias adjustment procedures in Python are very slow, so they should not be used on large data sets.

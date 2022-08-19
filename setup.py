@@ -17,12 +17,12 @@ VERSION = None
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-   'xarray', 'tqdm' # <- always conflicts on install with tqdm
+   'xarray', 'numpy', 'tqdm' # <- always conflicts on install with tqdm
 ]
 
 # What packages are optional?
 EXTRAS = {
-    # 'fancy feature': ['django'],
+    'working examples notebook': ['matplotlib'],
 }
 
 here = os.path.abspath(os.path.dirname(__file__))
