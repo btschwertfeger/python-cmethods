@@ -74,11 +74,9 @@ class CMethods(object):
         obs: xr.core.dataarray.DataArray, 
         simh: xr.core.dataarray.DataArray, 
         simp: xr.core.dataarray.DataArray,
-        tslice_adjust: slice=None,
         n_quantiles: int=100, 
         kind: str='+', 
         group: str=None, 
-        window: int=1,
         n_jobs: int=1,
         **kwargs
     ) -> xr.core.dataarray.Dataset:
@@ -94,11 +92,9 @@ class CMethods(object):
             simh (xarray.core.dataarray.DataArray): simulated historical Data
             simp (xarray.core.dataarray.DataArray): future simulated Data to adjust
             
-            tslice_adjust (slice): Timespan to adjust, default: None
             n_quantiles (int): Number of quantiles to involve
             kind (str): Kind of adjustment ('+' or '*'), default: '+' (always use '+' for temperature)
             group (str): Group data by (e.g.: 'time.month', 'time.dayofyear')
-            window (int): Grouping window, default: 1
             n_jobs (int): Use n processes, default: 1
             
         ----- R E T U R N -----
@@ -116,7 +112,6 @@ class CMethods(object):
                 obs = obs[variable], 
                 simh = simh[variable], 
                 simp = simp[variable], 
-                tslice_adjust = slice('2071-01-01', '2100-12-31'),
                 n_quantiles = 100, 
                 group = 'time.month', 
                 n_jobs = 4
@@ -171,11 +166,9 @@ class CMethods(object):
         obs = params['obs']
         simh = params['simh']
         simp = params['simp']
-        tslice_adjust = params.get('tslice_adjust', None) 
         n_quantiles = params.get('n_quantiles', 100)
         kind = params.get('kind', '+')
         group = params.get('group', None)
-        window = params.get('window', 1)
         save_model = params.get('save_model', None)
         kwargs = params.get('kwargs', {})
         
@@ -208,7 +201,7 @@ class CMethods(object):
         '''Method to adjust 1 dimensional climate data while respecting adjustment groups.
         
         ----- P A R A M E T E R S -----
-    
+            method (str): adjustment method name
             obs (xarray.core.dataarray.DataArray): observed / obserence Data
             simh (xarray.core.dataarray.DataArray): simulated historical Data
             simp (xarray.core.dataarray.DataArray): future simulated Data
@@ -256,7 +249,7 @@ class CMethods(object):
             simh (xarray.core.dataarray.DataArray): simulated historical Data
             simp (xarray.core.dataarray.DataArray): future simulated Data
             group (str): [optional] Group / Period (e.g.: 'time.month')
-            method (str): '+' or '*', default: '+'
+            kind (str): '+' or '*', default: '+'
             
         ----- R E T U R N -----
             
@@ -313,6 +306,7 @@ class CMethods(object):
             simh (xarray.core.dataarray.DataArray): simulated historical Data
             simp (xarray.core.dataarray.DataArray): future simulated Data
             group (str): [optional] Group / Period (e.g.: 'time.month')
+            kind (str): '+' or '*', default: '+'
             
         ----- R E T U R N -----
             
@@ -375,7 +369,8 @@ class CMethods(object):
             simh (xarray.core.dataarray.DataArray): simulated historical Data
             simp (xarray.core.dataarray.DataArray): future simulated Data
             group (str): [optional] Group / Period (e.g.: 'time.month')
-            
+            kind (str): '+' or '*', default: '+'
+
         ----- R E T U R N -----
             
             xarray.core.dataarray.DataArray: Adjusted data 
@@ -418,17 +413,30 @@ class CMethods(object):
         **kwargs
     ) -> xr.core.dataarray.DataArray:
         ''' Quantile Mapping Bias Correction
-                
-                ------ E Q U A T I O N S -----
-                Add (+):
-                    (1.) X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h} \left\{F_{sim,h}\left[X_{sim,p}(i)\right]\right\}
-                Mult (*):
-                    (1.) --//--
 
-                ----- R E F E R E N C E S -----
-                
-                Multiplicative implementeation by 'deleted profile' OR Adrian Tompkins tompkins@ictp.it, posted on November 8, 2016 at 
-                https://www.researchgate.net/post/Does-anyone-know-about-bias-correction-and-quantile-mapping-in-PYTHON
+        ----- P A R A M E T E R S -----
+    
+            obs (xarray.core.dataarray.DataArray): observed / obserence Data
+            simh (xarray.core.dataarray.DataArray): simulated historical Data
+            simp (xarray.core.dataarray.DataArray): future simulated Data
+            n_quantiles (int): number of quantiles to use 
+            group (str): [optional] Group / Period (e.g.: 'time.month')
+            kind (str): '+' or '*', default: '+'
+
+        ----- R E T U R N -----
+            
+        xarray.core.dataarray.DataArray: Adjusted data 
+            
+        ------ E Q U A T I O N S -----
+            Add (+):
+                (1.) X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h} \left\{F_{sim,h}\left[X_{sim,p}(i)\right]\right\}
+            Mult (*):
+                (1.) --//--
+
+        ----- R E F E R E N C E S -----
+        
+            Multiplicative implementeation by 'deleted profile' OR Adrian Tompkins tompkins@ictp.it, posted on November 8, 2016 at 
+            https://www.researchgate.net/post/Does-anyone-know-about-bias-correction-and-quantile-mapping-in-PYTHON
         '''
 
         if group != None: return cls.grouped_correction(method='quantile_mapping', obs=obs, simh=simh, simp=simp, group=group, n_quantiles=n_quantiles, kind=kind, **kwargs)
@@ -556,16 +564,29 @@ class CMethods(object):
         **kwargs
     ) -> xr.core.dataarray.DataArray:
         ''' Quantile Delta Mapping bias adjustment
-               
-            ------ E Q U A T I O N S -----
+        
+        ----- P A R A M E T E R S -----
+    
+            obs (xarray.core.dataarray.DataArray): observed / obserence Data
+            simh (xarray.core.dataarray.DataArray): simulated historical Data
+            simp (xarray.core.dataarray.DataArray): future simulated Data
+            n_quantiles (int): number of quantiles to use 
+            group (str): [optional] Group / Period (e.g.: 'time.month')
+            kind (str): '+' or '*', default: '+'
+
+        ----- R E T U R N -----
             
+            xarray.core.dataarray.DataArray: Adjusted data 
+
+        ------ E Q U A T I O N S -----
+        
             Add (+):
                 (1.1) \varepsilon(i) = F_{sim,p}\left[X_{sim,p}(i)\right], \hspace{1em} \varepsilon(i)\in\{0,1\}
 
                 (1.2) X^{QDM(1)}_{sim,p}(i) = F^{-1}_{obs,h}\left[\varepsilon(i)\right]
 
                 (1.3) \Delta(i) & = F^{-1}_{sim,p}\left[\varepsilon(i)\right] - F^{-1}_{sim,h}\left[\varepsilon(i)\right] \\[1pt]
-                              & = X_{sim,p}(i) - F^{-1}_{sim,h}\left\{F^{}_{sim,p}\left[X_{sim,p}(i)\right]\right\}
+                                & = X_{sim,p}(i) - F^{-1}_{sim,h}\left\{F^{}_{sim,p}\left[X_{sim,p}(i)\right]\right\}
 
                 (1.4) X^{*QDM}_{sim,p}(i) = X^{QDM(1)}_{sim,p}(i) + \Delta(i)
             
@@ -575,17 +596,17 @@ class CMethods(object):
                 (1.2) --//--
 
                 (2.3) \Delta(i) & = \frac{ F^{-1}_{sim,p}\left[\varepsilon(i)\right] }{ F^{-1}_{sim,h}\left[\varepsilon(i)\right] } \\[1pt]
-                              & = \frac{ X_{sim,p}(i) }{ F^{-1}_{sim,h}\left\{F^{}_{sim,p}\left[X_{sim,p}(i)\right]\right\} }
+                                & = \frac{ X_{sim,p}(i) }{ F^{-1}_{sim,h}\left\{F^{}_{sim,p}\left[X_{sim,p}(i)\right]\right\} }
 
                 (2.4) X^{*QDM}_{sim,p}(i) = X^{QDM(1)}_{sim,p}(i) \cdot \Delta(i)
 
-            ----- R E F E R E N C E S -----
-                Tong, Y., Gao, X., Han, Z. et al. Bias correction of temperature and precipitation over China for RCM simulations using the QM and QDM methods. Clim Dyn 57, 1425–1443 (2021). 
-                https://doi.org/10.1007/s00382-020-05447-4
+        ----- R E F E R E N C E S -----
+            Tong, Y., Gao, X., Han, Z. et al. Bias correction of temperature and precipitation over China for RCM simulations using the QM and QDM methods. Clim Dyn 57, 1425–1443 (2021). 
+            https://doi.org/10.1007/s00382-020-05447-4
 
-            ----- N O T E S -----
+        ----- N O T E S -----
 
-            @param global_min: float | this parameter can be set when kind == '*' to define a custom lower limit. Otherwise 0.0 is used.
+        @param global_min: float | this parameter can be set when kind == '*' to define a custom lower limit. Otherwise 0.0 is used.
             
         '''
         

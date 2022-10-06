@@ -13,7 +13,7 @@ A C++ implementation that works way faster can be found here: [https://github.co
 - Linear Scaling
 - Variance Scaling 
 - Delta (Change) Method
-- Quantile Mapping
+- Quantile and Detrended Quantile Mapping
 - Quantile Delta Mapping
 ____
 ## Usage
@@ -39,7 +39,7 @@ ls_result = cm.linear_scaling(
     kind = '+' # *
 )
 
-qdm_result = cm.adjust_2d(
+qdm_result = cm.adjust_2d( # 2d = 2 spatial and 1 time dimension
     method = 'quantile_delta_mapping',
     obs = obsh['tas'],
     simh = simh['tas'],
@@ -55,7 +55,7 @@ ____
 
 `/examples/examples.ipynb`: Notebook containing different methods and plots
 
-`/examples/do_bias_correctino.py`: Example script for adjusting climate data
+`/examples/do_bias_correction.py`: Example script for adjusting climate data
 ```bash
 python3 do_bias_correction.py   \
     --obs input_data/obs.nc     \
