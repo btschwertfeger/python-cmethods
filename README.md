@@ -47,7 +47,9 @@ qdm_result = cm.adjust_2d( # 2d = 2 spatial and 1 time dimension
     n_quaniles = 1000,
     kind = '+' # *
 )
-# * to calculate the relative rather than the absolute change, '*' can be used instead of '+' (this is prefered when adjusting precipitation)
+# * to calculate the relative rather than the absolute change, 
+# '*' can be used instead of '+' (this is prefered when adjusting
+# ratio based variables like precipitation)
 ```
 
 ____
@@ -69,8 +71,15 @@ python3 do_bias_correction.py   \
 ```
 
 - Linear and variance, as well as delta change method require `--group time.month` as argument.
-- Adjustment methods that apply changes in distributional biasses (QM. QDM, DQM; EQM, ...) need the `--nquantiles` argument set to some integer.
+- Adjustment methods that apply changes in distributional biasses (QM, QDM, DQM; EQM, ...) need the `--nquantiles` argument set to some integer.
 - Data sets should have the same spatial resolutions.
 ____
 ## Notes:
 - Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to the C++ implementation mentioned above.
+
+## Equation references
+
+- Linear Scaling and Variance Scaling based on: Teutschbein, Claudia and Seibert, Jan (2012) Bias correction of regional climate model simulations for hydrological climate-change impact studies: Review and evaluation of different methods (https://doi.org/10.1016/j.jhydrol.2012.05.052)
+- Delta Method based on: Beyer, R. and Krapp, M. and Manica, A.: An empirical evaluation of bias correction methods for palaeoclimate simulations (https://doi.org/10.5194/cp-16-1493-2020)
+- Quantile and Detrended Quantile Mapping based on: Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock Bias Correction of GCM Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles and Extremes? (https://doi.org/10.1175/JCLI-D-14-00754.1)
+- Quantile Delta Mapping based on: Tong, Y., Gao, X., Han, Z. et al. Bias correction of temperature and precipitation over China for RCM simulations using the QM and QDM methods. Clim Dyn 57, 1425–1443 (2021). (https://doi.org/10.1007/s00382-020-05447-4)
