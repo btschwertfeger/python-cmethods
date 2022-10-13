@@ -32,7 +32,6 @@ simh = xr.open_dataset('input_data/contr.nc')
 simp = xr.open_dataset('input_data/scen.nc')
 
 ls_result = cm.linear_scaling(
-    method = 'quantile_delta_mapping',
     obs = obsh['tas'][:,0,0],
     simh = simh['tas'][:,0,0],
     simp = simp['tas'][:,0,0],
@@ -77,8 +76,8 @@ ____
 ## Notes:
 - Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to the C++ implementation mentioned above.
 
-## Equation references
-
+## References
+- Schwertfeger, Benjamin Thomas (2022) The influence of bias corrections on variability, distribution, and correlation of temperatures in comparison to observed and modeled climate data in Europe (https://epic.awi.de/id/eprint/56689/)
 - Linear Scaling and Variance Scaling based on: Teutschbein, Claudia and Seibert, Jan (2012) Bias correction of regional climate model simulations for hydrological climate-change impact studies: Review and evaluation of different methods (https://doi.org/10.1016/j.jhydrol.2012.05.052)
 - Delta Method based on: Beyer, R. and Krapp, M. and Manica, A.: An empirical evaluation of bias correction methods for palaeoclimate simulations (https://doi.org/10.5194/cp-16-1493-2020)
 - Quantile and Detrended Quantile Mapping based on: Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock Bias Correction of GCM Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles and Extremes? (https://doi.org/10.1175/JCLI-D-14-00754.1)
