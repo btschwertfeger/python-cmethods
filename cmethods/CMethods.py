@@ -44,10 +44,9 @@ class CMethods(object):
         def __init__(self, method: str, available_methods: list):
             super().__init__(f'Unknown method "{method}"! Available methods: {available_methods}')
 
-    CUSTOM_METHODS = [
-        'linear_scaling', 'variance_scaling', 'delta_method',
-        'quantile_mapping', 'quantile_delta_mapping'
-    ]
+    SCALING_METHODS = ['linear_scaling', 'variance_scaling', 'delta_method']
+    DISTRIBUTION_METHODS = ['quantile_mapping', 'quantile_delta_mapping']
+    CUSTOM_METHODS = SCALING_METHODS + DISTRIBUTION_METHODS
     METHODS = CUSTOM_METHODS #+ XCLIM_SDBA_METHODS
 
     def __init__(self):
@@ -122,6 +121,8 @@ class CMethods(object):
         simh = simh.transpose('lat', 'lon', 'time')
         simp = simp.transpose('lat', 'lon', 'time')
 
+        if group == None and method in SCALING_METHODS: group = 'time.month'
+
         result = simp.copy(deep=True).load()
         len_lat, len_lon = len(obs.lat), len(obs.lon)
 
@@ -169,7 +170,6 @@ class CMethods(object):
         n_quantiles = params.get('n_quantiles', 100)
         kind = params.get('kind', '+')
         group = params.get('group', None)
-        save_model = params.get('save_model', None)
         kwargs = params.get('kwargs', {})
 
         result = simp.copy(deep=True).load()
@@ -393,7 +393,7 @@ class CMethods(object):
         ----- R E F E R E N C E S -----
             Beyer, R. and Krapp, M. and Manica, A.: An empirical evaluation of bias correction methods for palaeoclimate simulations (https://doi.org/10.5194/cp-16-1493-2020)
 
-            and 
+            and
             https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py
 
         '''
@@ -435,67 +435,65 @@ class CMethods(object):
             Add (+):
                 (1.) X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h} \left\{F_{sim,h}\left[X_{sim,p}(i)\right]\right\}
             Mult (*):
-                (1.) --//--
+                (2.) X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h}
+                        \Biggl\{
+                            F_{sim,h}\left[
+                                \frac{
+                                    \mu{X_{sim,h}} \mu{X_{sim,p}(i)}
+                                }{
+                                    \mu{X_{sim,p}(i)}
+                                }
+                            \right]
+                        \Biggr\}
+                        \frac{
+                            \mu{X_{sim,p}(i)}
+                        }{
+                            \mu{X_{sim,h}}
+                        }  
 
         ----- R E F E R E N C E S -----
             Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock Bias Correction of GCM Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles and Extremes?
             https://doi.org/10.1175/JCLI-D-14-00754.1)
-            and 
-            'deleted profile' OR Adrian Tompkins tompkins@ictp.it, posted on November 8, 2016 at
-            https://www.researchgate.net/post/Does-anyone-know-about-bias-correction-and-quantile-mapping-in-PYTHON
         '''
 
         if group != None: return cls.grouped_correction(method='quantile_mapping', obs=obs, simh=simh, simp=simp, group=group, n_quantiles=n_quantiles, kind=kind, **kwargs)
-        elif kind == '+':
-            res = simp.copy(deep=True)
-            obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
+        res = simp.copy(deep=True)
+        obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
 
-            global_max = max(np.amax(obs), np.amax(simh))
-            global_min = min(np.amin(obs), np.amin(simh))
-            wide = abs(global_max - global_min) / n_quantiles
-            xbins = np.arange(global_min, global_max + wide, wide)
+        global_max = max(np.amax(obs), np.amax(simh))
+        global_min = min(np.amin(obs), np.amin(simh))
+        wide = abs(global_max - global_min) / n_quantiles
+        xbins = np.arange(global_min, global_max + wide, wide)
 
-            cdf_obs = cls.get_cdf(obs, xbins)
-            cdf_simh = cls.get_cdf(simh, xbins)
+        cdf_obs = cls.get_cdf(obs, xbins)
+        cdf_simh = cls.get_cdf(simh, xbins)
 
-            if kwargs.get('detrended', False):
-                '''detrended => shift mean of $T_{sim,p}$ to range of $T_{sim,h}$ to adjust extremes'''
-                for month, idxs in res.groupby('time.month').groups.items():
-                    m_simh, m_simp = [], []
-                    for idx in idxs:
-                        m_simh.append(simh[idx])
-                        m_simp.append(simp[idx])
-
-                    m_simh_mean = np.nanmean(m_simh)
-                    m_simp_mean = np.nanmean(m_simp)
-
-                    epsilon = np.interp((m_simp - m_simp_mean) + m_simh_mean, xbins, cdf_simh)
-                    X = (cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins) + m_simp_mean) - m_simh_mean
-                    for i, idx in enumerate(idxs): res.values[idx] = X[i]
-            else:
-                epsilon = np.interp(simp, xbins, cdf_simh)                                  # Eq. 1
-                res.values = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)                # Eq. 1
+        if kwargs.get('detrended', False) or kind in [ '*', 'mult' ]:
+            '''detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes'''
+            for month, idxs in res.groupby('time.month').groups.items():
+                m_simh, m_simp = [], []
+                for idx in idxs:
+                    m_simh.append(simh[idx])
+                    m_simp.append(simp[idx])
+                
+                m_simh = np.array(m_simh)
+                m_simp = np.array(m_simp)
+                m_simh_mean = np.nanmean(m_simh)     
+                m_simp_mean = np.nanmean(m_simp) 
+                
+                if kind == '+':
+                    epsilon = np.interp(m_simp - m_simp_mean + m_simh_mean, xbins, cdf_simh)         # Eq. 1     
+                    X = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins) + m_simp_mean - m_simh_mean   # Eq. 1     
+                else: 
+                    epsilon = np.interp((m_simh_mean * m_simp) / m_simp_mean, xbins, cdf_simh, left=.0, right=999.0)    # Eq. 2
+                    X = np.interp(epsilon, cdf_obs, xbins, left=.0, right=999.9) * (m_simp_mean / m_simh_mean)          # Eq. 2
+                    #x = cm.get_inverse_of_cdf(cdf_obs, epsilon, xbins) * (m_simp_mean / m_simh_mean)
+                for i, idx in enumerate(idxs): res.values[idx] = X[i]
             return res
-
-        elif kind == '*':
-            ''' Inspired by Adrian Tompkins tompkins@ictp.it posted here:
-                https://www.researchgate.net/post/Does-anyone-know-about-bias-correction-and-quantile-mapping-in-PYTHON
-            '''
-
-            obs, simh, simp = np.sort(obs), np.sort(simh), np.array(simp)
-            global_max = max(np.amax(obs), np.amax(simh))
-            wide = global_max / n_quantiles
-            xbins = np.arange(0.0, global_max + wide, wide)
-
-            pdf_obs, bins = np.histogram(obs, bins=xbins)
-            pdf_simh, bins = np.histogram(simh, bins=xbins)
-
-            cdf_obs = np.insert(np.cumsum(pdf_obs), 0, 0.0)
-            cdf_simh = np.insert(np.cumsum(pdf_simh), 0, 0.0)
-
-            epsilon = np.interp(simp, xbins, cdf_simh, left=0.0, right=999.0)
-            return np.interp(epsilon, cdf_obs, xbins, left=0.0, right=-999.0)
-
+        elif kind in [ '+', 'add' ]: # additive, no detrend 
+            epsilon = np.interp(simp, xbins, cdf_simh)                                 # Eq. 1            
+            res.values = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)               # Eq. 1      
+            return res
         else: raise ValueError('Not implemented!')
 
     # ? -----========= E M P I R I C A L - Q U A N T I L E - M A P P I N G =========------
@@ -554,9 +552,7 @@ class CMethods(object):
         #         n_quantiles = n_quantiles,
         #         extrapolate = extrapolate
         #     )
-        # else:
-        #     obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
-        #     return corrected
+        # else: pass
 
     # ? -----========= Q U A N T I L E - D E L T A - M A P P I N G =========------
     @classmethod
@@ -638,7 +634,7 @@ class CMethods(object):
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
             global_max = max(np.amax(obs), np.amax(simh))
             wide = global_max / n_quantiles
-            xbins = np.arange(kwargs.get('global_min', 0.0), global_max + wide, wide)
+            xbins = np.arange(kwargs.get('global_min', .0), global_max + wide, wide)
 
             cdf_obs = cls.get_cdf(obs,xbins)
             cdf_simh = cls.get_cdf(simh,xbins)
@@ -672,14 +668,14 @@ class CMethods(object):
     @staticmethod
     def load_data(
         obs_fpath: str,
-        contr_fpath: str,
-        scen_fpath: str,
+        simh_fpath: str,
+        simp_fpath: str,
         use_cftime: bool=False,
         chunks=None
     ) -> (xr.core.dataarray.Dataset, xr.core.dataarray.Dataset, xr.core.dataarray.Dataset):
         '''Load and return loaded netcdf datasets'''
         obs = xr.open_dataset(obs_fpath, use_cftime=use_cftime, chunks=chunks)
-        simh = xr.open_dataset(contr_fpath, use_cftime=use_cftime, chunks=chunks)
-        simp = xr.open_dataset(scen_fpath, use_cftime=use_cftime, chunks=chunks)
+        simh = xr.open_dataset(simh_fpath, use_cftime=use_cftime, chunks=chunks)
+        simp = xr.open_dataset(simp_fpath, use_cftime=use_cftime, chunks=chunks)
 
         return obs, simh, simp

@@ -8,13 +8,15 @@ Collection of different scale- and distribution-based bias adjustment techniques
 
 Bias adjustment procedures in Python are very slow, so they should not be used on large data sets.
 A C++ implementation that works way faster can be found here: [https://github.com/btschwertfeger/Bias-Adjustment-Cpp](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
+____
+## Available methods:
+- Linear Scaling (additive and multiplicative)
+- Variance Scaling (additive)
+- Delta (Change) Method (additive and multiplicative)
+- Quantile Mapping (additive)
+- Detrended Quantile Mapping (additive and multiplicative)
+- Quantile Delta Mapping (additive and multuplicative)
 
-## Available methods
-- Linear Scaling
-- Variance Scaling 
-- Delta (Change) Method
-- Quantile and Detrended Quantile Mapping
-- Quantile Delta Mapping
 ____
 ## Usage
 
@@ -24,6 +26,7 @@ python3 -m pip install python-cmethods
 ```
 ### Import and application
 ```python 
+import xarray as xr
 from cmethods.CMethods import CMethods
 cm = CMethods()
 

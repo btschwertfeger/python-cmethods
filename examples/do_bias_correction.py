@@ -16,7 +16,7 @@ from cmethods.CMethods import CMethods
 # * ----- L O G G I N G -----
 formatter = logging.Formatter(
     fmt='%(asctime)s %(module)s,line: %(lineno)d %(levelname)8s | %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S' 
+    datefmt='%Y-%m-%d %H:%M:%S'
 )
 
 log = logging.getLogger()
@@ -37,7 +37,6 @@ parser.add_argument('-u', '--unit', dest='unit', type=str, default='°C', help='
 
 parser.add_argument('-g', '--group', dest='group', type=str, default=None, help='Value grouping, default: time, (options: time.month, time.dayofyear, time.year')
 parser.add_argument('-k', '--kind', dest='kind', type=str, default='+', help='+ or *, default: +')
-parser.add_argument('-w', '--window', dest='window', type=int, default=1, help='Window of grouping')
 parser.add_argument('-n', '--nquantiles', dest='n_quantiles', type=int, default=100, help='Nr. of Quantiles to use')
 
 parser.add_argument('-p', '--processes', dest='p', type=int, default=1, help='Multiprocessing with n processes, default: 1')
@@ -52,7 +51,6 @@ var = params['var']
 unit = params['unit']
 group = params['group']
 kind = params['kind']
-window = params['window']
 n_quantiles = params['n_quantiles']
 n_jobs = params['p']
 
@@ -75,9 +73,8 @@ def main() -> None:
     end_date: str = ds_simp['time'][-1].dt.strftime('%Y%m%d').values.ravel()[0]
 
     descr1, descr2 = '', ''
-    if method in cm.XCLIM_SDBA_METHODS or method in ['quantile_mapping', 'quantile_delta_mapping']:
+    if method in cm.DISTRIBUTION_METHODS:
         descr1 = f'_quantiles-{n_quantiles}'
-        descr2 = f'_window-{window}'
 
     # ----- Adjustment -----
     log.info(f'Starting {method} adjustment')
@@ -89,7 +86,6 @@ def main() -> None:
         n_quantiles = n_quantiles,
         kind = kind,
         group = group,
-        window = window,
         n_jobs = n_jobs
     )
     log.info('Saving now')
