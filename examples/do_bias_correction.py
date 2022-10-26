@@ -78,7 +78,7 @@ def main() -> None:
 
     # ----- Adjustment -----
     log.info(f'Starting {method} adjustment')
-    result = cm.adjust_2d(
+    result = cm.adjust_3d(
         method = method,
         obs = ds_obs,
         simh = ds_simh,

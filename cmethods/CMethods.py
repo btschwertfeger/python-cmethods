@@ -23,7 +23,7 @@ __description__ = '                                                             
     simp = data to correct (predicted simulated data) ($T_{sim,p}$)                     \
                                                                                         \
                                                                                         \
-    F = Cummulative Distribution Function                                               \
+    F = Cumulative Distribution Function                                               \
     \mu = mean                                                                          \
     \sigma = standard deviation                                                         \
     i = index                                                                           \
@@ -46,8 +46,13 @@ class CMethods(object):
 
     SCALING_METHODS = ['linear_scaling', 'variance_scaling', 'delta_method']
     DISTRIBUTION_METHODS = ['quantile_mapping', 'quantile_delta_mapping']
+    
     CUSTOM_METHODS = SCALING_METHODS + DISTRIBUTION_METHODS
+    
     METHODS = CUSTOM_METHODS #+ XCLIM_SDBA_METHODS
+
+    ADDITIVE = ['+', 'add']
+    MULTIPLICATIVE = ['*', 'mult']
 
     def __init__(self):
         pass
@@ -68,7 +73,7 @@ class CMethods(object):
         else: raise UnknownMethodError(method, cls.METHODS)
 
     @classmethod
-    def adjust_2d(cls,
+    def adjust_3d(cls,
         method: str,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
@@ -104,9 +109,9 @@ class CMethods(object):
             > simh = xarray.open_dataset('path/to/simulated/data.nc')
             > obs = xarray.open_dataset('path/to/observed/data.nc')
             > simp = xarray.open_dataset('path/to/simulated_future/data.nc')
-            > variable = 'temperature'
+            > variable = 'tas'
 
-            > adjusted_data = CMethods().adjust_2d(
+            > adjusted_data = CMethods().adjust_3d(
                 method = 'quantile_delta_mapping',
                 obs = obs[variable],
                 simh = simh[variable],
@@ -121,7 +126,7 @@ class CMethods(object):
         simh = simh.transpose('lat', 'lon', 'time')
         simp = simp.transpose('lat', 'lon', 'time')
 
-        if group == None and method in SCALING_METHODS: group = 'time.month'
+        if group == None and method in cls.SCALING_METHODS: group = 'time.month'
 
         result = simp.copy(deep=True).load()
         len_lat, len_lon = len(obs.lat), len(obs.lon)
@@ -160,7 +165,7 @@ class CMethods(object):
     @classmethod
     def pool_adjust(cls, params) -> xr.core.dataarray.DataArray:
         ''' Adjustment along longitude for one specific latitude
-            used by cls.adjust_2d as callbackfunction for multiprocessing.Pool
+            used by cls.adjust_3d as callbackfunction for multiprocessing.Pool
         '''
 
         method = params['method']
@@ -249,7 +254,7 @@ class CMethods(object):
             simh (xarray.core.dataarray.DataArray): simulated historical Data
             simp (xarray.core.dataarray.DataArray): future simulated Data
             group (str): [optional] Group / Period (e.g.: 'time.month')
-            kind (str): '+' or '*', default: '+'
+            kind (str): [optional] '+' or '*', default: '+'
 
         ----- R E T U R N -----
 
@@ -259,13 +264,13 @@ class CMethods(object):
             > obs = xarray.open_dataset('path/to/observed/data.nc')
             > simh = xarray.open_dataset('path/to/simulated/data.nc')
             > simp = xarray.open_dataset('path/to/predicted/data.nc')
-            > variable = 'temperature'
+            > variable = 'tas'
 
             > result = CMethods().linear_scaling(
             >    obs=obs[variable],
             >    simh=simh[variable],
             >    simp=simp[variable],
-            >    group='time.month'
+            >    group='time.month' # optional
             >)
 
         ----- E Q U A T I O N S -----
@@ -281,11 +286,10 @@ class CMethods(object):
             https://doi.org/10.1016/j.jhydrol.2012.05.052
 
         '''
-
         if group != None: return cls.grouped_correction(method='linear_scaling', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
         else:
-            if kind == '+': return np.array(simp) + (np.nanmean(obs) - np.nanmean(simh)) # Eq. 1
-            elif kind == '*': return np.array(simp) * (np.nanmean(obs) / np.nanmean(simh)) # Eq. 2
+            if kind in cls.ADDITIVE: return np.array(simp) + (np.nanmean(obs) - np.nanmean(simh)) # Eq. 1
+            elif kind in cls.MULTIPLICATIVE: return np.array(simp) * (np.nanmean(obs) / np.nanmean(simh)) # Eq. 2
             else: raise ValueError('Scaling type invalid. Valid options for param kind: "+" and "*"')
 
     # ? -----========= V A R I A N C E - S C A L I N G =========------
@@ -306,7 +310,7 @@ class CMethods(object):
             simh (xarray.core.dataarray.DataArray): simulated historical Data
             simp (xarray.core.dataarray.DataArray): future simulated Data
             group (str): [optional] Group / Period (e.g.: 'time.month')
-            kind (str): '+' or '*', default: '+'
+            kind (str): '+' or '*', default: '+' # '*' is not implemented
 
         ----- R E T U R N -----
 
@@ -316,7 +320,7 @@ class CMethods(object):
             > obs = xarray.open_dataset('path/to/observed/data.nc')
             > simh = xarray.open_dataset('path/to/simulated/data.nc')
             > simp = xarray.open_dataset('path/to/predicted/data.nc')
-            > variable = 'temperature'
+            > variable = 'tas'
 
             > result = CMethods().variance_scaling(obs=obs[variable], simh=simh[variable], simp=simp[variable] group='time.dayofyear')
 
@@ -341,8 +345,8 @@ class CMethods(object):
         '''
         if group != None: return cls.grouped_correction(method='variance_scaling', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
         else:
-            LS_simh = cls.linear_scaling(obs, simh, simh)               # Eq. 1
-            LS_simp = cls.linear_scaling(obs, simh, simp)               # Eq. 2
+            LS_simh = cls.linear_scaling(obs, simh, simh, group=None)   # Eq. 1
+            LS_simp = cls.linear_scaling(obs, simh, simp, group=None)   # Eq. 2
 
             VS_1_simh = LS_simh - np.nanmean(LS_simh)                   # Eq. 3
             VS_1_simp = LS_simp - np.nanmean(LS_simp)                   # Eq. 4
@@ -379,7 +383,7 @@ class CMethods(object):
             > obs = xarray.open_dataset('path/to/observed/data.nc')
             > simh = xarray.open_dataset('path/to/simulated/data.nc')
             > simp = xarray.open_dataset('path/to/predicted/data.nc')
-            > variable = 'temperature'
+            > variable = 'tas'
 
             > result = CMethods().delta_method(obs=obs[variable], simh=simh[variable], group='time.month')
 
@@ -399,8 +403,8 @@ class CMethods(object):
         '''
         if group != None: return cls.grouped_correction(method='delta_method', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
         else:
-            if kind == '+': return np.array(obs) + (np.nanmean(simp) - np.nanmean(simh))     # Eq. 1
-            elif kind == '*': return np.array(obs) * (np.nanmean(simp) / np.nanmean(simh))   # Eq. 2
+            if kind in cls.ADDITIVE: return np.array(obs) + (np.nanmean(simp) - np.nanmean(simh))     # Eq. 1
+            elif kind in cls.MULTIPLICATIVE: return np.array(obs) * (np.nanmean(simp) / np.nanmean(simh))   # Eq. 2
             else: raise ValueError(f'{kind} not implemented! Use "+" or "*" instead.')
 
 
@@ -468,7 +472,7 @@ class CMethods(object):
         cdf_obs = cls.get_cdf(obs, xbins)
         cdf_simh = cls.get_cdf(simh, xbins)
 
-        if kwargs.get('detrended', False) or kind in [ '*', 'mult' ]:
+        if kwargs.get('detrended', False) or kind in cls.MULTIPLICATIVE:
             '''detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes'''
             for month, idxs in res.groupby('time.month').groups.items():
                 m_simh, m_simp = [], []
@@ -481,7 +485,7 @@ class CMethods(object):
                 m_simh_mean = np.nanmean(m_simh)     
                 m_simp_mean = np.nanmean(m_simp) 
                 
-                if kind == '+':
+                if kind in cls.ADDITIVE:
                     epsilon = np.interp(m_simp - m_simp_mean + m_simh_mean, xbins, cdf_simh)         # Eq. 1     
                     X = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins) + m_simp_mean - m_simh_mean   # Eq. 1     
                 else: 
@@ -490,7 +494,7 @@ class CMethods(object):
                     #x = cm.get_inverse_of_cdf(cdf_obs, epsilon, xbins) * (m_simp_mean / m_simh_mean)
                 for i, idx in enumerate(idxs): res.values[idx] = X[i]
             return res
-        elif kind in [ '+', 'add' ]: # additive, no detrend 
+        elif kind in cls.ADDITIVE: # additive, no detrend 
             epsilon = np.interp(simp, xbins, cdf_simh)                                 # Eq. 1            
             res.values = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)               # Eq. 1      
             return res
@@ -527,7 +531,7 @@ class CMethods(object):
             > obs = xarray.open_dataset('path/to/observed/data.nc')
             > simh = xarray.open_dataset('path/to/simulated/data.nc')
             > simp = xarray.open_dataset('path/to/future/data.nc')
-            > variable = 'temperature'
+            > variable = 'tas'
             > result = CMethods().empirical_quantile_mapping(
             >    obs=obs[variable],
             >    simh=simh[variable],
@@ -613,7 +617,8 @@ class CMethods(object):
         '''
 
         if group != None: return cls.grouped_correction(method='quantile_delta_mapping', obs=obs, simh=simh, simp=simp, group=group, n_quantiles=n_quantiles, kind=kind, **kwargs)
-        elif kind == '+':
+        elif kind in cls.ADDITIVE:
+            res = simp.copy(deep=True)
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp) # to achieve higher accuracy
             global_max = max(np.amax(obs), np.amax(simh))
             global_min = min(np.amin(obs), np.amin(simh))
@@ -628,9 +633,11 @@ class CMethods(object):
             epsilon = np.interp(simp, xbins, cdf_simp)                            # Eq. 1.1
             QDM1 = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)                # Eq. 1.2
             delta = simp - cls.get_inverse_of_cdf(cdf_simh, epsilon, xbins)       # Eq. 1.3
-            return QDM1 + delta                                                   # Eq. 1.4
+            res.values = QDM1 + delta                                             # Eq. 1.4
+            return res
 
-        elif kind == '*':
+        elif kind in cls.MULTIPLICATIVE:
+            res = simp.copy(deep=True)
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
             global_max = max(np.amax(obs), np.amax(simh))
             wide = global_max / n_quantiles
@@ -643,8 +650,8 @@ class CMethods(object):
             epsilon = np.interp(simp, xbins, cdf_simp)                            # Eq. 1.1
             QDM1 = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)                # Eq. 1.2
             delta = simp / cls.get_inverse_of_cdf(cdf_simh, epsilon, xbins)       # Eq. 2.3
-            return QDM1 * delta                                                   # Eq. 2.4
-
+            res.values = QDM1 * delta                                             # Eq. 2.4
+            return res
         else: raise ValueError(f'Unknown kind {kind}!')
 
     # * -----========= G E N E R A L  =========------

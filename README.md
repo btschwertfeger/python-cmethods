@@ -1,15 +1,23 @@
 # Bias-Adjustment-Python
 
-[![Generic badge](https://img.shields.io/badge/license-MIT-green.svg)](https://shields.io/)
-[![Generic badge](https://img.shields.io/badge/python-3.7+-blue.svg)](https://shields.io/)
-[![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/btschwertfeger/Bias-Adjustment-Python)
+<div style="text-align: center">
 
+[![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/btschwertfeger/Bias-Adjustment-Python)
+[![Generic badge](https://img.shields.io/badge/python-3.7+-blue.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/license-MIT-green.svg)](https://shields.io/)
+[![Downloads](https://pepy.tech/badge/python-cmethods)](https://pepy.tech/project/python-cmethods)
+[![Downloads](https://pepy.tech/badge/python-cmethods/month)](https://pepy.tech/project/python-cmethods)
+
+</div>
 Collection of different scale- and distribution-based bias adjustment techniques for climatic research. (see `examples.ipynb` for help)
 
 Bias adjustment procedures in Python are very slow, so they should not be used on large data sets.
 A C++ implementation that works way faster can be found here: [https://github.com/btschwertfeger/Bias-Adjustment-Cpp](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
-____
+
+---
+
 ## Available methods:
+
 - Linear Scaling (additive and multiplicative)
 - Variance Scaling (additive)
 - Delta (Change) Method (additive and multiplicative)
@@ -17,15 +25,19 @@ ____
 - Detrended Quantile Mapping (additive and multiplicative)
 - Quantile Delta Mapping (additive and multuplicative)
 
-____
+---
+
 ## Usage
 
 ### Installation
+
 ```bash
 python3 -m pip install python-cmethods
 ```
+
 ### Import and application
-```python 
+
+```python
 import xarray as xr
 from cmethods.CMethods import CMethods
 cm = CMethods()
@@ -41,7 +53,7 @@ ls_result = cm.linear_scaling(
     kind = '+' # *
 )
 
-qdm_result = cm.adjust_2d( # 2d = 2 spatial and 1 time dimension
+qdm_result = cm.adjust_3d( # 3d = 2 spatial and 1 time dimension
     method = 'quantile_delta_mapping',
     obs = obsh['tas'],
     simh = simh['tas'],
@@ -49,17 +61,19 @@ qdm_result = cm.adjust_2d( # 2d = 2 spatial and 1 time dimension
     n_quaniles = 1000,
     kind = '+' # *
 )
-# * to calculate the relative rather than the absolute change, 
+# * to calculate the relative rather than the absolute change,
 # '*' can be used instead of '+' (this is prefered when adjusting
 # ratio based variables like precipitation)
 ```
 
-____
+---
+
 ## Examples (see repository on [GitHub](https://github.com/btschwertfeger/Bias-Adjustment-Python))
 
 `/examples/examples.ipynb`: Notebook containing different methods and plots
 
 `/examples/do_bias_correction.py`: Example script for adjusting climate data
+
 ```bash
 python3 do_bias_correction.py   \
     --obs input_data/obs.nc     \
@@ -69,17 +83,21 @@ python3 do_bias_correction.py   \
     --variable tas              \
     --unit '°C'                 \
     --group time.month          \
-    --kind + 
+    --kind +
 ```
 
 - Linear and variance, as well as delta change method require `--group time.month` as argument.
 - Adjustment methods that apply changes in distributional biasses (QM, QDM, DQM; EQM, ...) need the `--nquantiles` argument set to some integer.
 - Data sets should have the same spatial resolutions.
-____
+
+---
+
 ## Notes:
+
 - Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to the C++ implementation mentioned above.
 
 ## References
+
 - Schwertfeger, Benjamin Thomas (2022) The influence of bias corrections on variability, distribution, and correlation of temperatures in comparison to observed and modeled climate data in Europe (https://epic.awi.de/id/eprint/56689/)
 - Linear Scaling and Variance Scaling based on: Teutschbein, Claudia and Seibert, Jan (2012) Bias correction of regional climate model simulations for hydrological climate-change impact studies: Review and evaluation of different methods (https://doi.org/10.1016/j.jhydrol.2012.05.052)
 - Delta Method based on: Beyer, R. and Krapp, M. and Manica, A.: An empirical evaluation of bias correction methods for palaeoclimate simulations (https://doi.org/10.5194/cp-16-1493-2020)
