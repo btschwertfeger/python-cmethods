@@ -3,16 +3,38 @@
 <div style="text-align: center">
 
 [![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/btschwertfeger/Bias-Adjustment-Python)
-[![Generic badge](https://img.shields.io/badge/python-3.7+-blue.svg)](https://shields.io/)
-[![Generic badge](https://img.shields.io/badge/license-MIT-green.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/python-3.7+-green.svg)](https://shields.io/)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Downloads](https://pepy.tech/badge/python-cmethods)](https://pepy.tech/project/python-cmethods)
-[![Downloads](https://pepy.tech/badge/python-cmethods/month)](https://pepy.tech/project/python-cmethods)
 
 </div>
+
 Collection of different scale- and distribution-based bias adjustment techniques for climatic research. (see `examples.ipynb` for help)
 
 Bias adjustment procedures in Python are very slow, so they should not be used on large data sets.
-A C++ implementation that works way faster can be found here: [https://github.com/btschwertfeger/Bias-Adjustment-Cpp](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
+A C++ implementation that works way faster can be found [here](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
+
+## About
+
+These programs and data structures are designed to help minimize discrepancies between modeled and observed climate data. Data from past periods are used to adjust variables from current and future time series so that their distributional properties approximate possible actual values.
+
+<figure>
+  <img
+  src="images/biasCdiagram.png?raw=true"
+  alt="Schematic representation of a bias adjustment procedure"
+  style="background-color: white; border-radius: 7px">
+  <figcaption>Figure 1: Schematic representation of a bias adjustment procedure</figcaption>
+</figure>
+
+In this way, for example, modeled data, which on average represent values that are too cold, can be adjusted by applying an adjustment procedure. The following figure shows the observed, the modeled and the adjusted values. It is directly visible that the delta adjusted time series ($T^{*DM}_{sim,p}$) are much more similar to the observed data ($T_{obs,p}$) than the raw modeled data ($T_{sim,p}$).
+
+<figure>
+  <img
+  src="images/dm-doy-plot.png?raw=true"
+  alt="Temperature per day of year in modeled, observed and bias-adjusted climate data"
+  style="background-color: white; border-radius: 7px">
+  <figcaption>Figure 2: Temperature per day of year in modeled, observed and bias-adjusted climate data</figcaption>
+</figure>
 
 ---
 
@@ -95,6 +117,7 @@ python3 do_bias_correction.py   \
 ## Notes:
 
 - Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to the C++ implementation mentioned above.
+- Formulas and references can be found in the implementations of the corresponding functions.
 
 ## References
 
