@@ -1,4 +1,4 @@
-# Bias-Adjustment-Python
+# Bias adjustment/correction procedures for climatic reasearch
 
 <div style="text-align: center">
 
@@ -9,7 +9,7 @@
 
 </div>
 
-Collection of different scale- and distribution-based bias adjustment techniques for climatic research. (see `examples.ipynb` for help)
+Collection of different scale- and distribution-based bias adjustment techniques for climatic research (see `examples.ipynb` for help).
 
 Bias adjustment procedures in Python are very slow, so they should not be used on large data sets.
 A C++ implementation that works way faster can be found [here](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
@@ -87,6 +87,11 @@ qdm_result = cm.adjust_3d( # 3d = 2 spatial and 1 time dimension
 # '*' can be used instead of '+' (this is prefered when adjusting
 # ratio based variables like precipitation)
 ```
+
+Notes:
+
+- When using the `adjust_3d` method you have to specify the method by name.
+- For the multiplicative linear scaling and delta method is a maximum scaling factor of 10 set. This can be changed by the `max_scaling_factor` parameter.
 
 ---
 

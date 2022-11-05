@@ -54,6 +54,8 @@ class CMethods(object):
     ADDITIVE = ['+', 'add']
     MULTIPLICATIVE = ['*', 'mult']
 
+    MAX_SCALING_FACTOR = 10
+
     def __init__(self):
         pass
 
@@ -289,7 +291,14 @@ class CMethods(object):
         if group != None: return cls.grouped_correction(method='linear_scaling', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
         else:
             if kind in cls.ADDITIVE: return np.array(simp) + (np.nanmean(obs) - np.nanmean(simh)) # Eq. 1
-            elif kind in cls.MULTIPLICATIVE: return np.array(simp) * (np.nanmean(obs) / np.nanmean(simh)) # Eq. 2
+            elif kind in cls.MULTIPLICATIVE: 
+                scaling_factor = (np.nanmean(obs) / np.nanmean(simh))
+                if scaling_factor > 0 and scaling_factor > abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)):
+                    return np.array(simp) * abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR))
+                elif scaling_factor < 0 and scaling_factor < -abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)):
+                    return np.array(simp) * -abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR))
+                else: 
+                    return np.array(simp) * scaling_factor # Eq. 2
             else: raise ValueError('Scaling type invalid. Valid options for param kind: "+" and "*"')
 
     # ? -----========= V A R I A N C E - S C A L I N G =========------
@@ -404,7 +413,14 @@ class CMethods(object):
         if group != None: return cls.grouped_correction(method='delta_method', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
         else:
             if kind in cls.ADDITIVE: return np.array(obs) + (np.nanmean(simp) - np.nanmean(simh))     # Eq. 1
-            elif kind in cls.MULTIPLICATIVE: return np.array(obs) * (np.nanmean(simp) / np.nanmean(simh))   # Eq. 2
+            elif kind in cls.MULTIPLICATIVE: 
+                scaling_factor = (np.nanmean(simp) / np.nanmean(simh))  
+                if scaling_factor > 0 and scaling_factor > abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)):
+                    return np.array(obs) * abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR))
+                elif scaling_factor < 0 and scaling_factor < -abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)):
+                    return np.array(obs) * -abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR))
+                else: 
+                    return np.array(obs) * scaling_factor # Eq. 2
             else: raise ValueError(f'{kind} not implemented! Use "+" or "*" instead.')
 
 

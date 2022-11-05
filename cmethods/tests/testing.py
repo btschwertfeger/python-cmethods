@@ -8,6 +8,10 @@ import sys
 sys.path.append('../../')
 from cmethods.CMethods import CMethods
 
+if True: # local space
+    import cmethods
+    print(cmethods.__file__)
+
 formatter = logging.Formatter(
         fmt='%(asctime)s %(module)s,line: %(lineno)d %(levelname)8s | %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S' # %I:%M:%S %p AM|PM format
