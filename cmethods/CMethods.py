@@ -124,13 +124,13 @@ class CMethods(object):
             )
         '''
 
-        obs = obs.transpose('lat', 'lon', 'time')
-        simh = simh.transpose('lat', 'lon', 'time')
-        simp = simp.transpose('lat', 'lon', 'time')
+        obs = obs.transpose('lat', 'lon', 'time')#.load()
+        simh = simh.transpose('lat', 'lon', 'time')#.load()
+        simp = simp.transpose('lat', 'lon', 'time').load()
 
         if group == None and method in cls.SCALING_METHODS: group = 'time.month'
-
-        result = simp.copy(deep=True).load()
+        
+        result = simp.copy(deep=True)
         len_lat, len_lon = len(obs.lat), len(obs.lon)
 
         if method in cls.CUSTOM_METHODS:

@@ -1,3 +1,4 @@
 numpy
 xarray
 tqdm
+netCDF4

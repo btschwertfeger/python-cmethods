@@ -64,9 +64,9 @@ import xarray as xr
 from cmethods.CMethods import CMethods
 cm = CMethods()
 
-obsh = xr.open_dataset('input_data/obs.nc')
-simh = xr.open_dataset('input_data/contr.nc')
-simp = xr.open_dataset('input_data/scen.nc')
+obsh = xr.open_dataset('input_data/observations.nc')
+simh = xr.open_dataset('input_data/control.nc')
+simp = xr.open_dataset('input_data/scenario.nc')
 
 ls_result = cm.linear_scaling(
     obs = obsh['tas'][:,0,0],
@@ -102,14 +102,14 @@ Notes:
 `/examples/do_bias_correction.py`: Example script for adjusting climate data
 
 ```bash
-python3 do_bias_correction.py   \
-    --obs input_data/obs.nc     \
-    --contr input_data/contr.nc \
-    --scen input_data/scen.nc   \
-    --method linear_scaling     \
-    --variable tas              \
-    --unit '°C'                 \
-    --group time.month          \
+python3 do_bias_correction.py         \
+    --obs input_data/observations.nc  \
+    --contr input_data/control.nc     \
+    --scen input_data/scenario.nc     \
+    --method linear_scaling           \
+    --variable tas                    \
+    --unit '°C'                       \
+    --group time.month                \
     --kind +
 ```
 
@@ -119,10 +119,14 @@ python3 do_bias_correction.py   \
 
 ---
 
-## Notes:
+## Notes
 
 - Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to the C++ implementation mentioned above.
 - Formulas and references can be found in the implementations of the corresponding functions.
+
+## Space for improvements
+
+Since the scaling methods implemented so far scale by default over the mean values of the respective months, unrealistic long-term mean values may occur at the month transitions. This can be prevented either by selecting `group='time.dayofyear`. Alternatively, it is possible not to scale using long-term mean values, but using a 30-day interval, which takes the 30 surrounding values over all years as the basis for calculating the mean values. This is not yet implemented in this module, but is available in the C++ implementation [here](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
 
 ## References
 
