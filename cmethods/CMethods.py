@@ -272,7 +272,7 @@ class CMethods(object):
             >    obs=obs[variable],
             >    simh=simh[variable],
             >    simp=simp[variable],
-            >    group='time.month' # optional
+            >    group='time.month' # optional, this is default here
             >)
 
         ----- E Q U A T I O N S -----
@@ -292,13 +292,11 @@ class CMethods(object):
         else:
             if kind in cls.ADDITIVE: return np.array(simp) + (np.nanmean(obs) - np.nanmean(simh)) # Eq. 1
             elif kind in cls.MULTIPLICATIVE: 
-                scaling_factor = (np.nanmean(obs) / np.nanmean(simh))
-                if scaling_factor > 0 and scaling_factor > abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)):
-                    return np.array(simp) * abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR))
-                elif scaling_factor < 0 and scaling_factor < -abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)):
-                    return np.array(simp) * -abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR))
-                else: 
-                    return np.array(simp) * scaling_factor # Eq. 2
+                adj_scaling_factor = cls.get_adjusted_scaling_factor(
+                    np.nanmean(obs) / np.nanmean(simh), 
+                    kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)
+                )
+                return np.array(simp) * adj_scaling_factor # Eq. 2
             else: raise ValueError('Scaling type invalid. Valid options for param kind: "+" and "*"')
 
     # ? -----========= V A R I A N C E - S C A L I N G =========------
@@ -360,8 +358,12 @@ class CMethods(object):
             VS_1_simh = LS_simh - np.nanmean(LS_simh)                   # Eq. 3
             VS_1_simp = LS_simp - np.nanmean(LS_simp)                   # Eq. 4
 
-            VS_2_simp = VS_1_simp * (np.std(obs) / np.std(VS_1_simh))   # Eq. 5
-
+            adj_scaling_factor = cls.get_adjusted_scaling_factor(
+                np.std(obs) / np.std(VS_1_simh), 
+                kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)
+            )
+            
+            VS_2_simp = VS_1_simp * adj_scaling_factor                  # Eq. 5
             return VS_2_simp + np.nanmean(LS_simp)                      # Eq. 6
 
     # ? -----========= D E L T A - M E T H O D =========------
@@ -414,13 +416,11 @@ class CMethods(object):
         else:
             if kind in cls.ADDITIVE: return np.array(obs) + (np.nanmean(simp) - np.nanmean(simh))     # Eq. 1
             elif kind in cls.MULTIPLICATIVE: 
-                scaling_factor = (np.nanmean(simp) / np.nanmean(simh))  
-                if scaling_factor > 0 and scaling_factor > abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)):
-                    return np.array(obs) * abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR))
-                elif scaling_factor < 0 and scaling_factor < -abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)):
-                    return np.array(obs) * -abs(kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR))
-                else: 
-                    return np.array(obs) * scaling_factor # Eq. 2
+                adj_scaling_factor = cls.get_adjusted_scaling_factor(
+                    np.nanmean(simp) / np.nanmean(simh), 
+                    kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)
+                )
+                return np.array(obs) * adj_scaling_factor # Eq. 2
             else: raise ValueError(f'{kind} not implemented! Use "+" or "*" instead.')
 
 
@@ -689,16 +689,10 @@ class CMethods(object):
         return np.interp(insert_cdf, base_cdf, xbins)
 
     @staticmethod
-    def load_data(
-        obs_fpath: str,
-        simh_fpath: str,
-        simp_fpath: str,
-        use_cftime: bool=False,
-        chunks=None
-    ) -> (xr.core.dataarray.Dataset, xr.core.dataarray.Dataset, xr.core.dataarray.Dataset):
-        '''Load and return loaded netcdf datasets'''
-        obs = xr.open_dataset(obs_fpath, use_cftime=use_cftime, chunks=chunks)
-        simh = xr.open_dataset(simh_fpath, use_cftime=use_cftime, chunks=chunks)
-        simp = xr.open_dataset(simp_fpath, use_cftime=use_cftime, chunks=chunks)
-
-        return obs, simh, simp
+    def get_adjusted_scaling_factor(factor: float, max_scaling_factor: float) -> float:
+        if factor > 0 and factor > abs(max_scaling_factor):
+            return abs(max_scaling_factor)
+        elif factor < 0 and factor < -abs(max_scaling_factor):
+            return -abs(max_scaling_factor)
+        else: 
+            return factor

@@ -1,6 +1,6 @@
 # Bias adjustment/correction procedures for climatic reasearch
 
-<div style="text-align: center">
+<div align="center">
 
 [![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/btschwertfeger/Bias-Adjustment-Python)
 [![Generic badge](https://img.shields.io/badge/python-3.7+-green.svg)](https://shields.io/)
@@ -9,12 +9,26 @@
 
 </div>
 
-Collection of different scale- and distribution-based bias adjustment techniques for climatic research (see `examples.ipynb` for help).
+This Python module contains a collection of different scale- and distribution-based bias adjustment techniques for climatic research (see `examples.ipynb` for help).
 
-Bias adjustment procedures in Python are very slow, so they should not be used on large data sets.
-A C++ implementation that works way faster can be found [here](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
+Since the Python programming language is very slow and bias adjustments are complex statistical transformations, it is recommended to use the C++ implementation on large data sets. This can be found [here](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
 
-## About
+---
+
+## Table of Contents
+
+1. [ About ](#about)
+2. [ Available Methods ](#methods)
+3. [ Installation ](#installation)
+4. [ Usage and Examples ](#examples)
+5. [ Notes ](#notes)
+6. [ References ](#references)
+
+---
+
+<a name="about"></a>
+
+## 1. About
 
 These programs and data structures are designed to help minimize discrepancies between modeled and observed climate data. Data from past periods are used to adjust variables from current and future time series so that their distributional properties approximate possible actual values.
 
@@ -33,31 +47,41 @@ In this way, for example, modeled data, which on average represent values that a
   src="images/dm-doy-plot.png?raw=true"
   alt="Temperature per day of year in modeled, observed and bias-adjusted climate data"
   style="background-color: white; border-radius: 7px">
-  <figcaption>Figure 2: Temperature per day of year in modeled, observed and bias-adjusted climate data</figcaption>
+  <figcaption>Figure 2: Temperature per day of year in observed, modeled and bias-adjusted climate data</figcaption>
 </figure>
 
 ---
 
-## Available methods:
+<a name="methods"></a>
 
-- Linear Scaling (additive and multiplicative)
-- Variance Scaling (additive)
-- Delta (Change) Method (additive and multiplicative)
-- Quantile Mapping (additive)
-- Detrended Quantile Mapping (additive and multiplicative)
-- Quantile Delta Mapping (additive and multuplicative)
+## 2. Available methods:
+
+All methods except the `adjust_3d` function requires the application on one time series.
+
+| Function name            | Description                                                                                  |
+| ------------------------ | -------------------------------------------------------------------------------------------- |
+| `linear_scaling`         | Linear Scaling (additive and multiplicative)                                                 |
+| `variance_scaling`       | Variance Scaling (additive)                                                                  |
+| `delta_method`           | Delta (Change) Method (additive and multiplicative)                                          |
+| `quantile_mapping`       | Quantile Mapping (additive) and Detrended Quantile Mapping (additive and multiplicative)     |
+| `quantile_delta_mapping` | Quantile Delta Mapping (additive and multiplicative)                                         |
+| `adjust_3d`              | requires a method name and the respective parameters to adjust all time series of a data set |
 
 ---
 
-## Usage
+<a name="installation"></a>
 
-### Installation
+## 3. Installation
 
 ```bash
 python3 -m pip install python-cmethods
 ```
 
-### Import and application
+---
+
+<a name="examples"></a>
+
+## 4. Usage and Examples
 
 ```python
 import xarray as xr
@@ -91,15 +115,13 @@ qdm_result = cm.adjust_3d( # 3d = 2 spatial and 1 time dimension
 Notes:
 
 - When using the `adjust_3d` method you have to specify the method by name.
-- For the multiplicative linear scaling and delta method is a maximum scaling factor of 10 set. This can be changed by the `max_scaling_factor` parameter.
-
----
+- For the multiplicative linear scaling and the delta method as well as the variance scaling method a maximum scaling factor of 10 is defined. This can be changed by the parameter `max_scaling_factor`.
 
 ## Examples (see repository on [GitHub](https://github.com/btschwertfeger/Bias-Adjustment-Python))
 
-`/examples/examples.ipynb`: Notebook containing different methods and plots
+Notebook with different methods and plots: `/examples/examples.ipynb`
 
-`/examples/do_bias_correction.py`: Example script for adjusting climate data
+Example script for adjusting climate data: `/examples/do_bias_correction.py`
 
 ```bash
 python3 do_bias_correction.py         \
@@ -109,26 +131,32 @@ python3 do_bias_correction.py         \
     --method linear_scaling           \
     --variable tas                    \
     --unit '°C'                       \
-    --group time.month                \
+    --group 'time.month'              \
     --kind +
 ```
 
 - Linear and variance, as well as delta change method require `--group time.month` as argument.
-- Adjustment methods that apply changes in distributional biasses (QM, QDM, DQM; EQM, ...) need the `--nquantiles` argument set to some integer.
-- Data sets should have the same spatial resolutions.
+- Adjustment methods that apply changes in distributional biasses (QM, QDM, DQM, ...) need the `--nquantiles` argument set to some integer.
+- Data sets must have the same spatial resolutions.
 
 ---
 
-## Notes
+<a name="notes"></a>
 
-- Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to the C++ implementation mentioned above.
+## 5. Notes
+
+- Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to use the C++ implementation mentioned above.
 - Formulas and references can be found in the implementations of the corresponding functions.
 
-## Space for improvements
+### Space for improvements:
 
-Since the scaling methods implemented so far scale by default over the mean values of the respective months, unrealistic long-term mean values may occur at the month transitions. This can be prevented either by selecting `group='time.dayofyear`. Alternatively, it is possible not to scale using long-term mean values, but using a 30-day interval, which takes the 30 surrounding values over all years as the basis for calculating the mean values. This is not yet implemented in this module, but is available in the C++ implementation [here](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
+Since the scaling methods implemented so far scale by default over the mean values of the respective months, unrealistic long-term mean values may occur at the month transitions. This can be prevented either by selecting `group='time.dayofyear'`. Alternatively, it is possible not to scale using long-term mean values, but using a 31-day interval, which takes the 31 surrounding values over all years as the basis for calculating the mean values. This is not yet implemented in this module, but is available in the C++ implementation [here](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
 
-## References
+---
+
+<a name="references"></a>
+
+## 6. References
 
 - Schwertfeger, Benjamin Thomas (2022) The influence of bias corrections on variability, distribution, and correlation of temperatures in comparison to observed and modeled climate data in Europe (https://epic.awi.de/id/eprint/56689/)
 - Linear Scaling and Variance Scaling based on: Teutschbein, Claudia and Seibert, Jan (2012) Bias correction of regional climate model simulations for hydrological climate-change impact studies: Review and evaluation of different methods (https://doi.org/10.1016/j.jhydrol.2012.05.052)

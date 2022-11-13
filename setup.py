@@ -17,7 +17,7 @@ VERSION = None
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-   'xarray', 'numpy', 'tqdm', 'netCDF4' # <- always conflicts on install with tqdm on test.pypi..
+   'xarray>=2022.11.0','netCDF4>=1.6.1', 'numpy', 'tqdm', 
 ]
 
 # What packages are optional?
