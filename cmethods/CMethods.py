@@ -49,7 +49,7 @@ class CMethods(object):
     
     CUSTOM_METHODS = SCALING_METHODS + DISTRIBUTION_METHODS
     
-    METHODS = CUSTOM_METHODS #+ XCLIM_SDBA_METHODS
+    METHODS = CUSTOM_METHODS
 
     ADDITIVE = ['+', 'add']
     MULTIPLICATIVE = ['*', 'mult']
@@ -124,8 +124,8 @@ class CMethods(object):
             )
         '''
 
-        obs = obs.transpose('lat', 'lon', 'time')#.load()
-        simh = simh.transpose('lat', 'lon', 'time')#.load()
+        obs = obs.transpose('lat', 'lon', 'time')
+        simh = simh.transpose('lat', 'lon', 'time')
         simp = simp.transpose('lat', 'lon', 'time').load()
 
         if group == None and method in cls.SCALING_METHODS: group = 'time.month'
@@ -169,31 +169,28 @@ class CMethods(object):
         ''' Adjustment along longitude for one specific latitude
             used by cls.adjust_3d as callbackfunction for multiprocessing.Pool
         '''
-
-        method = params['method']
-        obs = params['obs']
-        simh = params['simh']
-        simp = params['simp']
-        n_quantiles = params.get('n_quantiles', 100)
-        kind = params.get('kind', '+')
-        group = params.get('group', None)
+        for key in ['method', 'obs', 'simh', 'simp']: assert params[key]
         kwargs = params.get('kwargs', {})
 
-        result = simp.copy(deep=True).load()
-        len_lon = len(obs.lon)
+        result = params['simp'].copy(deep=True).load()
+        len_lon = len(params['obs'].lon)
 
         func_adjustment = None
-        if method in cls.CUSTOM_METHODS:
-            func_adjustment = cls.get_function(method)
-            kwargs['n_quantiles'] = n_quantiles
-            kwargs['kind'] = kind
+        if params['method'] in cls.CUSTOM_METHODS:
+            func_adjustment = cls.get_function(params['method'])
+            kwargs['n_quantiles'] = params.get('n_quantiles', 100)
+            kwargs['kind'] = params.get('kind', '+')
             for lon in range(len_lon):
                 result[lon] = func_adjustment(
-                    obs=obs[lon], simh=simh[lon], simp=simp[lon], group=group, **kwargs
+                    obs=params['obs'][lon], 
+                    simh=params['simh'][lon], 
+                    simp=params['simp'][lon], 
+                    group=params.get('group', None), 
+                    **kwargs
                 )
             return result
 
-        else: raise UnknownMethodError(method, cls.METHODS)
+        else: raise UnknownMethodError(params['method'], cls.METHODS)
 
     @classmethod
     def grouped_correction(cls,
@@ -276,11 +273,10 @@ class CMethods(object):
             >)
 
         ----- E Q U A T I O N S -----
-            T = temperature; d = daily; m = monthly
             Add ('+'):
-            (1.)    X^{*LS}_{sim,p}(i) = X_{sim,p}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
+                (1.)    X^{*LS}_{sim,p}(i) = X_{sim,p}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
             Mult ('*'):
-            (2.)    X^{*LS}_{sim,h}(i) = X_{sim,h}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
+                (2.)    X^{*LS}_{sim,h}(i) = X_{sim,h}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
 
         ----- R E F E R E N C E S -----
 
@@ -333,8 +329,6 @@ class CMethods(object):
 
         ------ E Q U A T I O N S -----
 
-            T = temperature; d = daily; m = monthly
-
             (1.) X^{*LS}_{sim,h}(i) = X_{sim,h}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
             (2.) X^{*LS}_{sim,p}(i) = X_{sim,p}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
 
@@ -351,7 +345,7 @@ class CMethods(object):
             https://doi.org/10.1016/j.jhydrol.2012.05.052
         '''
         if group != None: return cls.grouped_correction(method='variance_scaling', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
-        else:
+        elif kind in cls.ADDITIVE:
             LS_simh = cls.linear_scaling(obs, simh, simh, group=None)   # Eq. 1
             LS_simp = cls.linear_scaling(obs, simh, simp, group=None)   # Eq. 2
 
@@ -365,6 +359,8 @@ class CMethods(object):
             
             VS_2_simp = VS_1_simp * adj_scaling_factor                  # Eq. 5
             return VS_2_simp + np.nanmean(LS_simp)                      # Eq. 6
+
+        else: raise ValueError(f'"{kind}" not available or variance scaling!')
 
     # ? -----========= D E L T A - M E T H O D =========------
     @classmethod
@@ -561,7 +557,7 @@ class CMethods(object):
             https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py
 
         '''
-        raise ValueError('idk if it is allowed to use this so please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py ')
+        raise ValueError('not implemented; please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py ')
         # if group != None:
         #     return cls.grouped_correction(
         #         method = 'empirical_quantile_mapping',

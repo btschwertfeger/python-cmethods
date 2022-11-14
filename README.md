@@ -58,14 +58,14 @@ In this way, for example, modeled data, which on average represent values that a
 
 All methods except the `adjust_3d` function requires the application on one time series.
 
-| Function name            | Description                                                                                  |
-| ------------------------ | -------------------------------------------------------------------------------------------- |
-| `linear_scaling`         | Linear Scaling (additive and multiplicative)                                                 |
-| `variance_scaling`       | Variance Scaling (additive)                                                                  |
-| `delta_method`           | Delta (Change) Method (additive and multiplicative)                                          |
-| `quantile_mapping`       | Quantile Mapping (additive) and Detrended Quantile Mapping (additive and multiplicative)     |
-| `quantile_delta_mapping` | Quantile Delta Mapping (additive and multiplicative)                                         |
-| `adjust_3d`              | requires a method name and the respective parameters to adjust all time series of a data set |
+| Function name            | Description                                                                                                |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `linear_scaling`         | Linear Scaling (additive and multiplicative)                                                               |
+| `variance_scaling`       | Variance Scaling (additive)                                                                                |
+| `delta_method`           | Delta (Change) Method (additive and multiplicative)                                                        |
+| `quantile_mapping`       | Quantile Mapping (additive) and Detrended Quantile Mapping (additive and multiplicative)                   |
+| `quantile_delta_mapping` | Quantile Delta Mapping (additive and multiplicative)                                                       |
+| `adjust_3d`              | requires a method name and the respective parameters to adjust all time series of a 3-dimensional data set |
 
 ---
 
@@ -105,9 +105,9 @@ qdm_result = cm.adjust_3d( # 3d = 2 spatial and 1 time dimension
     simh = simh['tas'],
     simp = simp['tas'],
     n_quaniles = 1000,
-    kind = '+' # *
+    kind = '+'
 )
-# * to calculate the relative rather than the absolute change,
+# to calculate the relative rather than the absolute change,
 # '*' can be used instead of '+' (this is prefered when adjusting
 # ratio based variables like precipitation)
 ```
@@ -136,7 +136,7 @@ python3 do_bias_correction.py         \
 ```
 
 - Linear and variance, as well as delta change method require `--group time.month` as argument.
-- Adjustment methods that apply changes in distributional biasses (QM, QDM, DQM, ...) need the `--nquantiles` argument set to some integer.
+- Adjustment methods that apply changes in distributional biasses (QM, QDM, DQM, ...) require the `--nquantiles` argument set to some integer.
 - Data sets must have the same spatial resolutions.
 
 ---
@@ -163,3 +163,5 @@ Since the scaling methods implemented so far scale by default over the mean valu
 - Delta Method based on: Beyer, R. and Krapp, M. and Manica, A.: An empirical evaluation of bias correction methods for palaeoclimate simulations (https://doi.org/10.5194/cp-16-1493-2020)
 - Quantile and Detrended Quantile Mapping based on: Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock Bias Correction of GCM Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles and Extremes? (https://doi.org/10.1175/JCLI-D-14-00754.1)
 - Quantile Delta Mapping based on: Tong, Y., Gao, X., Han, Z. et al. Bias correction of temperature and precipitation over China for RCM simulations using the QM and QDM methods. Clim Dyn 57, 1425–1443 (2021). (https://doi.org/10.1007/s00382-020-05447-4)
+
+---
