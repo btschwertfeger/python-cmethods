@@ -12,7 +12,7 @@ DESCRIPTION = 'Collection of bias adjustment procedures for multidimensional cli
 URL = 'https://github.com/btschwertfeger/Bias-Adjustment-Python'
 EMAIL = 'development@b-schwertfeger.de'
 AUTHOR = 'Benjamin Thomas Schwertfeger'
-REQUIRES_PYTHON = '>=3.7.0'
+REQUIRES_PYTHON = '>=3.8.0'
 VERSION = None
 
 # What packages are required for this module to be executed?
@@ -23,6 +23,7 @@ REQUIRED = [
 # What packages are optional?
 EXTRAS = {
     'working examples notebook': ['matplotlib'],
+    'tests': ['scikit-learn', 'scipy']
 }
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -124,7 +125,10 @@ setup(
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Natural Language :: English',
+        'Operating System :: MacOS',
+        'Operating System :: Unix'
     ],
     cmdclass={
         'upload': UploadCommand,

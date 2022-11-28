@@ -3,13 +3,16 @@
 <div align="center">
 
 [![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/btschwertfeger/Bias-Adjustment-Python)
-[![Generic badge](https://img.shields.io/badge/python-3.7+-green.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/python-3.8+-green.svg)](https://shields.io/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Downloads](https://pepy.tech/badge/python-cmethods)](https://pepy.tech/project/python-cmethods)
 
+![ql-workflow](https://github.com/btschwertfeger/Bias-Adjustment-Python/actions/workflows/codeql.yml/badge.svg)
+![python-package](https://github.com/btschwertfeger/Bias-Adjustment-Python/actions/workflows/python-package.yml/badge.svg)
+
 </div>
 
-This Python module contains a collection of different scale- and distribution-based bias adjustment techniques for climatic research (see `examples.ipynb` for help).
+This Python module contains a collection of different scale- and distribution-based bias adjustment techniques for climatic research (see `/examples/examples.ipynb` for help).
 
 Since the Python programming language is very slow and bias adjustments are complex statistical transformations, it is recommended to use the C++ implementation on large data sets. This can be found [here](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
 
@@ -96,7 +99,7 @@ ls_result = cm.linear_scaling(
     obs = obsh['tas'][:,0,0],
     simh = simh['tas'][:,0,0],
     simp = simp['tas'][:,0,0],
-    kind = '+' # *
+    kind = '+'
 )
 
 qdm_result = cm.adjust_3d( # 3d = 2 spatial and 1 time dimension

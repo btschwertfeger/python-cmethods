@@ -1,18 +1,19 @@
 #!/bin/python3
-
+'''Module that implements the bias adjustment procedutes'''
+from typing import List
 import multiprocessing
 import xarray as xr
 import numpy as np
 from tqdm import tqdm
 
-__descrption__ = 'Script to adjust climate bias in climate data'
+__descrption__ = 'Module to help adjusting bias estimated in climate data'
 __author__ = 'Benjamin Thomas Schwertfeger'
 __copyright__ = __author__
 __email__ = 'development@b-schwertfeger.de'
 __link__ = 'https://b-schwertfeger.de'
 __github__ = 'https://github.com/btschwertfeger/Bias-Adjustment-Python'
 __description__ = '                                                                     \
-    Class / Script / Methods to apply bias corrections on temperature climate data      \
+    Class / Script / Methods to adjust bias estimated in climate data                   \
                                                                                         \
     T = Temperatures ($T$)                                                              \
     X = Some climate variable ($X$)                                                     \
@@ -30,25 +31,24 @@ __description__ = '                                                             
     _{m} = long-term monthly interval                                                   \
 '
 
-class CMethods(object):
+class UnknownMethodError(Exception):
+    '''Exception raised for errors if unknown method called in CMethods class.
+
+    ----- P A R A M E T E R S -----
+        method (str): Input method name which caused the error
+        available_methods (str): List of available methods
+    '''
+
+    def __init__(self, method: str, available_methods: list):
+        super().__init__(f'Unknown method "{method}"! Available methods: {available_methods}')
+
+class CMethods():
     '''Class used to adjust timeseries climate data.'''
-
-    class UnknownMethodError(Exception):
-        '''Exception raised for errors if unknown method called in CMethods class.
-
-        ----- P A R A M E T E R S -----
-            method (str): Input method name which caused the error
-            available_methods (str): List of available methods
-        '''
-
-        def __init__(self, method: str, available_methods: list):
-            super().__init__(f'Unknown method "{method}"! Available methods: {available_methods}')
 
     SCALING_METHODS = ['linear_scaling', 'variance_scaling', 'delta_method']
     DISTRIBUTION_METHODS = ['quantile_mapping', 'quantile_delta_mapping']
-    
+
     CUSTOM_METHODS = SCALING_METHODS + DISTRIBUTION_METHODS
-    
     METHODS = CUSTOM_METHODS
 
     ADDITIVE = ['+', 'add']
@@ -66,13 +66,14 @@ class CMethods(object):
 
     @classmethod
     def get_function(cls, method: str):
+        '''Returns the method by name'''
         if method == 'linear_scaling': return cls.linear_scaling
-        elif method == 'variance_scaling': return cls.variance_scaling
-        elif method == 'delta_method':  return cls.delta_method
-        elif method == 'quantile_mapping': return cls.quantile_mapping
-        elif method == 'empirical_quantile_mapping': return cls.empirical_quantile_mapping
-        elif method == 'quantile_delta_mapping': return cls.quantile_delta_mapping
-        else: raise UnknownMethodError(method, cls.METHODS)
+        if method == 'variance_scaling': return cls.variance_scaling
+        if method == 'delta_method':  return cls.delta_method
+        if method == 'quantile_mapping': return cls.quantile_mapping
+        if method == 'empirical_quantile_mapping': return cls.empirical_quantile_mapping
+        if method == 'quantile_delta_mapping': return cls.quantile_delta_mapping
+        raise UnknownMethodError(method, cls.METHODS)
 
     @classmethod
     def adjust_3d(cls,
@@ -128,8 +129,8 @@ class CMethods(object):
         simh = simh.transpose('lat', 'lon', 'time')
         simp = simp.transpose('lat', 'lon', 'time').load()
 
-        if group == None and method in cls.SCALING_METHODS: group = 'time.month'
-        
+        if group is None and method in cls.SCALING_METHODS: group = 'time.month'
+
         result = simp.copy(deep=True)
         len_lat, len_lon = len(obs.lat), len(obs.lon)
 
@@ -149,7 +150,7 @@ class CMethods(object):
                         )
             else:
                 with multiprocessing.Pool(processes=n_jobs) as pool:
-                    params: [dict] = [{
+                    params: List[dict] = [{
                         'method': method,
                         'obs': obs[lat],
                         'simh': simh[lat],
@@ -162,7 +163,7 @@ class CMethods(object):
                     for lat, corrected in enumerate(pool.map(cls.pool_adjust, params)):
                         result[lat] = corrected
             return result.transpose('time', 'lat', 'lon')
-        else: raise UnknownMethodError(methodm, cls.METHODS)
+        raise UnknownMethodError(method, cls.METHODS)
 
     @classmethod
     def pool_adjust(cls, params) -> xr.core.dataarray.DataArray:
@@ -182,15 +183,15 @@ class CMethods(object):
             kwargs['kind'] = params.get('kind', '+')
             for lon in range(len_lon):
                 result[lon] = func_adjustment(
-                    obs=params['obs'][lon], 
-                    simh=params['simh'][lon], 
-                    simp=params['simp'][lon], 
-                    group=params.get('group', None), 
+                    obs=params['obs'][lon],
+                    simh=params['simh'][lon],
+                    simp=params['simp'][lon],
+                    group=params.get('group', None),
                     **kwargs
                 )
             return result
 
-        else: raise UnknownMethodError(params['method'], cls.METHODS)
+        raise UnknownMethodError(params['method'], cls.METHODS)
 
     @classmethod
     def grouped_correction(cls,
@@ -284,16 +285,16 @@ class CMethods(object):
             https://doi.org/10.1016/j.jhydrol.2012.05.052
 
         '''
-        if group != None: return cls.grouped_correction(method='linear_scaling', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
-        else:
-            if kind in cls.ADDITIVE: return np.array(simp) + (np.nanmean(obs) - np.nanmean(simh)) # Eq. 1
-            elif kind in cls.MULTIPLICATIVE: 
-                adj_scaling_factor = cls.get_adjusted_scaling_factor(
-                    np.nanmean(obs) / np.nanmean(simh), 
-                    kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)
-                )
-                return np.array(simp) * adj_scaling_factor # Eq. 2
-            else: raise ValueError('Scaling type invalid. Valid options for param kind: "+" and "*"')
+        if group is not None: return cls.grouped_correction(method='linear_scaling', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
+
+        if kind in cls.ADDITIVE: return np.array(simp) + (np.nanmean(obs) - np.nanmean(simh)) # Eq. 1
+        if kind in cls.MULTIPLICATIVE:
+            adj_scaling_factor = cls.get_adjusted_scaling_factor(
+                np.nanmean(obs) / np.nanmean(simh),
+                kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)
+            )
+            return np.array(simp) * adj_scaling_factor # Eq. 2
+        raise ValueError('Scaling type invalid. Valid options for param kind: "+" and "*"')
 
     # ? -----========= V A R I A N C E - S C A L I N G =========------
     @classmethod
@@ -344,8 +345,8 @@ class CMethods(object):
             Based on the equations of Teutschbein, Claudia and Seibert, Jan (2012) Bias correction of regional climate model simulations for hydrological climate-change impact studies: Review and evaluation of different methods
             https://doi.org/10.1016/j.jhydrol.2012.05.052
         '''
-        if group != None: return cls.grouped_correction(method='variance_scaling', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
-        elif kind in cls.ADDITIVE:
+        if group is not None: return cls.grouped_correction(method='variance_scaling', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
+        if kind in cls.ADDITIVE:
             LS_simh = cls.linear_scaling(obs, simh, simh, group=None)   # Eq. 1
             LS_simp = cls.linear_scaling(obs, simh, simp, group=None)   # Eq. 2
 
@@ -353,14 +354,14 @@ class CMethods(object):
             VS_1_simp = LS_simp - np.nanmean(LS_simp)                   # Eq. 4
 
             adj_scaling_factor = cls.get_adjusted_scaling_factor(
-                np.std(obs) / np.std(VS_1_simh), 
+                np.std(obs) / np.std(VS_1_simh),
                 kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)
             )
-            
+
             VS_2_simp = VS_1_simp * adj_scaling_factor                  # Eq. 5
             return VS_2_simp + np.nanmean(LS_simp)                      # Eq. 6
 
-        else: raise ValueError(f'"{kind}" not available or variance scaling!')
+        raise ValueError(f'"{kind}" not available or variance scaling!')
 
     # ? -----========= D E L T A - M E T H O D =========------
     @classmethod
@@ -408,16 +409,15 @@ class CMethods(object):
             https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py
 
         '''
-        if group != None: return cls.grouped_correction(method='delta_method', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
-        else:
-            if kind in cls.ADDITIVE: return np.array(obs) + (np.nanmean(simp) - np.nanmean(simh))     # Eq. 1
-            elif kind in cls.MULTIPLICATIVE: 
-                adj_scaling_factor = cls.get_adjusted_scaling_factor(
-                    np.nanmean(simp) / np.nanmean(simh), 
-                    kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)
-                )
-                return np.array(obs) * adj_scaling_factor # Eq. 2
-            else: raise ValueError(f'{kind} not implemented! Use "+" or "*" instead.')
+        if group is not None: return cls.grouped_correction(method='delta_method', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
+        if kind in cls.ADDITIVE: return np.array(obs) + (np.nanmean(simp) - np.nanmean(simh))     # Eq. 1
+        if kind in cls.MULTIPLICATIVE:
+            adj_scaling_factor = cls.get_adjusted_scaling_factor(
+                np.nanmean(simp) / np.nanmean(simh),
+                kwargs.get('max_scaling_factor', cls.MAX_SCALING_FACTOR)
+            )
+            return np.array(obs) * adj_scaling_factor # Eq. 2
+        raise ValueError(f'{kind} not implemented! Use "+" or "*" instead.')
 
 
     # ? -----========= Q U A N T I L E - M A P P I N G =========------
@@ -465,14 +465,14 @@ class CMethods(object):
                             \mu{X_{sim,p}(i)}
                         }{
                             \mu{X_{sim,h}}
-                        }  
+                        }
 
         ----- R E F E R E N C E S -----
             Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock Bias Correction of GCM Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles and Extremes?
             https://doi.org/10.1175/JCLI-D-14-00754.1)
         '''
 
-        if group != None: return cls.grouped_correction(method='quantile_mapping', obs=obs, simh=simh, simp=simp, group=group, n_quantiles=n_quantiles, kind=kind, **kwargs)
+        if group is not None: return cls.grouped_correction(method='quantile_mapping', obs=obs, simh=simh, simp=simp, group=group, n_quantiles=n_quantiles, kind=kind, **kwargs)
         res = simp.copy(deep=True)
         obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
 
@@ -485,32 +485,34 @@ class CMethods(object):
         cdf_simh = cls.get_cdf(simh, xbins)
 
         if kwargs.get('detrended', False) or kind in cls.MULTIPLICATIVE:
-            '''detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes'''
-            for month, idxs in res.groupby('time.month').groups.items():
+            # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
+            for _, idxs in res.groupby('time.month').groups.items():
                 m_simh, m_simp = [], []
                 for idx in idxs:
                     m_simh.append(simh[idx])
                     m_simp.append(simp[idx])
-                
+
                 m_simh = np.array(m_simh)
                 m_simp = np.array(m_simp)
-                m_simh_mean = np.nanmean(m_simh)     
-                m_simp_mean = np.nanmean(m_simp) 
-                
+                m_simh_mean = np.nanmean(m_simh)
+                m_simp_mean = np.nanmean(m_simp)
+
                 if kind in cls.ADDITIVE:
-                    epsilon = np.interp(m_simp - m_simp_mean + m_simh_mean, xbins, cdf_simh)         # Eq. 1     
-                    X = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins) + m_simp_mean - m_simh_mean   # Eq. 1     
-                else: 
+                    epsilon = np.interp(m_simp - m_simp_mean + m_simh_mean, xbins, cdf_simh)         # Eq. 1
+                    X = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins) + m_simp_mean - m_simh_mean   # Eq. 1
+                else:
                     epsilon = np.interp((m_simh_mean * m_simp) / m_simp_mean, xbins, cdf_simh, left=.0, right=999.0)    # Eq. 2
                     X = np.interp(epsilon, cdf_obs, xbins, left=.0, right=999.9) * (m_simp_mean / m_simh_mean)          # Eq. 2
                     #x = cm.get_inverse_of_cdf(cdf_obs, epsilon, xbins) * (m_simp_mean / m_simh_mean)
                 for i, idx in enumerate(idxs): res.values[idx] = X[i]
             return res
-        elif kind in cls.ADDITIVE: # additive, no detrend 
-            epsilon = np.interp(simp, xbins, cdf_simh)                                 # Eq. 1            
-            res.values = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)               # Eq. 1      
+
+        if kind in cls.ADDITIVE: # additive, no detrend
+            epsilon = np.interp(simp, xbins, cdf_simh)                                 # Eq. 1
+            res.values = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)               # Eq. 1
             return res
-        else: raise ValueError('Not implemented!')
+
+        raise ValueError('Not implemented!')
 
     # ? -----========= E M P I R I C A L - Q U A N T I L E - M A P P I N G =========------
     @classmethod
@@ -558,7 +560,7 @@ class CMethods(object):
 
         '''
         raise ValueError('not implemented; please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py ')
-        # if group != None:
+        # if group is not None:
         #     return cls.grouped_correction(
         #         method = 'empirical_quantile_mapping',
         #         obs = obs,
@@ -591,6 +593,7 @@ class CMethods(object):
             n_quantiles (int): number of quantiles to use
             group (str): [optional] Group / Period (e.g.: 'time.month')
             kind (str): '+' or '*', default: '+'
+            global_min (float): this parameter can be set when kind == '*' to define a custom lower limit. Otherwise 0.0 is used.
 
         ----- R E T U R N -----
 
@@ -622,14 +625,10 @@ class CMethods(object):
             Tong, Y., Gao, X., Han, Z. et al. Bias correction of temperature and precipitation over China for RCM simulations using the QM and QDM methods. Clim Dyn 57, 1425–1443 (2021).
             https://doi.org/10.1007/s00382-020-05447-4
 
-        ----- N O T E S -----
-
-        @param global_min: float | this parameter can be set when kind == '*' to define a custom lower limit. Otherwise 0.0 is used.
-
         '''
 
-        if group != None: return cls.grouped_correction(method='quantile_delta_mapping', obs=obs, simh=simh, simp=simp, group=group, n_quantiles=n_quantiles, kind=kind, **kwargs)
-        elif kind in cls.ADDITIVE:
+        if group is not None: return cls.grouped_correction(method='quantile_delta_mapping', obs=obs, simh=simh, simp=simp, group=group, n_quantiles=n_quantiles, kind=kind, **kwargs)
+        if kind in cls.ADDITIVE:
             res = simp.copy(deep=True)
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp) # to achieve higher accuracy
             global_max = max(np.amax(obs), np.amax(simh))
@@ -648,7 +647,7 @@ class CMethods(object):
             res.values = QDM1 + delta                                             # Eq. 1.4
             return res
 
-        elif kind in cls.MULTIPLICATIVE:
+        if kind in cls.MULTIPLICATIVE:
             res = simp.copy(deep=True)
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
             global_max = max(np.amax(obs), np.amax(simh))
@@ -664,13 +663,13 @@ class CMethods(object):
             delta = simp / cls.get_inverse_of_cdf(cdf_simh, epsilon, xbins)       # Eq. 2.3
             res.values = QDM1 * delta                                             # Eq. 2.4
             return res
-        else: raise ValueError(f'Unknown kind {kind}!')
+        raise ValueError(f'Unknown kind {kind}!')
 
     # * -----========= G E N E R A L  =========------
     @staticmethod
     def get_pdf(a, xbins: list) -> np.array:
         ''' returns the probability density function of a based on xbins ($P(x)$)'''
-        pdf, _ = np.histogram(a,xbins)
+        pdf, _ = np.histogram(a, xbins)
         return pdf
 
     @staticmethod
@@ -686,9 +685,9 @@ class CMethods(object):
 
     @staticmethod
     def get_adjusted_scaling_factor(factor: float, max_scaling_factor: float) -> float:
+        '''Checks if scaling factor is within the desired range'''
         if factor > 0 and factor > abs(max_scaling_factor):
             return abs(max_scaling_factor)
-        elif factor < 0 and factor < -abs(max_scaling_factor):
+        if factor < 0 and factor < -abs(max_scaling_factor):
             return -abs(max_scaling_factor)
-        else: 
-            return factor
+        return factor
