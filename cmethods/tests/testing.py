@@ -10,8 +10,12 @@ try:
     from cmethods.CMethods import CMethods
 except ModuleNotFoundError:
     print('Using local module')
-    sys.path.append('/Users/benjamin/repositories/awi-workspace/Bias-Adjustment-Python')
-    from cmethods.CMethods import CMethods
+    try:
+        sys.path.append('/Users/benjamin/repositories/awi-workspace/Bias-Adjustment-Python')
+        from cmethods.CMethods import CMethods
+    except ModuleNotFoundError:
+        sys.path.append('../')
+        from CMethods import CMethods
 
 logging.basicConfig(
     format='%(asctime)s %(module)s,line: %(lineno)d %(levelname)8s | %(message)s',
