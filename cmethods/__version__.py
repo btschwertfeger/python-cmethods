@@ -1,3 +1,3 @@
 '''version of this module'''
-VERSION = (0,5,4,2)
+VERSION = (0,6,1)
 __version__ = '.'.join(map(str, VERSION))

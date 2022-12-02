@@ -70,9 +70,14 @@ class UploadCommand(Command):
         self.status('Building Source and Wheel (universal) distribution…')
         os.system(f'{sys.executable} setup.py sdist bdist_wheel --universal')
 
+        self.status('Testing the build using flake8')
+        if os.system('flake8 . --select=E9,F63,F7,F82 --show-source --statistics') != 0:
+            self.status('Testing failed, build has some errors in it!')
+            sys.exit(1)
+
         self.status('Uploading the package to PyPI via Twine…')
         os.system('twine upload dist/*')
-        sys.exit()
+        sys.exit(0)
 
 class TestUploadCommand(Command):
     '''Support setup.py test upload.'''
@@ -100,10 +105,15 @@ class TestUploadCommand(Command):
         self.status('Building Source and Wheel (universal) distribution…')
         os.system(f'{sys.executable} setup.py sdist bdist_wheel --universal')
 
+        self.status('Testing the build using flake8')
+        if os.system('flake8 . --select=E9,F63,F7,F82 --show-source --statistics') != 0:
+            self.status('Testing failed, build has some errors in it!')
+            sys.exit(1)
+
         self.status('Uploading the package to PyPI via Twine…')
         os.system('twine upload -r testpypi dist/*')
 
-        sys.exit()
+        sys.exit(0)
 
 setup(
     name=NAME,

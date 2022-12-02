@@ -409,6 +409,7 @@ class CMethods():
             https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py
 
         '''
+
         if group is not None: return cls.grouped_correction(method='delta_method', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
         if kind in cls.ADDITIVE: return np.array(obs) + (np.nanmean(simp) - np.nanmean(simh))     # Eq. 1
         if kind in cls.MULTIPLICATIVE:
@@ -484,7 +485,7 @@ class CMethods():
         cdf_obs = cls.get_cdf(obs, xbins)
         cdf_simh = cls.get_cdf(simh, xbins)
 
-        if kwargs.get('detrended', False) or kind in cls.MULTIPLICATIVE:
+        if kwargs.get('detrended', False):
             # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
             for _, idxs in res.groupby('time.month').groups.items():
                 m_simh, m_simp = [], []
@@ -498,18 +499,34 @@ class CMethods():
                 m_simp_mean = np.nanmean(m_simp)
 
                 if kind in cls.ADDITIVE:
-                    epsilon = np.interp(m_simp - m_simp_mean + m_simh_mean, xbins, cdf_simh)         # Eq. 1
+                    epsilon = np.interp(m_simp - m_simp_mean + m_simh_mean, xbins, cdf_simh)          # Eq. 1
                     X = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins) + m_simp_mean - m_simh_mean   # Eq. 1
-                else:
-                    epsilon = np.interp((m_simh_mean * m_simp) / m_simp_mean, xbins, cdf_simh, left=.0, right=999.0)    # Eq. 2
-                    X = np.interp(epsilon, cdf_obs, xbins, left=.0, right=999.9) * (m_simp_mean / m_simh_mean)          # Eq. 2
-                    #x = cm.get_inverse_of_cdf(cdf_obs, epsilon, xbins) * (m_simp_mean / m_simh_mean)
+
+                elif kind in cls.MULTIPLICATIVE:
+                    epsilon = np.interp(                                                              # Eq. 2
+                        (m_simh_mean * m_simp) / m_simp_mean, 
+                        xbins, cdf_simh, 
+                        left=kwargs.get('val_min', 0.0), 
+                        right=kwargs.get('val_max', None)
+                    )   
+                    X = np.interp(epsilon, cdf_obs, xbins) * (m_simp_mean / m_simh_mean)              # Eq. 2
                 for i, idx in enumerate(idxs): res.values[idx] = X[i]
             return res
 
-        if kind in cls.ADDITIVE: # additive, no detrend
-            epsilon = np.interp(simp, xbins, cdf_simh)                                 # Eq. 1
-            res.values = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)               # Eq. 1
+        if kind in cls.ADDITIVE: 
+            epsilon = np.interp(simp, xbins, cdf_simh)                     # Eq. 1
+            res.values = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)   # Eq. 1
+            return res
+
+        if kind in cls.MULTIPLICATIVE:
+            epsilon = np.interp(                                           # Eq. 2
+                simp, 
+                xbins, 
+                cdf_simh, 
+                left=kwargs.get('val_min', 0.0), 
+                right=kwargs.get('val_max', None)
+            )     
+            res.values = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)   # Eq. 2
             return res
 
         raise ValueError('Not implemented!')
@@ -526,37 +543,6 @@ class CMethods():
         **kwargs
     ) -> xr.core.dataarray.DataArray:
         ''' Method to adjust 1 dimensional climate data by empirical quantile mapping
-
-        ----- P A R A M E T E R S -----
-
-            obs (xarray.core.dataarray.DataArray): observed / obserence Data
-            simh (xarray.core.dataarray.DataArray): simulated historical Data
-            simp (xarray.core.dataarray.DataArray): future simulated Data
-            n_quantiles (int): Quantiles to involve, default: 10
-            extrapolate (str): [optional] 'linear' or 'constant', default: None
-            group (str): [optional] Group / Period (e.g.: 'time.month')
-
-        ----- R E T U R N -----
-
-            xarray.core.dataarray.DataArray: Adjusted data
-
-        ----- E X A M P L E -----
-
-            > obs = xarray.open_dataset('path/to/observed/data.nc')
-            > simh = xarray.open_dataset('path/to/simulated/data.nc')
-            > simp = xarray.open_dataset('path/to/future/data.nc')
-            > variable = 'tas'
-            > result = CMethods().empirical_quantile_mapping(
-            >    obs=obs[variable],
-            >    simh=simh[variable],
-            >    simp=simp[variable],
-            >    group='time.dayofyear'
-            >)
-
-        ----- R E F E R E N C E S -----
-
-            (April 2022) Taken from:
-            https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py
 
         '''
         raise ValueError('not implemented; please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py ')
@@ -631,8 +617,8 @@ class CMethods():
         if kind in cls.ADDITIVE:
             res = simp.copy(deep=True)
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp) # to achieve higher accuracy
-            global_max = max(np.amax(obs), np.amax(simh))
-            global_min = min(np.amin(obs), np.amin(simh))
+            global_max = kwargs.get('global_max', max(np.amax(obs), np.amax(simh)))
+            global_min = kwargs.get('global_min', min(np.amin(obs), np.amin(simh)))
             wide = abs(global_max - global_min) / n_quantiles
             xbins = np.arange(global_min, global_max + wide, wide)
 
@@ -650,17 +636,21 @@ class CMethods():
         if kind in cls.MULTIPLICATIVE:
             res = simp.copy(deep=True)
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
-            global_max = max(np.amax(obs), np.amax(simh))
+            global_max = kwargs.get('global_max', max(np.amax(obs), np.amax(simh)))
             wide = global_max / n_quantiles
             xbins = np.arange(kwargs.get('global_min', .0), global_max + wide, wide)
 
-            cdf_obs = cls.get_cdf(obs,xbins)
-            cdf_simh = cls.get_cdf(simh,xbins)
+            cdf_obs = cls.get_cdf(obs, xbins)
+            cdf_simh = cls.get_cdf(simh, xbins)
             cdf_simp = cls.get_cdf(simp, xbins)
 
             epsilon = np.interp(simp, xbins, cdf_simp)                            # Eq. 1.1
             QDM1 = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)                # Eq. 1.2
-            delta = simp / cls.get_inverse_of_cdf(cdf_simh, epsilon, xbins)       # Eq. 2.3
+            
+            with np.errstate(divide='ignore', invalid='ignore'):
+                delta = simp / cls.get_inverse_of_cdf(cdf_simh, epsilon, xbins)   # Eq. 2.3
+            delta[np.isnan(delta)] = 0
+            
             res.values = QDM1 * delta                                             # Eq. 2.4
             return res
         raise ValueError(f'Unknown kind {kind}!')

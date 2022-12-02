@@ -43,14 +43,14 @@ These programs and data structures are designed to help minimize discrepancies b
   <figcaption>Figure 1: Schematic representation of a bias adjustment procedure</figcaption>
 </figure>
 
-In this way, for example, modeled data, which on average represent values that are too cold, can be adjusted by applying an adjustment procedure. The following figure shows the observed, the modeled and the adjusted values. It is directly visible that the delta adjusted time series ($T^{*DM}_{sim,p}$) are much more similar to the observed data ($T_{obs,p}$) than the raw modeled data ($T_{sim,p}$).
+In this way, for example, modeled data, which on average represent values that are too cold, can be adjusted by applying an adjustment procedure. The following figure shows the observed, the modeled, and the adjusted values. It is directly visible that the delta adjusted time series ($T^{*DM}_{sim,p}$) are much more similar to the observed data ($T_{obs,p}$) than the raw modeled data ($T_{sim,p}$).
 
 <figure>
   <img
   src="images/dm-doy-plot.png?raw=true"
   alt="Temperature per day of year in modeled, observed and bias-adjusted climate data"
   style="background-color: white; border-radius: 7px">
-  <figcaption>Figure 2: Temperature per day of year in observed, modeled and bias-adjusted climate data</figcaption>
+  <figcaption>Figure 2: Temperature per day of year in observed, modeled, and bias-adjusted climate data</figcaption>
 </figure>
 
 ---
@@ -61,14 +61,14 @@ In this way, for example, modeled data, which on average represent values that a
 
 All methods except the `adjust_3d` function requires the application on one time series.
 
-| Function name            | Description                                                                                                |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| `linear_scaling`         | Linear Scaling (additive and multiplicative)                                                               |
-| `variance_scaling`       | Variance Scaling (additive)                                                                                |
-| `delta_method`           | Delta (Change) Method (additive and multiplicative)                                                        |
-| `quantile_mapping`       | Quantile Mapping (additive) and Detrended Quantile Mapping (additive and multiplicative)                   |
-| `quantile_delta_mapping` | Quantile Delta Mapping (additive and multiplicative)                                                       |
-| `adjust_3d`              | requires a method name and the respective parameters to adjust all time series of a 3-dimensional data set |
+| Function name            | Description                                                                                                                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `linear_scaling`         | Linear Scaling (additive and multiplicative)                                                                                                                 |
+| `variance_scaling`       | Variance Scaling (additive)                                                                                                                                  |
+| `delta_method`           | Delta (Change) Method (additive and multiplicative)                                                                                                          |
+| `quantile_mapping`       | Quantile Mapping (additive and multiplicative) and Detrended Quantile Mapping (additive and multiplicative; to use DQM, set parameter `detrended` to `True`) |
+| `quantile_delta_mapping` | Quantile Delta Mapping (additive and multiplicative)                                                                                                         |
+| `adjust_3d`              | requires a method name and the respective parameters to adjust all time series of a 3-dimensional data set                                                   |
 
 ---
 
@@ -148,7 +148,7 @@ python3 do_bias_correction.py         \
 
 ## 5. Notes
 
-- Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to use the C++ implementation mentioned above.
+- Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to use the C++ implementation mentioned earlier.
 - Formulas and references can be found in the implementations of the corresponding functions.
 
 ### Space for improvements:
