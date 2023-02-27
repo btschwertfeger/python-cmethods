@@ -1,6 +1,6 @@
 #!/bin/python3
 '''Module that implements the bias adjustment procedutes'''
-from typing import List
+from typing import List, Union
 import multiprocessing
 import xarray as xr
 import numpy as np
@@ -24,7 +24,7 @@ __description__ = '                                                             
     simp = data to correct (predicted simulated data) ($T_{sim,p}$)                     \
                                                                                         \
                                                                                         \
-    F = Cumulative Distribution Function                                               \
+    F = Cumulative Distribution Function                                                \
     \mu = mean                                                                          \
     \sigma = standard deviation                                                         \
     i = index                                                                           \
@@ -83,7 +83,7 @@ class CMethods():
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int=100,
         kind: str='+',
-        group: str=None,
+        group: Union[str, None]=None,
         n_jobs: int=1,
         **kwargs
     ) -> xr.core.dataarray.Dataset:
@@ -132,7 +132,7 @@ class CMethods():
         if group is None and method in cls.SCALING_METHODS: group = 'time.month'
 
         result = simp.copy(deep=True)
-        len_lat, len_lon = len(obs.lat), len(obs.lon)
+        len_lat, len_lon = len(simp.lat), len(simp.lon)
 
         if method in cls.CUSTOM_METHODS:
             if n_jobs == 1:
@@ -166,11 +166,10 @@ class CMethods():
         raise UnknownMethodError(method, cls.METHODS)
 
     @classmethod
-    def pool_adjust(cls, params) -> xr.core.dataarray.DataArray:
+    def pool_adjust(cls, params: dict) -> xr.core.dataarray.DataArray:
         ''' Adjustment along longitude for one specific latitude
             used by cls.adjust_3d as callbackfunction for multiprocessing.Pool
         '''
-        for key in ['method', 'obs', 'simh', 'simp']: assert params[key]
         kwargs = params.get('kwargs', {})
 
         result = params['simp'].copy(deep=True).load()
@@ -189,7 +188,7 @@ class CMethods():
                     group=params.get('group', None),
                     **kwargs
                 )
-            return result
+            return np.array(result)
 
         raise UnknownMethodError(params['method'], cls.METHODS)
 
@@ -242,7 +241,7 @@ class CMethods():
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
-        group: str='time.month',
+        group: Union[str, None]='time.month',
         kind: str='+',
         **kwargs
     ) -> xr.core.dataarray.DataArray:
@@ -286,7 +285,6 @@ class CMethods():
 
         '''
         if group is not None: return cls.grouped_correction(method='linear_scaling', obs=obs, simh=simh, simp=simp, group=group, kind=kind, **kwargs)
-
         if kind in cls.ADDITIVE: return np.array(simp) + (np.nanmean(obs) - np.nanmean(simh)) # Eq. 1
         if kind in cls.MULTIPLICATIVE:
             adj_scaling_factor = cls.get_adjusted_scaling_factor(
@@ -302,7 +300,7 @@ class CMethods():
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
-        group: str='time.month',
+        group: Union[str, None]='time.month',
         kind: str='+',
         **kwargs
     ) -> xr.core.dataarray.DataArray:
@@ -369,7 +367,7 @@ class CMethods():
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
-        group: str='time.month',
+        group: Union[str, None]='time.month',
         kind: str='+',
         **kwargs
     ) -> xr.core.dataarray.DataArray:
@@ -428,7 +426,7 @@ class CMethods():
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int,
-        group: str=None,
+        group: Union[str, None]=None,
         kind: str='+',
         **kwargs
     ) -> xr.core.dataarray.DataArray:
@@ -538,8 +536,8 @@ class CMethods():
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int=10,
-        extrapolate: str=None,
-        group: str=None,
+        extrapolate: Union[str, None]=None,
+        group: Union[str, None]=None,
         **kwargs
     ) -> xr.core.dataarray.DataArray:
         ''' Method to adjust 1 dimensional climate data by empirical quantile mapping
@@ -565,7 +563,7 @@ class CMethods():
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int,
-        group: str=None,
+        group: Union[str, None]=None,
         kind: str='+',
         **kwargs
     ) -> xr.core.dataarray.DataArray:
@@ -657,24 +655,24 @@ class CMethods():
 
     # * -----========= G E N E R A L  =========------
     @staticmethod
-    def get_pdf(a, xbins: list) -> np.array:
+    def get_pdf(a: Union[list, np.array], xbins: Union[list, np.array]) -> np.array:
         ''' returns the probability density function of a based on xbins ($P(x)$)'''
         pdf, _ = np.histogram(a, xbins)
         return pdf
 
     @staticmethod
-    def get_cdf(a, xbins: list) -> np.array:
+    def get_cdf(a: Union[list, np.array], xbins: Union[list, np.array]) -> np.array:
         ''' returns the cummulative distribution function of a based on xbins ($F_{a}$)'''
         pdf, _ = np.histogram(a, xbins)
         return np.insert(np.cumsum(pdf), 0, 0.0)
 
     @staticmethod
-    def get_inverse_of_cdf(base_cdf, insert_cdf, xbins) -> np.array:
+    def get_inverse_of_cdf(base_cdf: Union[list, np.array], insert_cdf: Union[list, np.array], xbins: Union[list, np.array]) -> np.array:
         ''' returns the inverse cummulative distribution function of base_cdf ($F_{base_cdf}\left[insert_cdf\right])$'''
         return np.interp(insert_cdf, base_cdf, xbins)
 
     @staticmethod
-    def get_adjusted_scaling_factor(factor: float, max_scaling_factor: float) -> float:
+    def get_adjusted_scaling_factor(factor: Union[int, float], max_scaling_factor: Union[int, float]) -> float:
         '''Checks if scaling factor is within the desired range'''
         if factor > 0 and factor > abs(max_scaling_factor):
             return abs(max_scaling_factor)
