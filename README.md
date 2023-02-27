@@ -10,6 +10,8 @@
 ![ql-workflow](https://github.com/btschwertfeger/Bias-Adjustment-Python/actions/workflows/codeql.yml/badge.svg)
 ![python-package](https://github.com/btschwertfeger/Bias-Adjustment-Python/actions/workflows/python-package.yml/badge.svg)
 
+[![DOI](https://zenodo.org/badge/496160109.svg)](https://zenodo.org/badge/latestdoi/496160109)
+
 </div>
 
 This Python module contains a collection of different scale- and distribution-based bias adjustment techniques for climatic research (see `/examples/examples.ipynb` for help).
@@ -57,7 +59,7 @@ In this way, for example, modeled data, which on average represent values that a
 
 <a name="methods"></a>
 
-## 2. Available methods:
+## 2. Available methods
 
 All methods except the `adjust_3d` function requires the application on one time series.
 
@@ -139,7 +141,7 @@ python3 do_bias_correction.py         \
 ```
 
 - Linear and variance, as well as delta change method require `--group time.month` as argument.
-- Adjustment methods that apply changes in distributional biasses (QM, QDM, DQM, ...) require the `--nquantiles` argument set to some integer.
+- Adjustment methods that apply changes in distributional biases (QM, QDM, DQM, ...) require the `--nquantiles` argument set to some integer.
 - Data sets must have the same spatial resolutions.
 
 ---
