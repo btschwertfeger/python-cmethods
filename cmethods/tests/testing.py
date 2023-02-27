@@ -1,29 +1,30 @@
 '''Module to to test the bias adjustment methods'''
 import sys
 import logging
-from typing import List
+from typing import List, Tuple
 import numpy as np
 import xarray as xr
 from sklearn.metrics import mean_squared_error
+import unittest
 
 try:
     from cmethods.CMethods import CMethods
 except ModuleNotFoundError:
     print('Using local module')
     try:
-        sys.path.append('/Users/benjamin/repositories/awi-workspace/Bias-Adjustment-Python')
+        sys.path.append('/Users/benjamin/repositories/awi-workspace/python-cmethods')
         from cmethods.CMethods import CMethods
     except ModuleNotFoundError:
-        sys.path.append('/')
-        from cmethods.CMethods import CMethods
+        sys.exit(0)
 
-logging.basicConfig(
-    format='%(asctime)s %(module)s,line: %(lineno)d %(levelname)8s | %(message)s',
-    datefmt='%Y/%m/%d %H:%M:%S',
-    level=logging.INFO
-)
 
-def get_datasets(kind: str):
+class TestMethods(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+
+def get_datasets(kind: str) -> Tuple[xr.Dataset,xr.Dataset,xr.Dataset,xr.Dataset]:
     historical_time = xr.cftime_range('1971-01-01', '2000-12-31', freq='D', calendar='noleap')
     future_time = xr.cftime_range('2001-01-01', '2030-12-31', freq='D', calendar='noleap')
     latitudes = np.arange(23,27,1)
@@ -41,7 +42,7 @@ def get_datasets(kind: str):
         )
 
     def get_fake_hist_precipitation_data() -> List[float]:
-        '''Returns fake ratio based fake time series'''
+        '''Returns ratio based fake time series'''
         pr = ( 
             np.cos(2 * np.pi * historical_time.dayofyear / 365) \
             * np.cos(2 * np.pi * historical_time.dayofyear / 365) \
@@ -56,17 +57,21 @@ def get_datasets(kind: str):
         pr.ravel()[np.random.choice(pr.size, c, replace=False)] = 0
         return pr
     
-    def get_dataset(data, time, kind: str) -> xr.DataArray:
+    def get_dataset(data, time, kind: str) -> xr.Dataset:
         '''Returns a data set by data and time'''
         return xr.DataArray(
             data,
             dims=('lon', 'lat', 'time'),
-            coords={'time': time, 'lat': latitudes, 'lon': [0, 1]},
+            coords={
+                'time': time, 
+                'lat': latitudes, 
+                'lon': [0, 1, 3]
+            },
         ).transpose('time', 'lat', 'lon').to_dataset(name=kind)
 
     if kind == '+': 
         some_data = [get_hist_temp_for_lat(val) for val in latitudes]
-        data = np.array([some_data, np.array(some_data)+1])
+        data = np.array([ np.array(some_data), np.array(some_data) + .5, np.array(some_data)+1 ])
         obsh = get_dataset(data, historical_time, kind=kind)
         obsp = get_dataset(data + 1, historical_time, kind=kind)
         simh = get_dataset(data - 2, historical_time, kind=kind)
@@ -74,7 +79,7 @@ def get_datasets(kind: str):
 
     else: # precipitation
         some_data = [get_fake_hist_precipitation_data() for _ in latitudes]
-        data = np.array([some_data, np.array(some_data)])
+        data = np.array([some_data, np.array(some_data) + np.random.rand(), np.array(some_data)])
         obsh = get_dataset(data, historical_time, kind=kind)
         obsp = get_dataset(data * 1.02, historical_time, kind=kind)
         simh = get_dataset(data * 0.98, historical_time, kind=kind)
@@ -108,7 +113,7 @@ def test_linear_scaling() -> None:
     logging.info('Linear Scaling done!')
 
 
-def test_variance_scaling() -> None:
+def test_variance_scaling() -> None:    
     '''Tests the variance scaling method'''
     logging.info('Testing Variance Scaling')
 
@@ -299,6 +304,29 @@ def test_3d_distribution_methods() -> None:
                     )
             logging.info(f'3d {method} {kind} - success!')
 
+def test_n_jobs() -> None:
+    obsh, obsp, simh, simp = get_datasets(kind='+')
+    result = CMethods().adjust_3d(
+        method = 'quantile_mapping',
+        obs = obsh['+'],
+        simh = simh['+'],
+        simp = simp['+'],
+        n_quantiles = 100,
+        n_jobs = 2
+    )
+    assert isinstance(result, xr.core.dataarray.DataArray)
+    for lat in range(len(obsh.lat)):
+        for lon in range(len(obsh.lon)):
+            assert mean_squared_error(
+                result[:,lat,lon],
+                obsp['+'][:,lat,lon],
+                squared=False
+            ) < mean_squared_error(
+                simp['+'][:,lat,lon],
+                obsp['+'][:,lat,lon],
+                squared = False
+            )
+
 def main() -> None:
     '''Main'''
 
@@ -310,6 +338,7 @@ def main() -> None:
     test_quantile_delta_mapping()
     test_3d_sclaing_methods()
     test_3d_distribution_methods()
+    test_n_jobs()
 
 if __name__ == '__main__':
     main()
