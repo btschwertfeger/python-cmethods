@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      max-parallel: 1 # to avoid failing tests because of API Rate limits
+      max-parallel: 1
       matrix:
         os: [ubuntu-latest] #, macos-latest, windows-latest]
         python-version: ["3.11"]
@@ -41,6 +41,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pytest pytest-cov
           python -m pip install -r requirements.txt
+          python -m pip install -r tests/requirements.txt
 
       - name: Install package
         run: python setup.py install
