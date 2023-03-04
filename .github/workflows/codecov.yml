@@ -1,4 +1,19 @@
-codecov:
+name: Codecov
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+concurrency:
+  group: codecov-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  codecov:
     name: Coverage
     needs: [test]
     runs-on: ${{ matrix.os }}
