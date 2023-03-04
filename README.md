@@ -9,6 +9,7 @@
 
 ![ql-workflow](https://github.com/btschwertfeger/Bias-Adjustment-Python/actions/workflows/codeql.yml/badge.svg)
 ![python-package](https://github.com/btschwertfeger/Bias-Adjustment-Python/actions/workflows/python-package.yml/badge.svg)
+[![codecov](https://codecov.io/github/btschwertfeger/python-cmethods/branch/master/graph/badge.svg?token=OSO4PAABPD)](https://codecov.io/github/btschwertfeger/python-cmethods)
 
 [![DOI](https://zenodo.org/badge/496160109.svg)](https://zenodo.org/badge/latestdoi/496160109)
 
