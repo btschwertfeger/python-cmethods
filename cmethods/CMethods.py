@@ -18,7 +18,7 @@ __copyright__ = __author__
 __email__ = "development@b-schwertfeger.de"
 __link__ = "https://b-schwertfeger.de"
 __github__ = "https://github.com/btschwertfeger/Bias-Adjustment-Python"
-__description__ = "                                                                     \
+__description__ = r"                                                                     \
     Class / Script / Methods to adjust bias estimated in climate data                   \
                                                                                         \
     T = Temperatures ($T$)                                                              \
@@ -104,7 +104,7 @@ class CMethods:
         n_jobs: int = 1,
         **kwargs,
     ) -> xr.core.dataarray.Dataset:
-        """Function to adjust 3 dimensional climate data
+        r"""Function to adjust 3 dimensional climate data
 
         Note: obs, simh and simp has to be in the format (time, lat, lon)
 
@@ -167,7 +167,9 @@ class CMethods:
                             **kwargs,
                         )
             else:
-                with multiprocessing.Pool(processes=n_jobs) as pool:
+                try:
+                    pool = multiprocessing.Pool(processes=n_jobs)
+                    # with multiprocessing.Pool(processes=n_jobs) as pool:
                     params: List[dict] = [
                         {
                             "method": method,
@@ -183,6 +185,10 @@ class CMethods:
                     ]
                     for lat, corrected in enumerate(pool.map(cls.pool_adjust, params)):
                         result[lat] = corrected
+                finally:
+                    pool.close()
+                    pool.join()
+
             return result.transpose("time", "lat", "lon")
         raise UnknownMethodError(method, cls.METHODS)
 
@@ -271,7 +277,7 @@ class CMethods:
         kind: str = "+",
         **kwargs,
     ) -> xr.core.dataarray.DataArray:
-        """Method to adjust 1 dimensional climate data by the linear scaling method.
+        r"""Method to adjust 1 dimensional climate data by the linear scaling method.
 
         ----- P A R A M E T E R S -----
 
@@ -343,7 +349,7 @@ class CMethods:
         kind: str = "+",
         **kwargs,
     ) -> xr.core.dataarray.DataArray:
-        """Method to adjust 1 dimensional climate data by variance scaling method.
+        r"""Method to adjust 1 dimensional climate data by variance scaling method.
 
         ----- P A R A M E T E R S -----
 
@@ -420,7 +426,7 @@ class CMethods:
         kind: str = "+",
         **kwargs,
     ) -> xr.core.dataarray.DataArray:
-        """Method to adjust 1 dimensional climate data by delta method.
+        r"""Method to adjust 1 dimensional climate data by delta method.
 
         ----- P A R A M E T E R S -----
 
@@ -485,11 +491,11 @@ class CMethods:
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int,
-        group: Union[str, None] = None,
+        # group: Union[str, None] = None,
         kind: str = "+",
         **kwargs,
     ) -> xr.core.dataarray.DataArray:
-        """Quantile Mapping Bias Correction
+        r"""Quantile Mapping Bias Correction
 
         ----- P A R A M E T E R S -----
 
@@ -529,18 +535,20 @@ class CMethods:
             Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock Bias Correction of GCM Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles and Extremes?
             https://doi.org/10.1175/JCLI-D-14-00754.1)
         """
-
-        if group is not None:
-            return cls.grouped_correction(
-                method="quantile_mapping",
-                obs=obs,
-                simh=simh,
-                simp=simp,
-                group=group,
-                n_quantiles=n_quantiles,
-                kind=kind,
-                **kwargs,
-            )
+        # distribution-based adjustment on a grouped basis lead to high deviations
+        # in the monthly transitions, if group = "time.month". This is also when the group is
+        # day of year and so on.
+        # if group is not None:
+        #     return cls.grouped_correction(
+        #         method="quantile_mapping",
+        #         obs=obs,
+        #         simh=simh,
+        #         simp=simp,
+        #         group=group,
+        #         n_quantiles=n_quantiles,
+        #         kind=kind,
+        #         **kwargs,
+        #     )
         res = simp.copy(deep=True)
         obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
 
@@ -617,24 +625,12 @@ class CMethods:
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int = 10,
         extrapolate: Union[str, None] = None,
-        group: Union[str, None] = None,
         **kwargs,
     ) -> xr.core.dataarray.DataArray:
         """Method to adjust 1 dimensional climate data by empirical quantile mapping"""
         raise ValueError(
             "not implemented; please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py "
         )
-        # if group is not None:
-        #     return cls.grouped_correction(
-        #         method = 'empirical_quantile_mapping',
-        #         obs = obs,
-        #         simh = simh,
-        #         simp = simp,
-        #         group = group,
-        #         n_quantiles = n_quantiles,
-        #         extrapolate = extrapolate
-        #     )
-        # else: pass
 
     # ? -----========= Q U A N T I L E - D E L T A - M A P P I N G =========------
     @classmethod
@@ -644,11 +640,11 @@ class CMethods:
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int,
-        group: Union[str, None] = None,
+        # group: Union[str, None] = None,
         kind: str = "+",
         **kwargs,
     ) -> xr.core.dataarray.DataArray:
-        """Quantile Delta Mapping bias adjustment
+        r"""Quantile Delta Mapping bias adjustment
 
         ----- P A R A M E T E R S -----
 
@@ -692,17 +688,20 @@ class CMethods:
 
         """
 
-        if group is not None:
-            return cls.grouped_correction(
-                method="quantile_delta_mapping",
-                obs=obs,
-                simh=simh,
-                simp=simp,
-                group=group,
-                n_quantiles=n_quantiles,
-                kind=kind,
-                **kwargs,
-            )
+        # distribution-based adjustment on a grouped basis lead to high deviations
+        # in the monthly transitions, if group = "time.month". This is also when the group is
+        # day of year and so on.
+        # if group is not None:
+        #     return cls.grouped_correction(
+        #         method="quantile_delta_mapping",
+        #         obs=obs,
+        #         simh=simh,
+        #         simp=simp,
+        #         group=group,
+        #         n_quantiles=n_quantiles,
+        #         kind=kind,
+        #         **kwargs,
+        #     )
         if kind in cls.ADDITIVE:
             res = simp.copy(deep=True)
             obs, simh, simp = (
@@ -769,7 +768,7 @@ class CMethods:
         insert_cdf: Union[list, np.array],
         xbins: Union[list, np.array],
     ) -> np.array:
-        """returns the inverse cummulative distribution function of base_cdf ($F_{base_cdf}\left[insert_cdf\right])$"""
+        r"""returns the inverse cummulative distribution function of base_cdf ($F_{base_cdf}\left[insert_cdf\right])$"""
         return np.interp(insert_cdf, base_cdf, xbins)
 
     @staticmethod
