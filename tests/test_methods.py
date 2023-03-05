@@ -9,13 +9,33 @@ import unittest
 from typing import List, Tuple
 
 import numpy as np
+import pytest
 import xarray as xr
 from sklearn.metrics import mean_squared_error
 
-from cmethods.CMethods import CMethods
+from cmethods.CMethods import CMethods, UnknownMethodError
 
 
 class TestMethods(unittest.TestCase):
+    def setUp(self) -> None:
+        obsh_add, obsp_add, simh_add, simp_add = self.get_datasets(kind="+")
+        obsh_mult, obsp_mult, simh_mult, simp_mult = self.get_datasets(kind="*")
+
+        self.data = {
+            "+": {
+                "obsh": obsh_add["+"],
+                "obsp": obsp_add["+"],
+                "simh": simh_add["+"],
+                "simp": simp_add["+"],
+            },
+            "*": {
+                "obsh": obsh_mult["*"],
+                "obsp": obsp_mult["*"],
+                "simh": simh_mult["*"],
+                "simp": simp_mult["*"],
+            },
+        }
+
     def get_datasets(
         self,
         kind: str,
@@ -95,134 +115,143 @@ class TestMethods(unittest.TestCase):
         """Tests the linear scaling method"""
 
         for kind in ("+", "*"):
-            obsh, obsp, simh, simp = self.get_datasets(kind=kind)
             ls_result = CMethods().linear_scaling(
-                obs=obsh[kind][:, 0, 0],
-                simh=simh[kind][:, 0, 0],
-                simp=simp[kind][:, 0, 0],
+                obs=self.data[kind]["obsh"][:, 0, 0],
+                simh=self.data[kind]["simh"][:, 0, 0],
+                simp=self.data[kind]["simp"][:, 0, 0],
                 kind=kind,
             )
             assert isinstance(ls_result, xr.core.dataarray.DataArray)
             assert mean_squared_error(
-                ls_result, obsp[kind][:, 0, 0], squared=False
+                ls_result, self.data[kind]["obsp"][:, 0, 0], squared=False
             ) < mean_squared_error(
-                simp[kind][:, 0, 0], obsp[kind][:, 0, 0], squared=False
+                self.data[kind]["simp"][:, 0, 0],
+                self.data[kind]["obsp"][:, 0, 0],
+                squared=False,
             )
 
     def test_variance_scaling(self) -> None:
         """Tests the variance scaling method"""
-
-        obsh, obsp, simh, simp = self.get_datasets(kind="+")
+        kind = "+"
         vs_result = CMethods().variance_scaling(
-            obs=obsh["+"][:, 0, 0],
-            simh=simh["+"][:, 0, 0],
-            simp=simp["+"][:, 0, 0],
+            obs=self.data[kind]["obsh"][:, 0, 0],
+            simh=self.data[kind]["simh"][:, 0, 0],
+            simp=self.data[kind]["simp"][:, 0, 0],
             kind="+",
         )
         assert isinstance(vs_result, xr.core.dataarray.DataArray)
         assert mean_squared_error(
-            vs_result, obsp["+"][:, 0, 0], squared=False
-        ) < mean_squared_error(simp["+"][:, 0, 0], obsp["+"][:, 0, 0], squared=False)
+            vs_result, self.data[kind]["obsp"][:, 0, 0], squared=False
+        ) < mean_squared_error(
+            self.data[kind]["simp"][:, 0, 0],
+            self.data[kind]["obsp"][:, 0, 0],
+            squared=False,
+        )
 
     def test_delta_method(self) -> None:
         """Tests the delta method"""
 
         for kind in ("+", "*"):
-            obsh, obsp, simh, simp = self.get_datasets(kind=kind)
             dm_result = CMethods().delta_method(
-                obs=obsh[kind][:, 0, 0],
-                simh=simh[kind][:, 0, 0],
-                simp=simp[kind][:, 0, 0],
+                obs=self.data[kind]["obsh"][:, 0, 0],
+                simh=self.data[kind]["simh"][:, 0, 0],
+                simp=self.data[kind]["simp"][:, 0, 0],
                 kind=kind,
             )
             assert isinstance(dm_result, xr.core.dataarray.DataArray)
             assert mean_squared_error(
-                dm_result, obsp[kind][:, 0, 0], squared=False
+                dm_result, self.data[kind]["obsp"][:, 0, 0], squared=False
             ) < mean_squared_error(
-                simp[kind][:, 0, 0], obsp[kind][:, 0, 0], squared=False
+                self.data[kind]["simp"][:, 0, 0],
+                self.data[kind]["obsp"][:, 0, 0],
+                squared=False,
             )
 
     def test_quantile_mapping(self) -> None:
         """Tests the quantile mapping method"""
 
         for kind in ("+", "*"):
-            obsh, obsp, simh, simp = self.get_datasets(kind=kind)
             qm_result = CMethods().quantile_mapping(
-                obs=obsh[kind][:, 0, 0],
-                simh=simh[kind][:, 0, 0],
-                simp=simp[kind][:, 0, 0],
+                obs=self.data[kind]["obsh"][:, 0, 0],
+                simh=self.data[kind]["simh"][:, 0, 0],
+                simp=self.data[kind]["simp"][:, 0, 0],
                 n_quantiles=100,
                 kind=kind,
             )
             assert isinstance(qm_result, xr.core.dataarray.DataArray)
             assert mean_squared_error(
-                qm_result, obsp[kind][:, 0, 0], squared=False
+                qm_result, self.data[kind]["obsp"][:, 0, 0], squared=False
             ) < mean_squared_error(
-                simp[kind][:, 0, 0], obsp[kind][:, 0, 0], squared=False
+                self.data[kind]["simp"][:, 0, 0],
+                self.data[kind]["obsp"][:, 0, 0],
+                squared=False,
             )
 
     def test_detrended_quantile_mapping(self) -> None:
         """Tests the detrendeed quantile mapping method"""
 
         for kind in ("+", "*"):
-            obsh, obsp, simh, simp = self.get_datasets(kind=kind)
             dqm_result = CMethods().quantile_mapping(
-                obs=obsh[kind][:, 0, 0],
-                simh=simh[kind][:, 0, 0],
-                simp=simp[kind][:, 0, 0],
+                obs=self.data[kind]["obsh"][:, 0, 0],
+                simh=self.data[kind]["simh"][:, 0, 0],
+                simp=self.data[kind]["simp"][:, 0, 0],
                 n_quantiles=100,
                 kind=kind,
                 detrended=True,
             )
             assert isinstance(dqm_result, xr.core.dataarray.DataArray)
             assert mean_squared_error(
-                dqm_result, obsp[kind][:, 0, 0], squared=False
+                dqm_result, self.data[kind]["obsp"][:, 0, 0], squared=False
             ) < mean_squared_error(
-                simp[kind][:, 0, 0], obsp[kind][:, 0, 0], squared=False
+                self.data[kind]["simp"][:, 0, 0],
+                self.data[kind]["obsp"][:, 0, 0],
+                squared=False,
             )
 
     def test_quantile_delta_mapping(self) -> None:
         """Tests the quantile delta mapping method"""
 
         for kind in ("+", "*"):
-            obsh, obsp, simh, simp = self.get_datasets(kind=kind)
             qdm_result = CMethods().quantile_delta_mapping(
-                obs=obsh[kind][:, 0, 0],
-                simh=simh[kind][:, 0, 0],
-                simp=simp[kind][:, 0, 0],
+                obs=self.data[kind]["obsh"][:, 0, 0],
+                simh=self.data[kind]["simh"][:, 0, 0],
+                simp=self.data[kind]["simp"][:, 0, 0],
                 n_quantiles=100,
                 kind=kind,
             )
 
             assert isinstance(qdm_result, xr.core.dataarray.DataArray)
             assert mean_squared_error(
-                qdm_result, obsp[kind][:, 0, 0], squared=False
+                qdm_result, self.data[kind]["obsp"][:, 0, 0], squared=False
             ) < mean_squared_error(
-                simp[kind][:, 0, 0], obsp[kind][:, 0, 0], squared=False
+                self.data[kind]["simp"][:, 0, 0],
+                self.data[kind]["obsp"][:, 0, 0],
+                squared=False,
             )
 
     def test_3d_sclaing_methods(self) -> None:
         """Tests the scaling based methods for 3-dimentsional data sets"""
 
         kind = "+"
-        obsh, obsp, simh, simp = self.get_datasets(kind=kind)
         for method in CMethods().SCALING_METHODS:
             result = CMethods().adjust_3d(
                 method=method,
-                obs=obsh[kind],
-                simh=simh[kind],
-                simp=simp[kind],
+                obs=self.data[kind]["obsh"],
+                simh=self.data[kind]["simh"],
+                simp=self.data[kind]["simp"],
                 kind=kind,
                 goup="time.month",  # default
             )
             assert isinstance(result, xr.core.dataarray.DataArray)
-            for lat in range(len(obsh.lat)):
-                for lon in range(len(obsh.lon)):
+            for lat in range(len(self.data[kind]["obsh"].lat)):
+                for lon in range(len(self.data[kind]["obsh"].lon)):
                     assert mean_squared_error(
-                        result[:, lat, lon], obsp[kind][:, lat, lon], squared=False
+                        result[:, lat, lon],
+                        self.data[kind]["obsp"][:, lat, lon],
+                        squared=False,
                     ) < mean_squared_error(
-                        simp[kind][:, lat, lon],
-                        obsp[kind][:, lat, lon],
+                        self.data[kind]["simp"][:, lat, lon],
+                        self.data[kind]["obsp"][:, lat, lon],
                         squared=False,
                     )
 
@@ -230,44 +259,131 @@ class TestMethods(unittest.TestCase):
         """Tests the distribution based methods for 3-dimentsional data sets"""
 
         for kind in ("+", "*"):
-            obsh, obsp, simh, simp = self.get_datasets(kind=kind)
             for method in CMethods().DISTRIBUTION_METHODS:
                 result = CMethods().adjust_3d(
                     method=method,
-                    obs=obsh[kind],
-                    simh=simh[kind],
-                    simp=simp[kind],
-                    n_quantiles=100,
+                    obs=self.data[kind]["obsh"],
+                    simh=self.data[kind]["simh"],
+                    simp=self.data[kind]["simp"],
+                    n_quantiles=25,
                 )
                 assert isinstance(result, xr.core.dataarray.DataArray)
-                for lat in range(len(obsh.lat)):
-                    for lon in range(len(obsh.lon)):
+                for lat in range(len(self.data[kind]["obsh"].lat)):
+                    for lon in range(len(self.data[kind]["obsh"].lon)):
                         assert mean_squared_error(
-                            result[:, lat, lon], obsp[kind][:, lat, lon], squared=False
+                            result[:, lat, lon],
+                            self.data[kind]["obsp"][:, lat, lon],
+                            squared=False,
                         ) < mean_squared_error(
-                            simp[kind][:, lat, lon],
-                            obsp[kind][:, lat, lon],
+                            self.data[kind]["simp"][:, lat, lon],
+                            self.data[kind]["obsp"][:, lat, lon],
                             squared=False,
                         )
 
     def test_n_jobs(self) -> None:
-        obsh, obsp, simh, simp = self.get_datasets(kind="+")
+        kind = "+"
         result = CMethods().adjust_3d(
             method="quantile_mapping",
-            obs=obsh["+"],
-            simh=simh["+"],
-            simp=simp["+"],
-            n_quantiles=100,
+            obs=self.data[kind]["obsh"],
+            simh=self.data[kind]["simh"],
+            simp=self.data[kind]["simp"],
+            n_quantiles=25,
             n_jobs=2,
         )
         assert isinstance(result, xr.core.dataarray.DataArray)
-        for lat in range(len(obsh.lat)):
-            for lon in range(len(obsh.lon)):
+        for lat in range(len(self.data[kind]["obsh"].lat)):
+            for lon in range(len(self.data[kind]["obsh"].lon)):
                 assert mean_squared_error(
-                    result[:, lat, lon], obsp["+"][:, lat, lon], squared=False
+                    result[:, lat, lon],
+                    self.data[kind]["obsp"][:, lat, lon],
+                    squared=False,
                 ) < mean_squared_error(
-                    simp["+"][:, lat, lon], obsp["+"][:, lat, lon], squared=False
+                    self.data[kind]["simp"][:, lat, lon],
+                    self.data[kind]["obsp"][:, lat, lon],
+                    squared=False,
                 )
+
+    def test_get_available_methods(self) -> None:
+        assert CMethods().get_available_methods() == [
+            "linear_scaling",
+            "variance_scaling",
+            "delta_method",
+            "quantile_mapping",
+            "quantile_delta_mapping",
+        ]
+
+    def test_unknown_method(self) -> None:
+        with pytest.raises(UnknownMethodError):
+            CMethods.get_function("LOCI_INTENSITY_SCALING")
+
+        kind = "+"
+        with pytest.raises(UnknownMethodError):
+            CMethods().adjust_3d(
+                method="distribution_mapping",
+                obs=self.data[kind]["obsh"],
+                simh=self.data[kind]["simh"],
+                simp=self.data[kind]["simp"],
+                kind=kind,
+            )
+
+    def test_not_implemented_methods(self) -> None:
+        kind = "+"
+        with pytest.raises(ValueError):
+            CMethods.empirical_quantile_mapping(
+                self.data[kind]["obsh"],
+                self.data[kind]["simh"],
+                self.data[kind]["simp"],
+                n_quantiles=10,
+            )
+
+    def test_invalid_adjustment_type(self) -> None:
+        kind = "+"
+        with pytest.raises(ValueError):
+            CMethods.linear_scaling(
+                self.data[kind]["obsh"],
+                self.data[kind]["simh"],
+                self.data[kind]["simp"],
+                kind="/",
+            )
+        with pytest.raises(ValueError):
+            CMethods.variance_scaling(
+                self.data[kind]["obsh"],
+                self.data[kind]["simh"],
+                self.data[kind]["simp"],
+                kind="*",
+            )
+        with pytest.raises(ValueError):
+            CMethods.delta_method(
+                self.data[kind]["obsh"],
+                self.data[kind]["simh"],
+                self.data[kind]["simp"],
+                kind="/",
+            )
+        with pytest.raises(ValueError):
+            CMethods.quantile_mapping(
+                self.data[kind]["obsh"],
+                self.data[kind]["simh"],
+                self.data[kind]["simp"],
+                kind="/",
+                n_quantiles=10,
+            )
+        with pytest.raises(ValueError):
+            CMethods.quantile_delta_mapping(
+                self.data[kind]["obsh"],
+                self.data[kind]["simh"],
+                self.data[kind]["simp"],
+                kind="/",
+                n_quantiles=10,
+            )
+
+    def test_get_pdf(self) -> None:
+        assert (CMethods.get_pdf(np.arange(10), [0, 5, 11]) == np.array((5, 5))).all()
+
+    def test_get_adjusted_scaling_factor(self) -> None:
+        assert CMethods().get_adjusted_scaling_factor(10, 5) == 5
+        assert CMethods().get_adjusted_scaling_factor(10, 11) == 10
+        assert CMethods().get_adjusted_scaling_factor(-10, -11) == -10
+        assert CMethods().get_adjusted_scaling_factor(-11, -10) == -10
 
 
 if __name__ == "__main__":
