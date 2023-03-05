@@ -326,6 +326,17 @@ class TestMethods(unittest.TestCase):
                 kind=kind,
             )
 
+        with pytest.raises(UnknownMethodError):
+            CMethods().pool_adjust(
+                params=dict(
+                    method="distribution_mapping",
+                    obs=self.data[kind]["obsh"],
+                    simh=self.data[kind]["simh"],
+                    simp=self.data[kind]["simp"],
+                    kind=kind,
+                )
+            )
+
     def test_not_implemented_methods(self) -> None:
         kind = "+"
         with pytest.raises(ValueError):
