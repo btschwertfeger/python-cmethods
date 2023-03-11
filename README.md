@@ -1,9 +1,9 @@
-# Bias adjustment/correction procedures for climatic reasearch
+# Bias correction/adjustment procedures for climatic reasearch
 
 <div align="center">
 
 [![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/btschwertfeger/Bias-Adjustment-Python)
-[![Generic badge](https://img.shields.io/badge/python-3.8+-green.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/python-3.8_|_3.9_|_3.10_|_3.11-yellow.svg)](https://shields.io/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Downloads](https://pepy.tech/badge/python-cmethods)](https://pepy.tech/project/python-cmethods)
 
@@ -17,7 +17,8 @@
 
 This Python module contains a collection of different scale- and distribution-based bias adjustment techniques for climatic research (see `/examples/examples.ipynb` for help).
 
-Since the Python programming language is very slow and bias adjustments are complex statistical transformations, it is recommended to use the C++ implementation on large data sets. This can be found [here](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
+
+### 📍 For the application of bias corrections on *lage data sets* it is recomanded to use the C++ tool [BiasAdjustCXX](https://github.com/btschwertfeger/Bias-Adjustment-Cpp) since bias corrections are complex statistical transformation which are very slow in Python compared to the C++ implementation.
 
 ---
 
@@ -151,7 +152,7 @@ python3 do_bias_correction.py         \
 
 ## 5. Notes
 
-- Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to use the C++ implementation mentioned earlier.
+- Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to use the C++ tool [BiasAdjustCXX](https://github.com/btschwertfeger/Bias-Adjustment-Cpp).
 - Formulas and references can be found in the implementations of the corresponding functions.
 
 ### Space for improvements:
