@@ -17,8 +17,7 @@
 
 This Python module contains a collection of different scale- and distribution-based bias adjustment techniques for climatic research (see `/examples/examples.ipynb` for help).
 
-
-### 📍 For the application of bias corrections on *lage data sets* it is recomanded to use the C++ tool [BiasAdjustCXX](https://github.com/btschwertfeger/Bias-Adjustment-Cpp) since bias corrections are complex statistical transformation which are very slow in Python compared to the C++ implementation.
+### 📍 For the application of bias corrections on _lage data sets_ it is recomanded to use the C++ tool [BiasAdjustCXX](https://github.com/btschwertfeger/Bias-Adjustment-Cpp) since bias corrections are complex statistical transformation which are very slow in Python compared to the C++ implementation.
 
 ---
 
