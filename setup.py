@@ -1,6 +1,7 @@
-#!/usr/bin/python3
-# -*- coding:utf-8 -*-
-# run via  python3 setup.py upload
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (C) 2023 Benjamin Thomas Schwertfeger
+# Github: https://github.com/btschwertfeger
 
 import io
 import os
@@ -9,7 +10,6 @@ from shutil import rmtree
 
 from setuptools import Command, find_packages, setup
 
-# Package meta-data.
 NAME = "python-cmethods"
 DESCRIPTION = (
     "Collection of bias adjustment procedures for multidimensional climate data"
