@@ -136,8 +136,7 @@ class CMethods:
                 obs = obs[variable],
                 simh = simh[variable],
                 simp = simp[variable],
-                n_quantiles = 100,
-                group = 'time.month',
+                n_quantiles = 250,
                 n_jobs = 4
             )
         """
@@ -145,9 +144,6 @@ class CMethods:
         obs = obs.transpose("lat", "lon", "time")
         simh = simh.transpose("lat", "lon", "time")
         simp = simp.transpose("lat", "lon", "time").load()
-
-        if group is None and method in cls.SCALING_METHODS:
-            group = "time.month"
 
         result = simp.copy(deep=True)
         len_lat, len_lon = len(simp.lat), len(simp.lon)
@@ -170,6 +166,7 @@ class CMethods:
                 try:
                     pool = multiprocessing.Pool(processes=n_jobs)
                     # with multiprocessing.Pool(processes=n_jobs) as pool:
+                    # conntext manager is not use because than the coverage does not work.
                     params: List[dict] = [
                         {
                             "method": method,
@@ -334,8 +331,8 @@ class CMethods:
                 kwargs.get("max_scaling_factor", cls.MAX_SCALING_FACTOR),
             )
             return np.array(simp) * adj_scaling_factor  # Eq. 2
-        raise ValueError(
-            'Scaling type invalid. Valid options for param kind: "+" and "*"'
+        raise NotImplementedError(
+            f"{kind} not available for linear_scaling. Use '+' or '*' instead."
         )
 
     # ? -----========= V A R I A N C E - S C A L I N G =========------
@@ -368,8 +365,7 @@ class CMethods:
             > simh = xarray.open_dataset('path/to/simulated/data.nc')
             > simp = xarray.open_dataset('path/to/predicted/data.nc')
             > variable = 'tas'
-
-            > result = CMethods().variance_scaling(obs=obs[variable], simh=simh[variable], simp=simp[variable] group='time.dayofyear')
+            > result = CMethods().variance_scaling(obs=obs[variable], simh=simh[variable], simp=simp[variable] group='time.month')
 
         ------ E Q U A T I O N S -----
 
@@ -413,7 +409,9 @@ class CMethods:
             VS_2_simp = VS_1_simp * adj_scaling_factor  # Eq. 5
             return VS_2_simp + np.nanmean(LS_simp)  # Eq. 6
 
-        raise ValueError(f'"{kind}" not available or variance scaling!')
+        raise NotImplementedError(
+            f"{kind} not available for variance_scaling. Use '+' instead."
+        )
 
     # ? -----========= D E L T A - M E T H O D =========------
     @classmethod
@@ -445,7 +443,6 @@ class CMethods:
             > simh = xarray.open_dataset('path/to/simulated/data.nc')
             > simp = xarray.open_dataset('path/to/predicted/data.nc')
             > variable = 'tas'
-
             > result = CMethods().delta_method(obs=obs[variable], simh=simh[variable], group='time.month')
 
         ------ E Q U A T I O N S -----
@@ -481,7 +478,9 @@ class CMethods:
                 kwargs.get("max_scaling_factor", cls.MAX_SCALING_FACTOR),
             )
             return np.array(obs) * adj_scaling_factor  # Eq. 2
-        raise ValueError(f'{kind} not implemented! Use "+" or "*" instead.')
+        raise NotImplementedError(
+            f"{kind} not available for delta_method. Use '+' or '*' instead."
+        )
 
     # ? -----========= Q U A N T I L E - M A P P I N G =========------
     @classmethod
@@ -503,7 +502,6 @@ class CMethods:
             simh (xarray.core.dataarray.DataArray): simulated historical Data
             simp (xarray.core.dataarray.DataArray): future simulated Data
             n_quantiles (int): number of quantiles to use
-            group (str): [optional] Group / Period (e.g.: 'time.month')
             kind (str): '+' or '*', default: '+'
             detrended (bool): [optional] detrend by shifting mean on long term basis
 
@@ -535,20 +533,7 @@ class CMethods:
             Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock Bias Correction of GCM Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles and Extremes?
             https://doi.org/10.1175/JCLI-D-14-00754.1)
         """
-        # distribution-based adjustment on a grouped basis lead to high deviations
-        # in the monthly transitions, if group = "time.month". This is also when the group is
-        # day of year and so on.
-        # if group is not None:
-        #     return cls.grouped_correction(
-        #         method="quantile_mapping",
-        #         obs=obs,
-        #         simh=simh,
-        #         simp=simp,
-        #         group=group,
-        #         n_quantiles=n_quantiles,
-        #         kind=kind,
-        #         **kwargs,
-        #     )
+
         res = simp.copy(deep=True)
         obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
 
@@ -614,7 +599,9 @@ class CMethods:
             res.values = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 2
             return res
 
-        raise ValueError("Not implemented!")
+        raise NotImplementedError(
+            f"{kind} for quantile_mapping is not available. Use '+' or '*' instead."
+        )
 
     # ? -----========= E M P I R I C A L - Q U A N T I L E - M A P P I N G =========------
     @classmethod
@@ -628,8 +615,8 @@ class CMethods:
         **kwargs,
     ) -> xr.core.dataarray.DataArray:
         """Method to adjust 1 dimensional climate data by empirical quantile mapping"""
-        raise ValueError(
-            "not implemented; please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py "
+        raise NotImplementedError(
+            "Not implemented; please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py "
         )
 
     # ? -----========= Q U A N T I L E - D E L T A - M A P P I N G =========------
@@ -640,7 +627,6 @@ class CMethods:
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int,
-        # group: Union[str, None] = None,
         kind: str = "+",
         **kwargs,
     ) -> xr.core.dataarray.DataArray:
@@ -652,7 +638,6 @@ class CMethods:
             simh (xarray.core.dataarray.DataArray): simulated historical Data
             simp (xarray.core.dataarray.DataArray): future simulated Data
             n_quantiles (int): number of quantiles to use
-            group (str): [optional] Group / Period (e.g.: 'time.month')
             kind (str): '+' or '*', default: '+'
             global_min (float): this parameter can be set when kind == '*' to define a custom lower limit. Otherwise 0.0 is used.
 
@@ -688,20 +673,6 @@ class CMethods:
 
         """
 
-        # distribution-based adjustment on a grouped basis lead to high deviations
-        # in the monthly transitions, if group = "time.month". This is also when the group is
-        # day of year and so on.
-        # if group is not None:
-        #     return cls.grouped_correction(
-        #         method="quantile_delta_mapping",
-        #         obs=obs,
-        #         simh=simh,
-        #         simp=simp,
-        #         group=group,
-        #         n_quantiles=n_quantiles,
-        #         kind=kind,
-        #         **kwargs,
-        #     )
         if kind in cls.ADDITIVE:
             res = simp.copy(deep=True)
             obs, simh, simp = (
