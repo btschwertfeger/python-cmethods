@@ -18,7 +18,7 @@ URL = "https://github.com/btschwertfeger/Bias-Adjustment-Python"
 EMAIL = "development@b-schwertfeger.de"
 AUTHOR = "Benjamin Thomas Schwertfeger"
 REQUIRES_PYTHON = ">=3.8.0"
-VERSION = "0.6.2"
+VERSION = "0.6.3"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
