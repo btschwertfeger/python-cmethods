@@ -240,7 +240,7 @@ class TestMethods(unittest.TestCase):
                 simh=self.data[kind]["simh"],
                 simp=self.data[kind]["simp"],
                 kind=kind,
-                goup="time.month",  # default
+                group="time.month",  # default
             )
             assert isinstance(result, xr.core.dataarray.DataArray)
             for lat in range(len(self.data[kind]["obsh"].lat)):

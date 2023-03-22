@@ -718,7 +718,9 @@ class CMethods:
 
             res.values = QDM1 * delta  # Eq. 2.4
             return res
-        raise ValueError(f"Unknown kind {kind}!")
+        raise NotImplementedError(
+            f"{kind} not available for quantile_delta_mapping. Use '+' or '*' instead."
+        )
 
     # * -----========= G E N E R A L  =========------
     @staticmethod
