@@ -240,7 +240,7 @@ class TestMethods(unittest.TestCase):
                 simh=self.data[kind]["simh"],
                 simp=self.data[kind]["simp"],
                 kind=kind,
-                goup="time.month",  # default
+                group="time.month",  # default
             )
             assert isinstance(result, xr.core.dataarray.DataArray)
             for lat in range(len(self.data[kind]["obsh"].lat)):
@@ -339,7 +339,7 @@ class TestMethods(unittest.TestCase):
 
     def test_not_implemented_methods(self) -> None:
         kind = "+"
-        with pytest.raises(ValueError):
+        with pytest.raises(NotImplementedError):
             CMethods.empirical_quantile_mapping(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
@@ -349,28 +349,28 @@ class TestMethods(unittest.TestCase):
 
     def test_invalid_adjustment_type(self) -> None:
         kind = "+"
-        with pytest.raises(ValueError):
+        with pytest.raises(NotImplementedError):
             CMethods.linear_scaling(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],
                 kind="/",
             )
-        with pytest.raises(ValueError):
+        with pytest.raises(NotImplementedError):
             CMethods.variance_scaling(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],
                 kind="*",
             )
-        with pytest.raises(ValueError):
+        with pytest.raises(NotImplementedError):
             CMethods.delta_method(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],
                 kind="/",
             )
-        with pytest.raises(ValueError):
+        with pytest.raises(NotImplementedError):
             CMethods.quantile_mapping(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
@@ -378,7 +378,7 @@ class TestMethods(unittest.TestCase):
                 kind="/",
                 n_quantiles=10,
             )
-        with pytest.raises(ValueError):
+        with pytest.raises(NotImplementedError):
             CMethods.quantile_delta_mapping(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
