@@ -20,7 +20,7 @@
 
 This Python module contains a collection of different scale- and distribution-based bias adjustment techniques for climatic research (see `/examples/examples.ipynb` for help).
 
-The documentation can be found here: [https://python-kraken-sdk.readthedocs.io/en/stable/](https://python-kraken-sdk.readthedocs.io/en/stable/)
+The documentation is available at: [https://python-kraken-sdk.readthedocs.io/en/stable/](https://python-kraken-sdk.readthedocs.io/en/stable/)
 
 > ⚠️ For the application of bias corrections on _lage data sets_ it is recomanded to use the command-line tool [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX) since bias corrections are complex statistical transformation which are very slow in Python compared to the C++ implementation.
 
@@ -96,8 +96,7 @@ python3 -m pip install python-cmethods
 
 ```python
 import xarray as xr
-from cmethods.CMethods import CMethods
-cm = CMethods()
+from cmethods.CMethods import CMethods as cm
 
 obsh = xr.open_dataset('input_data/observations.nc')
 simh = xr.open_dataset('input_data/control.nc')

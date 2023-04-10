@@ -46,7 +46,7 @@ pre-commit:
 ##		Clean the workspace
 ##
 clean:
-	rm -rf .pytest_cache build/ dist/ python_cmethods.egg-info docs/_build
+	rm -rf .pytest_cache build/ dist/ python_cmethods.egg-info docs/_build examples/.ipynb_checkpoints
 	rm -f .coverage cmethods/_version.py
 
 	find tests -name "__pycache__" | xargs rm -rf

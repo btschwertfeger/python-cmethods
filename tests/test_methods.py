@@ -13,7 +13,8 @@ import pytest
 import xarray as xr
 from sklearn.metrics import mean_squared_error
 
-from cmethods.CMethods import CMethods, UnknownMethodError
+from cmethods.CMethods import CMethods as cm
+from cmethods.CMethods import UnknownMethodError
 
 
 class TestMethods(unittest.TestCase):
@@ -115,7 +116,7 @@ class TestMethods(unittest.TestCase):
         """Tests the linear scaling method"""
 
         for kind in ("+", "*"):
-            ls_result = CMethods().linear_scaling(
+            ls_result = cm.linear_scaling(
                 obs=self.data[kind]["obsh"][:, 0, 0],
                 simh=self.data[kind]["simh"][:, 0, 0],
                 simp=self.data[kind]["simp"][:, 0, 0],
@@ -133,7 +134,7 @@ class TestMethods(unittest.TestCase):
     def test_variance_scaling(self) -> None:
         """Tests the variance scaling method"""
         kind = "+"
-        vs_result = CMethods().variance_scaling(
+        vs_result = cm.variance_scaling(
             obs=self.data[kind]["obsh"][:, 0, 0],
             simh=self.data[kind]["simh"][:, 0, 0],
             simp=self.data[kind]["simp"][:, 0, 0],
@@ -152,7 +153,7 @@ class TestMethods(unittest.TestCase):
         """Tests the delta method"""
 
         for kind in ("+", "*"):
-            dm_result = CMethods().delta_method(
+            dm_result = cm.delta_method(
                 obs=self.data[kind]["obsh"][:, 0, 0],
                 simh=self.data[kind]["simh"][:, 0, 0],
                 simp=self.data[kind]["simp"][:, 0, 0],
@@ -171,7 +172,7 @@ class TestMethods(unittest.TestCase):
         """Tests the quantile mapping method"""
 
         for kind in ("+", "*"):
-            qm_result = CMethods().quantile_mapping(
+            qm_result = cm.quantile_mapping(
                 obs=self.data[kind]["obsh"][:, 0, 0],
                 simh=self.data[kind]["simh"][:, 0, 0],
                 simp=self.data[kind]["simp"][:, 0, 0],
@@ -191,7 +192,7 @@ class TestMethods(unittest.TestCase):
         """Tests the detrendeed quantile mapping method"""
 
         for kind in ("+", "*"):
-            dqm_result = CMethods().quantile_mapping(
+            dqm_result = cm.quantile_mapping(
                 obs=self.data[kind]["obsh"][:, 0, 0],
                 simh=self.data[kind]["simh"][:, 0, 0],
                 simp=self.data[kind]["simp"][:, 0, 0],
@@ -212,7 +213,7 @@ class TestMethods(unittest.TestCase):
         """Tests the quantile delta mapping method"""
 
         for kind in ("+", "*"):
-            qdm_result = CMethods().quantile_delta_mapping(
+            qdm_result = cm.quantile_delta_mapping(
                 obs=self.data[kind]["obsh"][:, 0, 0],
                 simh=self.data[kind]["simh"][:, 0, 0],
                 simp=self.data[kind]["simp"][:, 0, 0],
@@ -233,8 +234,8 @@ class TestMethods(unittest.TestCase):
         """Tests the scaling based methods for 3-dimentsional data sets"""
 
         kind = "+"
-        for method in CMethods().SCALING_METHODS:
-            result = CMethods().adjust_3d(
+        for method in cm.SCALING_METHODS:
+            result = cm.adjust_3d(
                 method=method,
                 obs=self.data[kind]["obsh"],
                 simh=self.data[kind]["simh"],
@@ -259,8 +260,8 @@ class TestMethods(unittest.TestCase):
         """Tests the distribution based methods for 3-dimentsional data sets"""
 
         for kind in ("+", "*"):
-            for method in CMethods().DISTRIBUTION_METHODS:
-                result = CMethods().adjust_3d(
+            for method in cm.DISTRIBUTION_METHODS:
+                result = cm.adjust_3d(
                     method=method,
                     obs=self.data[kind]["obsh"],
                     simh=self.data[kind]["simh"],
@@ -282,7 +283,7 @@ class TestMethods(unittest.TestCase):
 
     def test_n_jobs(self) -> None:
         kind = "+"
-        result = CMethods().adjust_3d(
+        result = cm.adjust_3d(
             method="quantile_mapping",
             obs=self.data[kind]["obsh"],
             simh=self.data[kind]["simh"],
@@ -304,7 +305,7 @@ class TestMethods(unittest.TestCase):
                 )
 
     def test_get_available_methods(self) -> None:
-        assert CMethods().get_available_methods() == [
+        assert cm.get_available_methods() == [
             "linear_scaling",
             "variance_scaling",
             "delta_method",
@@ -314,11 +315,11 @@ class TestMethods(unittest.TestCase):
 
     def test_unknown_method(self) -> None:
         with pytest.raises(UnknownMethodError):
-            CMethods.get_function("LOCI_INTENSITY_SCALING")
+            cm.get_function("LOCI_INTENSITY_SCALING")
 
         kind = "+"
         with pytest.raises(UnknownMethodError):
-            CMethods().adjust_3d(
+            cm.adjust_3d(
                 method="distribution_mapping",
                 obs=self.data[kind]["obsh"],
                 simh=self.data[kind]["simh"],
@@ -327,7 +328,7 @@ class TestMethods(unittest.TestCase):
             )
 
         with pytest.raises(UnknownMethodError):
-            CMethods().pool_adjust(
+            cm.pool_adjust(
                 params=dict(
                     method="distribution_mapping",
                     obs=self.data[kind]["obsh"],
@@ -340,7 +341,7 @@ class TestMethods(unittest.TestCase):
     def test_not_implemented_methods(self) -> None:
         kind = "+"
         with pytest.raises(NotImplementedError):
-            CMethods.empirical_quantile_mapping(
+            cm.get_function(method="empirical_quantile_mapping")(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],
@@ -350,28 +351,28 @@ class TestMethods(unittest.TestCase):
     def test_invalid_adjustment_type(self) -> None:
         kind = "+"
         with pytest.raises(NotImplementedError):
-            CMethods.linear_scaling(
+            cm.linear_scaling(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],
                 kind="/",
             )
         with pytest.raises(NotImplementedError):
-            CMethods.variance_scaling(
+            cm.variance_scaling(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],
                 kind="*",
             )
         with pytest.raises(NotImplementedError):
-            CMethods.delta_method(
+            cm.delta_method(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],
                 kind="/",
             )
         with pytest.raises(NotImplementedError):
-            CMethods.quantile_mapping(
+            cm.quantile_mapping(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],
@@ -379,7 +380,7 @@ class TestMethods(unittest.TestCase):
                 n_quantiles=10,
             )
         with pytest.raises(NotImplementedError):
-            CMethods.quantile_delta_mapping(
+            cm.quantile_delta_mapping(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],
@@ -388,13 +389,13 @@ class TestMethods(unittest.TestCase):
             )
 
     def test_get_pdf(self) -> None:
-        assert (CMethods.get_pdf(np.arange(10), [0, 5, 11]) == np.array((5, 5))).all()
+        assert (cm.get_pdf(np.arange(10), [0, 5, 11]) == np.array((5, 5))).all()
 
     def test_get_adjusted_scaling_factor(self) -> None:
-        assert CMethods().get_adjusted_scaling_factor(10, 5) == 5
-        assert CMethods().get_adjusted_scaling_factor(10, 11) == 10
-        assert CMethods().get_adjusted_scaling_factor(-10, -11) == -10
-        assert CMethods().get_adjusted_scaling_factor(-11, -10) == -10
+        assert cm.get_adjusted_scaling_factor(10, 5) == 5
+        assert cm.get_adjusted_scaling_factor(10, 11) == 10
+        assert cm.get_adjusted_scaling_factor(-10, -11) == -10
+        assert cm.get_adjusted_scaling_factor(-11, -10) == -10
 
 
 if __name__ == "__main__":

@@ -48,8 +48,7 @@ class UnknownMethodError(Exception):
 class CMethods:
     """
     The CMethods class serves a collection of bias correction procedures to adjust
-    time-series of climate data. It accept no parameters but must be instantiated
-    to apply the bias correction techniques.
+    time-series of climate data.
 
     The following bias correction techniques are available:
         Scaling-based techniques:
@@ -91,8 +90,9 @@ class CMethods:
             :linenos:
             :caption: Example: Get available methods
 
-            >>> from cmethods.CMethods import CMethods
-            >>> CMethods().get_available_methods()
+            >>> from cmethods.CMethods import CMethods as cm
+
+            >>> cm.get_available_methods()
             [
                 "linear_scaling", "variance_scaling", "delta_method",
                 "quantile_mapping", "quantile_delta_mapping"
@@ -169,7 +169,7 @@ class CMethods:
             :caption: Example application - 3-dimensinoal bias correction
 
             >>> import xarray as xr
-            >>> from cmethods.CMethods import CMethods
+            >>> from cmethods.CMethods import CMethods as cm
 
             >>> # Note: The data sets must contain the dimensions "time", "lat", and "lon"
             >>> #       for the respective variable.
@@ -177,8 +177,6 @@ class CMethods:
             >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
             >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
             >>> variable = "tas" # temperatures
-
-            >>> cm = CMethods()
 
             '''
             In the following the Quantile Delta Mapping techniques is applied on
@@ -422,7 +420,7 @@ class CMethods:
             :caption: Example: Linear Scaling
 
             >>> import xarray as xr
-            >>> from cmethods.CMethods import CMethods
+            >>> from cmethods.CMethods import CMethods as cm
 
             >>> # Note: The data sets must contain the dimension "time"
             >>> #       for the respective variable.
@@ -431,7 +429,6 @@ class CMethods:
             >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
             >>> variable = "tas" # temperatures
 
-            >>> cm = CMethods()
             >>> ls_adjusted = cm.linear_scaling(
             ...     obs=obs[variable],
             ...     simh=simh[variable],
@@ -543,7 +540,7 @@ class CMethods:
             :caption: Example: Variance Scaling
 
             >>> import xarray as xr
-            >>> from cmethods.CMethods import CMethods
+            >>> from cmethods.CMethods import CMethods as cm
 
             >>> # Note: The data sets must contain the dimension "time"
             >>> #       for the respective variable.
@@ -552,7 +549,6 @@ class CMethods:
             >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
             >>> variable = "tas" # temperatures
 
-            >>> cm = CMethods()
             >>> vs_adjusted = cm.variance_scaling(
             ...     obs=obs[variable],
             ...     simh=simh[variable],
@@ -663,7 +659,7 @@ class CMethods:
             :caption: Example: Delta Method
 
             >>> import xarray as xr
-            >>> from cmethods.CMethods import CMethods
+            >>> from cmethods.CMethods import CMethods as cm
 
             >>> # Note: The data sets must contain the dimension "time"
             >>> #       for the respective variable.
@@ -672,7 +668,6 @@ class CMethods:
             >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
             >>> variable = "tas" # temperatures
 
-            >>> cm = CMethods()
             >>> dm_adjusted = cm.delta_method(
             ...     obs=obs[variable],
             ...     simh=simh[variable],
@@ -775,7 +770,7 @@ class CMethods:
             :caption: Example: Quantile Mapping
 
             >>> import xarray as xr
-            >>> from cmethods.CMethods import CMethods
+            >>> from cmethods.CMethods import CMethods as cm
 
             >>> # Note: The data sets must contain the dimension "time"
             >>> #       for the respective variable.
@@ -784,7 +779,6 @@ class CMethods:
             >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
             >>> variable = "tas" # temperatures
 
-            >>> cm = CMethods()
             >>> qm_adjusted = cm.quantile_mapping(
             ...     obs=obs[variable],
             ...     simh=simh[variable],
@@ -1005,7 +999,7 @@ class CMethods:
             :caption: Example: Quantile Delta Mapping
 
             >>> import xarray as xr
-            >>> from cmethods.CMethods import CMethods
+            >>> from cmethods.CMethods import CMethods as cm
 
             >>> # Note: The data sets must contain the dimension "time"
             >>> #       for the respective variable.
@@ -1014,7 +1008,6 @@ class CMethods:
             >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
             >>> variable = "tas" # temperatures
 
-            >>> cm = CMethods()
             >>> qdm_adjusted = cm.quantile_delta_mapping(
             ...     obs=obs[variable],
             ...     simh=simh[variable],
@@ -1089,8 +1082,8 @@ class CMethods:
             :linenos:
             :caption: Compute the probability density function :math:`P(x)`
 
-            >>> from cmethods.CMethods import CMethods
-            >>> cm = CMethods()
+            >>> from cmethods.CMethods import CMethods as cm
+
             >>> x = [1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9, 10]
             >>> xbins = [0, 3, 6, 10]
             >>> print(cm.get_pdf(x=x, xbins=xbins))
@@ -1117,8 +1110,8 @@ class CMethods:
             :linenos:
             :caption: Compute the cmmulative distribution function :math:`F(x)`
 
-            >>> from cmethods.CMethods import CMethods
-            >>> cm = CMethods()
+            >>> from cmethods.CMethods import CMethods as cm
+
             >>> x = [1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9, 10]
             >>> xbins = [0, 3, 6, 10]
             >>> print(cm.get_cdf(x=x, xbins=xbins))

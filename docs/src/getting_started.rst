@@ -23,8 +23,7 @@ method specific documentation.
     :caption: Apply the Linear Scaling bias correction technique on 1-dimensional data
 
     import xarray as xr
-    from cmethods.CMethods import CMethods
-    cm = CMethods()
+    from cmethods.CMethods import CMethods as cm
 
     obsh = xr.open_dataset('input_data/observations.nc')
     simh = xr.open_dataset('input_data/control.nc')
@@ -42,8 +41,7 @@ method specific documentation.
     :caption: Apply the Quantile Delta Mapping bias correction technique on 1-dimensional data
 
     import xarray as xr
-    from cmethods.CMethods import CMethods
-    cm = CMethods()
+    from cmethods.CMethods import CMethods as cm
 
     obsh = xr.open_dataset('input_data/observations.nc')
     simh = xr.open_dataset('input_data/control.nc')
@@ -57,5 +55,3 @@ method specific documentation.
         n_quaniles = 1000,
         kind = '+'
     )
-
-```
