@@ -47,7 +47,7 @@ jobs:
   ##
   Test:
     needs: [Build]
-    uses: ./.github/workflows/_test_spot.yml
+    uses: ./.github/workflows/_test.yml
     strategy:
       matrix:
         os: [ubuntu-latest]
