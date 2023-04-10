@@ -13,8 +13,8 @@ import pytest
 import xarray as xr
 from sklearn.metrics import mean_squared_error
 
-from cmethods.CMethods import CMethods as cm
-from cmethods.CMethods import UnknownMethodError
+from cmethods import CMethods as cm
+from cmethods import UnknownMethodError
 
 
 class TestMethods(unittest.TestCase):

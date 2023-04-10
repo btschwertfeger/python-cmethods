@@ -2,7 +2,7 @@
 Classes and Functions
 =====================
 
-.. currentmodule:: cmethods.CMethods
+.. currentmodule:: cmethods
 
 .. autoclass:: CMethods
    :members: linear_scaling, variance_scaling, delta_method, quantile_mapping, quantile_delta_mapping, adjust_3d
