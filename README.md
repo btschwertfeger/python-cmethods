@@ -131,23 +131,44 @@ Notes:
 
 Notebook with different methods and plots: `/examples/examples.ipynb`
 
-Example script for adjusting climate data: `/examples/do_bias_correction.py`
+There is also an exmple script (`/examples/biasadjust.py`) that can be used to apply the available bias correction methods
+on 1- and 3-dimensional data sets (see `/examples/input_data/*.nc`).
+
+Help:
 
 ```bash
-python3 do_bias_correction.py         \
-    --obs input_data/observations.nc  \
-    --contr input_data/control.nc     \
-    --scen input_data/scenario.nc     \
-    --method linear_scaling           \
-    --variable tas                    \
-    --unit '°C'                       \
-    --group 'time.month'              \
-    --kind +
+╰─ python3 biasadjust.py --help
 ```
 
-- Linear and variance, as well as delta change method require `--group time.month` as argument.
-- Adjustment methods that apply changes in distributional biases (QM, QDM, DQM, ...) require the `--nquantiles` argument set to some integer.
+(1.) Example - Quantile Mapping bias correction on the provided example data:
+
+```bash
+╰─ python3 biasadjust.py              \
+    --ref input_data/observations.nc  \
+    --contr input_data/control.nc     \
+    --scen input_data/scenario.nc     \
+    --kind "+"                        \
+    --variable "tas"                  \
+    -method quantile_mapping
+```
+
+(2.) Example - Linear Scaling bias correction on the provided example data:
+
+```bash
+╰─ python3 biasadjust.py              \
+    --ref input_data/observations.nc  \
+    --contr input_data/control.nc     \
+    --scen input_data/scenario.nc     \
+    --kind "+"                        \
+    --variable "tas"                  \
+    --group "time.month"              \
+    -method linear_scaling
+```
+
+Notes:
+
 - Data sets must have the same spatial resolutions.
+- This script is far away from perfect - so please look at it, as a starting point. (:
 
 ---
 
@@ -155,12 +176,12 @@ python3 do_bias_correction.py         \
 
 ## 5. Notes
 
-- Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to use the C++ tool [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX).
-- Formulas and references can be found in the implementations of the corresponding functions.
+- Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to use the command-line tool [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX).
+- Formulas and references can be found in the implementations of the corresponding functions, on the bottom of the README.md and in the [documentation](https://python-kraken-sdk.readthedocs.io/en/stable/).
 
 ### Space for improvements:
 
-Since the scaling methods implemented so far scale by default over the mean values of the respective months, unrealistic long-term mean values may occur at the month transitions. This can be prevented either by selecting `group='time.dayofyear'`. Alternatively, it is possible not to scale using long-term mean values, but using a 31-day interval, which takes the 31 surrounding values over all years as the basis for calculating the mean values. This is not yet implemented in this module, but is available in the C++ tool [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX).
+- Since the scaling methods implemented so far scale by default over the mean values of the respective months, unrealistic long-term mean values may occur at the month transitions. This can be prevented either by selecting `group='time.dayofyear'`. Alternatively, it is possible not to scale using long-term mean values, but using a 31-day interval, which takes the 31 surrounding values over all years as the basis for calculating the mean values. This is not yet implemented, because even the computation for this takes so much time, that it is not worth implementing it in python - but this is available in [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX).
 
 ---
 
