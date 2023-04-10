@@ -96,7 +96,7 @@ python3 -m pip install python-cmethods
 
 ```python
 import xarray as xr
-from cmethods.CMethods import CMethods as cm
+from cmethods import CMethods as cm
 
 obsh = xr.open_dataset('input_data/observations.nc')
 simh = xr.open_dataset('input_data/control.nc')

@@ -44,16 +44,16 @@ Available Methods
 
 The following bias correction techniques are available:
     Scaling-based techniques:
-        * Linear Scaling :func:`cmethods.CMethods.CMethods.linear_scaling`
-        * Vairance Scaling :func:`cmethods.CMethods.CMethods.variance_scaling`
-        * Delta (change) Method :func:`cmethods.CMethods.CMethods.delta_method`
+        * Linear Scaling :func:`cmethods.CMethods.linear_scaling`
+        * Vairance Scaling :func:`cmethods.CMethods.variance_scaling`
+        * Delta (change) Method :func:`cmethods.CMethods.delta_method`
 
     Distribution-based techniques:
-        * Quantile Mapping :func:`cmethods.CMethods.CMethods.quantile_mapping`
-        * Quantile Delta Mapping :func:`cmethods.CMethods.CMethods.quantile_delta_mapping`
+        * Quantile Mapping :func:`cmethods.CMethods.quantile_mapping`
+        * Quantile Delta Mapping :func:`cmethods.CMethods.quantile_delta_mapping`
 
 All of these methods are intended to be applied on 1-dimensional time-series climate data.
-This module also provides the function :func:`cmethods.CMethods.CMethods.adjust_3d` that enables
+This module also provides the function :func:`cmethods.CMethods.adjust_3d` that enables
 the application of the desired bias correction method on 3-dimensinoal data sets.
 
 Examples can be found in the `python-cmethods`_ repository and of course
