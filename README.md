@@ -7,10 +7,12 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Downloads](https://pepy.tech/badge/python-cmethods)](https://pepy.tech/project/python-cmethods)
 
-![ql-workflow](https://github.com/btschwertfeger/Bias-Adjustment-Python/actions/workflows/codeql.yml/badge.svg)
-![python-package](https://github.com/btschwertfeger/Bias-Adjustment-Python/actions/workflows/python-package.yml/badge.svg)
+![CodeQL](https://github.com/btschwertfeger/Bias-Adjustment-Python/actions/workflows/codeql.yml/badge.svg)
+[![CI/CD](https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yml/badge.svg?branch=master)](https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yml)
 [![codecov](https://codecov.io/github/btschwertfeger/python-cmethods/branch/master/graph/badge.svg?token=OSO4PAABPD)](https://codecov.io/github/btschwertfeger/python-cmethods)
 
+![release](https://shields.io/github/release-date/btschwertfeger/python-cmethods)
+![release](https://shields.io/github/v/release/btschwertfeger/python-cmethods?display_name=tag)
 [![DOI](https://zenodo.org/badge/496160109.svg)](https://zenodo.org/badge/latestdoi/496160109)
 
 </div>
@@ -46,7 +48,7 @@ These programs and data structures are designed to help minimize discrepancies b
   <figcaption>Figure 1: Schematic representation of a bias adjustment procedure</figcaption>
 </figure>
 
-In this way, for example, modeled data, which on average represent values that are too cold, can be adjusted by applying an adjustment procedure. The following figure shows the observed, the modeled, and the adjusted values. It is directly visible that the delta adjusted time series ($T^{*DM}_{sim,p}$) are much more similar to the observed data ($T_{obs,p}$) than the raw modeled data ($T_{sim,p}$).
+In this way, for example, modeled data, which on average represent values that are too cold, can be adjusted by applying an adjustment procedure. The following figure shows the observed, the modeled, and the adjusted values. It is directly visible that the delta adjusted time series ($T^{\*DM}_{sim,p}$) are much more similar to the observed data ($T_{obs,p}$) than the raw modeled data ($T_{sim,p}$).
 
 <figure>
   <img

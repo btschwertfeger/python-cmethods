@@ -1,12 +1,22 @@
-name: Codecov
+# -*- coding: utf-8 -*-
+# Copyright (C) 2023 Benjamin Thomas Schwertfeger
+# Github: https://github.com/btschwertfeger
+#
+# Template workflow to build the project for a specific os
+# and Python version, run the tests and upload the results to codecov.
+#
+
+name: CodeCov
 
 on:
-  push:
-    branches:
-      - "**"
-  pull_request:
-    branches:
-      - "**"
+  workflow_call:
+    inputs:
+      os:
+        type: string
+        required: true
+      python-version:
+        type: string
+        required: true
 
 concurrency:
   group: codecov-${{ github.ref }}
@@ -15,17 +25,10 @@ concurrency:
 jobs:
   codecov:
     name: Coverage
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.11"]
-
+    runs-on: ${{ inputs.os }}
     env:
-      OS: ${{ matrix.os }}
-      PYTHON: ${{ matrix.python-version }}
+      OS: ${{ inputs.os }}
+      PYTHON: ${{ inputs.python-version }}
 
     steps:
       - name: Checkout repository
@@ -34,7 +37,7 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ inputs.python-version }}
 
       - name: Install dependencies
         run: |
