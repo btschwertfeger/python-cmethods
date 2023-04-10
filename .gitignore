@@ -135,6 +135,7 @@ del*.py
 *.csv
 *.log
 *.zip
+.vscode/
 
 *.egg-info/
 conda.stuff/

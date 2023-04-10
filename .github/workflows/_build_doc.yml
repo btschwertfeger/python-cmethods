@@ -2,10 +2,10 @@
 # Copyright (C) 2023 Benjamin Thomas Schwertfeger
 # Github: https://github.com/btschwertfeger
 #
-# Template workflow to run the unit tests of the package
+# Template workflow to build documentation.
 #
 
-name: Test Spot
+name: Build Doc
 
 on:
   workflow_call:
@@ -18,8 +18,7 @@ on:
         required: true
 
 jobs:
-  Test:
-    name: Test ${{ inputs.os }} ${{ inputs.python-version }}
+  Build:
     runs-on: ${{ inputs.os }}
     steps:
       - name: Checkout repository
@@ -33,9 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          python -m pip install -r docs/requirements.txt
 
-      - name: Install package
-        run: python -m pip install ".[dev]"
-
-      - name: Run unit tests
-        run: pytest tests/
+      - name: Build the documentation
+        run: cd docs && make html

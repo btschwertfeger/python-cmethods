@@ -37,6 +37,15 @@ jobs:
       os: ${{ matrix.os }}
       python-version: ${{ matrix.python-version }}
 
+  ##    Build the documentation
+  ##
+  Build-Doc:
+    needs: [Pre-Commit]
+    uses: ./.github/workflows/_build_doc.yml
+    with:
+      os: "ubuntu-latest"
+      python-version: "3.11"
+
   ##    Run the unit tests for Python 3.8 until 3.11
   ##
   Test:
