@@ -4,7 +4,22 @@
 # Github: https://github.com/btschwertfeger
 #
 
-"""Module that implements the bias adjustment procedutes"""
+r"""
+    Module to apply different bias correction techniques to time-series climate data
+
+    T = Temperatures ($T$)
+    X = Some climate variable ($X$)
+    h = historical
+    p = scenario; future; predicted
+    obs = observed data ($T_{obs,h}$)
+    simh = modeled data with same time period as obs ($T_{sim,h}$)
+    simp = data to correct (predicted simulated data) ($T_{sim,p}$)
+    F = Cumulative Distribution Function
+    \mu = mean
+    \sigma = standard deviation
+    i = index
+    _{m} = long-term monthly interval
+"""
 import multiprocessing
 from typing import List, Union
 
@@ -12,38 +27,16 @@ import numpy as np
 import xarray as xr
 from tqdm import tqdm
 
-__descrption__ = "Module to help adjusting bias estimated in climate data"
 __author__ = "Benjamin Thomas Schwertfeger"
 __copyright__ = __author__
 __email__ = "development@b-schwertfeger.de"
 __link__ = "https://b-schwertfeger.de"
-__github__ = "https://github.com/btschwertfeger/Bias-Adjustment-Python"
-__description__ = r"                                                                     \
-    Class / Script / Methods to adjust bias estimated in climate data                   \
-                                                                                        \
-    T = Temperatures ($T$)                                                              \
-    X = Some climate variable ($X$)                                                     \
-    h = historical                                                                      \
-    p = scenario; future; predicted                                                     \
-    obs = observed data ($T_{obs,h}$)                                                   \
-    simh = modeled data with same time period as obs ($T_{sim,h}$)                      \
-    simp = data to correct (predicted simulated data) ($T_{sim,p}$)                     \
-                                                                                        \
-                                                                                        \
-    F = Cumulative Distribution Function                                                \
-    \mu = mean                                                                          \
-    \sigma = standard deviation                                                         \
-    i = index                                                                           \
-    _{m} = long-term monthly interval                                                   \
-"
+__github__ = "https://github.com/btschwertfeger/python-cmethods"
 
 
 class UnknownMethodError(Exception):
-    """Exception raised for errors if unknown method called in CMethods class.
-
-    ----- P A R A M E T E R S -----
-        method (str): Input method name which caused the error
-        available_methods (str): List of available methods
+    """
+    Exception raised for errors if unknown method called in CMethods class.
     """
 
     def __init__(self, method: str, available_methods: list):
@@ -53,7 +46,24 @@ class UnknownMethodError(Exception):
 
 
 class CMethods:
-    """Class used to adjust timeseries climate data."""
+    """
+    The CMethods class serves a collection of bias correction procedures to adjust
+    time-series of climate data. It accept no parameters but must be instantiated
+    to apply the bias correction techniques.
+
+    The following bias correction techniques are available:
+        Scaling-based techniques:
+            * Linear Scaling :func:`cmethods.CMethods.CMethods.linear_scaling`
+            * Vairance Scaling :func:`cmethods.CMethods.CMethods.variance_scaling`
+            * Delta (change) Method :func:`cmethods.CMethods.CMethods.delta_method`
+
+        Distribution-based techniques:
+            * Quantile Mapping :func:`cmethods.CMethods.CMethods.quantile_mapping`
+            * Quantile Delta Mapping :func:`cmethods.CMethods.CMethods.quantile_delta_mapping`
+
+    Except for the Variance Scaling all methods can be applied on both, interval- and ratio- based
+    variables. The Variance Scaling can only be applied on interval-based variables.
+    """
 
     SCALING_METHODS = ["linear_scaling", "variance_scaling", "delta_method"]
     DISTRIBUTION_METHODS = ["quantile_mapping", "quantile_delta_mapping"]
@@ -71,12 +81,36 @@ class CMethods:
 
     @classmethod
     def get_available_methods(cls) -> list:
-        """Function to return the available adjustment methods"""
+        """
+        Function to return the available adjustment methods of the CMethods class.
+
+        :return: List of available bias correction methods
+        :rtype: List[str]
+
+        .. code-block:: python
+            :linenos:
+            :caption: Example: Get available methods
+
+            >>> from cmethods.CMethods import CMethods
+            >>> CMethods().get_available_methods()
+            [
+                "linear_scaling", "variance_scaling", "delta_method",
+                "quantile_mapping", "quantile_delta_mapping"
+            ]
+        """
         return cls.METHODS
 
     @classmethod
     def get_function(cls, method: str):
-        """Returns the method by name"""
+        """
+        Returns the bias correction function corresponding to the ``method`` name.
+
+        :param method: The method name to get the function for
+        :type method: str
+        :raises UnknownMethodError: If the function is not implemented
+        :return: The function of the corresponding method
+        :rtype: function
+        """
         if method == "linear_scaling":
             return cls.linear_scaling
         if method == "variance_scaling":
@@ -85,8 +119,8 @@ class CMethods:
             return cls.delta_method
         if method == "quantile_mapping":
             return cls.quantile_mapping
-        if method == "empirical_quantile_mapping":
-            return cls.empirical_quantile_mapping
+        # if method == "empirical_quantile_mapping":
+        #     return cls.empirical_quantile_mapping
         if method == "quantile_delta_mapping":
             return cls.quantile_delta_mapping
         raise UnknownMethodError(method, cls.METHODS)
@@ -104,43 +138,82 @@ class CMethods:
         n_jobs: int = 1,
         **kwargs,
     ) -> xr.core.dataarray.Dataset:
-        r"""Function to adjust 3 dimensional climate data
-
-        Note: obs, simh and simp has to be in the format (time, lat, lon)
-
-        ----- P A R A M E T E R S -----
-
-            method (str): adjustment method (see available methods by calling classmethod "get_available_methods")
-
-            obs (xarray.core.dataarray.DataArray): observed / obserence Data
-            simh (xarray.core.dataarray.DataArray): simulated historical Data
-            simp (xarray.core.dataarray.DataArray): future simulated Data to adjust
-
-            n_quantiles (int): Number of quantiles to involve
-            kind (str): Kind of adjustment ('+' or '*'), default: '+' (always use '+' for temperature)
-            group (str): Group data by (e.g.: 'time.month', 'time.dayofyear')
-            n_jobs (int): Use n processes, default: 1
-
-        ----- R E T U R N -----
-
-            xarray.core.dataarray.Dataset: Adjusted dataset
-
-        ----- E X A M P L E -----
-            > simh = xarray.open_dataset('path/to/simulated/data.nc')
-            > obs = xarray.open_dataset('path/to/observed/data.nc')
-            > simp = xarray.open_dataset('path/to/simulated_future/data.nc')
-            > variable = 'tas'
-
-            > adjusted_data = CMethods().adjust_3d(
-                method = 'quantile_delta_mapping',
-                obs = obs[variable],
-                simh = simh[variable],
-                simp = simp[variable],
-                n_quantiles = 250,
-                n_jobs = 4
-            )
         """
+        Function to apply a bias correction method on 3-dimensional climate data.
 
+        :param method: The bias correction method to use
+        :type method: str
+        :param obs: The reference data set of the control period
+            (in most cases the observational data)
+        :type obs: xr.core.dataarray.DataArray
+        :param simh: The modeled data of the control period
+        :type simh: xr.core.dataarray.DataArray
+        :param simp: The modeled data of the scenario period (this is the data set
+            on which the bias correction takes action)
+        :type simp: xr.core.dataarray.DataArray
+        :param n_quantiles: Number of quantiles to respect. Only applies to
+            distribution-based bias correction techniques, defaults to 100
+        :type n_quantiles: int, optional
+        :param kind: The kind of adjustment - additive or multiplicative, defaults to "+"
+        :type kind: str, optional
+        :param group: The grouping base, Only applies to scaling-based techniques, defaults to None
+        :type group: Union[str, None], optional
+        :param n_jobs: Number of parallels jobs to run the correction, defaults to 1
+        :type n_jobs: int, optional
+        :raises UnknownMethodError: If the correction method is not implemented
+        :return: The bias-corrected time series
+        :rtype: xr.core.dataarray.Dataset
+
+        .. code-block:: python
+            :linenos:
+            :caption: Example application - 3-dimensinoal bias correction
+
+            >>> import xarray as xr
+            >>> from cmethods.CMethods import CMethods
+
+            >>> # Note: The data sets must contain the dimensions "time", "lat", and "lon"
+            >>> #       for the respective variable.
+            >>> obsh = xr.open_dataset("path/to/reference_data-control_period.nc")
+            >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
+            >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
+            >>> variable = "tas" # temperatures
+
+            >>> cm = CMethods()
+
+            '''
+            In the following the Quantile Delta Mapping techniques is applied on
+            3-dimensional time-series data sets containing the variable "tas". The
+            parameter "kind" is not specified, since the additive ("+") kind is the default.
+            When adjusting ratio-based variables like precipitation, the multiplicative
+            variant ("*") should be used. In addition "n_jobs" is set to 4 which means that
+            four processes are used. This can improve the overall execution time.
+
+            After the execution, "qdm_adjusted" contains the fully bias-corrected
+            data - with the same shape, resolution, dimensions, coordinates and
+            attributes.
+            '''
+            >>> qdm_adjusted = cm.adjust_3d(
+            ...     method = "quantile_delta_mapping",
+            ...     obs = obs[variable],
+            ...     simh = simh[variable],
+            ...     simp = simp[variable],
+            ...     n_quantiles = 250,
+            ...     n_jobs = 4
+            ... )
+
+            '''
+            The next exampke shows how to apply the Linear Scaling bias correction
+            techqnique based on long-term monthly means.
+            '''
+            >>> ls_adjusted = cm.adjust_3d(
+            ...     method="linear_scaling",
+            ...     obs=obs[variable],
+            ...     simh=simh[variable],
+            ...     simp=simp[variable],
+            ...     group="time.month",
+            ...     kind="+"
+            ... )
+        """
         obs = obs.transpose("lat", "lon", "time")
         simh = simh.transpose("lat", "lon", "time")
         simp = simp.transpose("lat", "lon", "time").load()
@@ -166,7 +239,8 @@ class CMethods:
                 try:
                     pool = multiprocessing.Pool(processes=n_jobs)
                     # with multiprocessing.Pool(processes=n_jobs) as pool:
-                    # conntext manager is not use because than the coverage does not work.
+                    # conntext manager is not used because than the coverage does not work.
+                    # this may change when upgrading to only support Python 3.11+
                     params: List[dict] = [
                         {
                             "method": method,
@@ -190,9 +264,20 @@ class CMethods:
         raise UnknownMethodError(method, cls.METHODS)
 
     @classmethod
-    def pool_adjust(cls, params: dict) -> xr.core.dataarray.DataArray:
-        """Adjustment along longitude for one specific latitude
-        used by cls.adjust_3d as callbackfunction for multiprocessing.Pool
+    def pool_adjust(cls, params: dict) -> np.array:
+        """
+        Adjustment along the longitudes for one specific latitude
+        used by :func:`cmethods.CMethods.CMethods.adjust_3d`
+        as callback function for :class:`multiprocessing.Pool`.
+
+        **Not intended to be executed somwhere else.**
+
+        :params params: The method specific parameters
+        :type params: dict
+        :raises UnknownMethodError: If the specified method is not implemented
+        :return: The bias-corrected time series as 2-dimensional (longitudes x time)
+            numpy array
+        :rtype: np.array
         """
         kwargs = params.get("kwargs", {})
 
@@ -274,44 +359,85 @@ class CMethods:
         kind: str = "+",
         **kwargs,
     ) -> xr.core.dataarray.DataArray:
-        r"""Method to adjust 1 dimensional climate data by the linear scaling method.
+        r"""
+        The Linear Scaling bias correction technique can be applied on interval- and
+        ratio-based climate variables to minimize deviations in the mean values
+        between predicted and observed time-series of past and future time periods.
 
-        ----- P A R A M E T E R S -----
+        Since the multiplicative scaling can result in very high scaling factors,
+        a maximum scaling factor of 10 is set. This can be changed by passing
+        another value to the optional `max_scaling_factor` argument.
 
-            obs (xarray.core.dataarray.DataArray): observed / obserence Data
-            simh (xarray.core.dataarray.DataArray): simulated historical Data
-            simp (xarray.core.dataarray.DataArray): future simulated Data
-            group (str): [optional] Group / Period (e.g.: 'time.month')
-            kind (str): [optional] '+' or '*', default: '+'
+        This method must be applied on a 1-dimensional data set i.e., there is only one
+        time-series passed for each of ``obs``, ``simh``, and ``simp``.
 
-        ----- R E T U R N -----
+        The Linear Scaling bias correction technique implemented here is based on the
+        method described in the equations of Teutschbein, Claudia and Seibert, Jan (2012)
+        *"Bias correction of regional climate model simulations for hydrological climate-change
+        impact studies: Review and evaluation of different methods"*
+        (https://doi.org/10.1016/j.jhydrol.2012.05.052). In the following the equations
+        for both additive and multiplicative Linear Scaling are shown:
 
-            xarray.core.dataarray.DataArray: Adjusted data
+        **Additive**:
 
-        ----- E X A M P L E -----
-            > obs = xarray.open_dataset('path/to/observed/data.nc')
-            > simh = xarray.open_dataset('path/to/simulated/data.nc')
-            > simp = xarray.open_dataset('path/to/predicted/data.nc')
-            > variable = 'tas'
+            In Linear Scaling, the long-term monthly mean (:math:`\mu_m`) of the modeled data :math:`T_{sim,h}` is subtracted
+            from the long-term monthly mean of the reference data :math:`T_{obs,h}` at time step :math:`i`.
+            This difference in month-dependent long-term mean is than added to the long-term monthly mean for time step :math:`i`,
+            in the time-series that is to be adjusted (:math:`T_{sim,p}`).
 
-            > result = CMethods().linear_scaling(
-            >    obs=obs[variable],
-            >    simh=simh[variable],
-            >    simp=simp[variable],
-            >    group='time.month' # optional, this is default here
-            >)
+            .. math::
 
-        ----- E Q U A T I O N S -----
-            Add ('+'):
-                (1.)    X^{*LS}_{sim,p}(i) = X_{sim,p}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
-            Mult ('*'):
-                (2.)    X^{*LS}_{sim,h}(i) = X_{sim,h}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
+                X^{*LS}_{sim,p}(i) = X_{sim,p}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
 
-        ----- R E F E R E N C E S -----
 
-            Based on the equations of Teutschbein, Claudia and Seibert, Jan (2012) Bias correction of regional climate model simulations for hydrological climate-change impact studies: Review and evaluation of different methods
-            https://doi.org/10.1016/j.jhydrol.2012.05.052
+        **Multiplicative**:
 
+            The multiplicative Linear Scaling differs from the additive variant in such way, that the changes are not computed
+            in absolute but in relative values.
+
+            .. math::
+
+                X^{*LS}_{sim,h}(i) = X_{sim,h}(i) \cdot \left[\frac{\mu_{m}(X_{obs,h}(i))}{\mu_{m}(X_{sim,h}(i))}\right]
+
+
+        :param obs: The reference data set of the control period
+            (in most cases the observational data)
+        :type obs: xr.core.dataarray.DataArray
+        :param simh: The modeled data of the control period
+        :type simh: xr.core.dataarray.DataArray
+        :param simp: The modeled data of the scenario period (this is the data set
+            on which the bias correction takes action)
+        :type simp: xr.core.dataarray.DataArray
+        :param group: The grouping defines the basis of the mean, defaults to ``time.month``
+        :type group: Union[str, None], optional
+        :param kind: The kind of the correction, additive for interval- and multiplicative
+            for ratio-based variables, defaults to ``+``
+        :type kind: str, optional
+        :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
+        :return: The bias-corrected time series
+        :rtype: xr.core.dataarray.DataArray
+
+        .. code-block:: python
+            :linenos:
+            :caption: Example: Linear Scaling
+
+            >>> import xarray as xr
+            >>> from cmethods.CMethods import CMethods
+
+            >>> # Note: The data sets must contain the dimension "time"
+            >>> #       for the respective variable.
+            >>> obsh = xr.open_dataset("path/to/reference_data-control_period.nc")
+            >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
+            >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
+            >>> variable = "tas" # temperatures
+
+            >>> cm = CMethods()
+            >>> ls_adjusted = cm.linear_scaling(
+            ...     obs=obs[variable],
+            ...     simh=simh[variable],
+            ...     simp=simp[variable],
+            ...     kind="+"
+            ... )
         """
         if group is not None:
             return cls.grouped_correction(
@@ -346,43 +472,92 @@ class CMethods:
         kind: str = "+",
         **kwargs,
     ) -> xr.core.dataarray.DataArray:
-        r"""Method to adjust 1 dimensional climate data by variance scaling method.
+        r"""
+        The Variance Scaling bias correction technique can be applied on interval-based
+        climate variables to minimize deviations in the mean and variance
+        between predicted and observed time-series of past and future time periods.
 
-        ----- P A R A M E T E R S -----
+        This method must be applied on a 1-dimensional data set i.e., there is only one
+        time-series passed for each of ``obs``, ``simh``, and ``simp``.
 
-            obs (xarray.core.dataarray.DataArray): observed / obserence Data
-            simh (xarray.core.dataarray.DataArray): simulated historical Data
-            simp (xarray.core.dataarray.DataArray): future simulated Data
-            group (str): [optional] Group / Period (e.g.: 'time.month')
-            kind (str): '+' or '*', default: '+' # '*' is not implemented
+        The Variance Scaling bias correction technique implemented here is based on the
+        method described in the equations of Teutschbein, Claudia and Seibert, Jan (2012)
+        *"Bias correction of regional climate model simulations for hydrological climate-change
+        impact studies: Review and evaluation of different methods"*
+        (https://doi.org/10.1016/j.jhydrol.2012.05.052). In the following the equations
+        of the Variance Scaling approach are shown:
 
-        ----- R E T U R N -----
+        **(1)** First, the modeled data of the control and scenario period must be bias-corrected using
+        the Linear Scaling technique. This corrects the deviation in the mean.
 
-            xarray.core.dataarray.DataArray: Adjusted data
+        .. math::
 
-        ----- E X A M P L E -----
-            > obs = xarray.open_dataset('path/to/observed/data.nc')
-            > simh = xarray.open_dataset('path/to/simulated/data.nc')
-            > simp = xarray.open_dataset('path/to/predicted/data.nc')
-            > variable = 'tas'
-            > result = CMethods().variance_scaling(obs=obs[variable], simh=simh[variable], simp=simp[variable] group='time.month')
+            X^{*LS}_{sim,h}(i) = X_{sim,h}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
 
-        ------ E Q U A T I O N S -----
+            X^{*LS}_{sim,p}(i) = X_{sim,p}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
 
-            (1.) X^{*LS}_{sim,h}(i) = X_{sim,h}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
-            (2.) X^{*LS}_{sim,p}(i) = X_{sim,p}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
 
-            (3.) X^{VS(1)}_{sim,h}(i) = X^{*LS}_{sim,h}(i) - \mu_{m}(X^{*LS}_{sim,h}(i))
-            (4.) X^{VS(1)}_{sim,p}(i) = X^{*LS}_{sim,p}(i) - \mu_{m}(X^{*LS}_{sim,p}(i))
+        **(2)** In the second step, the time-series are shifted to a zero mean. This enables the adjustment
+        of the standard deviation in the following step.
 
-            (5.) X^{VS(2)}_{sim,p}(i) = X^{VS(1)}_{sim,p}(i) \cdot \left[\frac{\sigma_{m}(X_{obs,h}(i))}{\sigma_{m}(X^{VS(1)}_{sim,h}(i))}\right]
+        .. math::
 
-            (6.) X^{*VS}_{sim,p}(i) = X^{VS(2)}_{sim,p}(i) + \mu_{m}(X^{*LS}_{sim,p}(i))
+            X^{VS(1)}_{sim,h}(i) = X^{*LS}_{sim,h}(i) - \mu_{m}(X^{*LS}_{sim,h}(i))
 
-        ----- R E F E R E N C E S -----
+            X^{VS(1)}_{sim,p}(i) = X^{*LS}_{sim,p}(i) - \mu_{m}(X^{*LS}_{sim,p}(i))
 
-            Based on the equations of Teutschbein, Claudia and Seibert, Jan (2012) Bias correction of regional climate model simulations for hydrological climate-change impact studies: Review and evaluation of different methods
-            https://doi.org/10.1016/j.jhydrol.2012.05.052
+
+        **(3)** Now the standard deviation (so variance too) can be scaled.
+
+        .. math::
+
+            X^{VS(2)}_{sim,p}(i) = X^{VS(1)}_{sim,p}(i) \cdot \left[\frac{\sigma_{m}(X_{obs,h}(i))}{\sigma_{m}(X^{VS(1)}_{sim,h}(i))}\right]
+
+
+        **(4)** Finally the prevously removed mean is shifted back
+
+        .. math::
+
+            X^{*VS}_{sim,p}(i) = X^{VS(2)}_{sim,p}(i) + \mu_{m}(X^{*LS}_{sim,p}(i))
+
+
+        :param obs: The reference data set of the control period
+            (in most cases the observational data)
+        :type obs: xr.core.dataarray.DataArray
+        :param simh: The modeled data of the control period
+        :type simh: xr.core.dataarray.DataArray
+        :param simp: The modeled data of the scenario period (this is the data set
+            on which the bias correction takes action)
+        :type simp: xr.core.dataarray.DataArray
+        :param group: The grouping defines the basis of the mean, defaults to ``time.month``
+        :type group: Union[str, None], optional
+        :param kind: The kind of the correction, additive for interval-based variables,
+            no other kind is available so far, defaults to ``+``
+        :type kind: str, optional
+        :raises NotImplementedError: If the kind is not in (``+``, ``add``)
+        :return: The bias-corrected time series
+        :rtype: xr.core.dataarray.DataArray
+
+        .. code-block:: python
+            :linenos:
+            :caption: Example: Variance Scaling
+
+            >>> import xarray as xr
+            >>> from cmethods.CMethods import CMethods
+
+            >>> # Note: The data sets must contain the dimension "time"
+            >>> #       for the respective variable.
+            >>> obsh = xr.open_dataset("path/to/reference_data-control_period.nc")
+            >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
+            >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
+            >>> variable = "tas" # temperatures
+
+            >>> cm = CMethods()
+            >>> vs_adjusted = cm.variance_scaling(
+            ...     obs=obs[variable],
+            ...     simh=simh[variable],
+            ...     simp=simp[variable],
+            ... )
         """
         if group is not None:
             return cls.grouped_correction(
@@ -424,42 +599,86 @@ class CMethods:
         kind: str = "+",
         **kwargs,
     ) -> xr.core.dataarray.DataArray:
-        r"""Method to adjust 1 dimensional climate data by delta method.
+        r"""
+        The Delta Method bias correction technique can be applied on interval- and
+        ratio-based climate variables to minimize deviations in the mean values
+        between predicted and observed time-series of past and future time periods.
 
-        ----- P A R A M E T E R S -----
+        Since the multiplicative scaling can result in very high scaling factors,
+        a maximum scaling factor of 10 is set. This can be changed by passing
+        another value to the optional `max_scaling_factor` argument.
 
-            obs (xarray.core.dataarray.DataArray): observed / obserence Data
-            simh (xarray.core.dataarray.DataArray): simulated historical Data
-            simp (xarray.core.dataarray.DataArray): future simulated Data
-            group (str): [optional] Group / Period (e.g.: 'time.month')
-            kind (str): '+' or '*', default: '+'
+        This method must be applied on a 1-dimensional data set i.e., there is only one
+        time-series passed for each of ``obs``, ``simh``, and ``simp``.
 
-        ----- R E T U R N -----
+        The Delta Method bias correction technique implemented here is based on the
+        method described in the equations of Beyer, R. and Krapp, M. and Manica, A. (2020)
+        *"An empirical evaluation of bias correction methods for palaeoclimate simulations"*
+        (https://doi.org/10.5194/cp-16-1493-2020). In the following the equations
+        for both additive and multiplicative Delta Method are shown:
 
-            xarray.core.dataarray.DataArray: Adjusted data
+        **Additive**:
 
-        ----- E X A M P L E -----
-            > obs = xarray.open_dataset('path/to/observed/data.nc')
-            > simh = xarray.open_dataset('path/to/simulated/data.nc')
-            > simp = xarray.open_dataset('path/to/predicted/data.nc')
-            > variable = 'tas'
-            > result = CMethods().delta_method(obs=obs[variable], simh=simh[variable], group='time.month')
+            The Delta Method looks like the Linear Scaling method but the important difference is, that the Delta method
+            uses the change between the modeled data instead of the difference between the modeled and reference data of the control
+            period. This means that the long-term monthly mean (:math:`\mu_m`) of the modeled data of the control period :math:`T_{sim,h}`
+            is subtracted from the long-term monthly mean of the modeled data from the scenario period :math:`T_{sim,p}` at time step :math:`i`.
+            This change in month-dependent long-term mean is than added to the long-term monthly mean for time step :math:`i`,
+            in the time-series that represents the reference data of the control period (:math:`T_{obs,h}`).
 
-        ------ E Q U A T I O N S -----
+            .. math::
 
-            Add (+):
-                (1.) X^{*DM}_{sim,p}(i) = X_{obs,h}(i) + (\mu_{m}(X_{sim,p}(i)) - \mu_{m}(X_{sim,h}(i)))
-            Mult (*):
-                (2.) X^{*DM}_{sim,p}(i) = X_{obs,h}(i) \cdot \frac{ \mu_{m}(X_{sim,p}(i)) }{ \mu_{m}(X_{sim,h}(i))}
+                X^{*DM}_{sim,p}(i) = X_{obs,h}(i) + \mu_{m}(X_{sim,p}(i)) - \mu_{m}(X_{sim,h}(i))
 
-        ----- R E F E R E N C E S -----
-            Beyer, R. and Krapp, M. and Manica, A.: An empirical evaluation of bias correction methods for palaeoclimate simulations (https://doi.org/10.5194/cp-16-1493-2020)
 
-            and
-            https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py
+        **Multiplicative**:
 
+            The multiplicative variant behaves like the additive, but with the difference that the change is computed using the relative change
+            instead of the absolute change.
+
+            .. math::
+
+                X^{*DM}_{sim,p}(i) = X_{obs,h}(i) \cdot \left[\frac{ \mu_{m}(X_{sim,p}(i)) }{ \mu_{m}(X_{sim,h}(i))}\right]
+
+
+        :param obs: The reference data set of the control period
+            (in most cases the observational data)
+        :type obs: xr.core.dataarray.DataArray
+        :param simh: The modeled data of the control period
+        :type simh: xr.core.dataarray.DataArray
+        :param simp: The modeled data of the scenario period (this is the data set
+            on which the bias correction takes action)
+        :type simp: xr.core.dataarray.DataArray
+        :param group: The grouping defines the basis of the mean, defaults to ``time.month``
+        :type group: Union[str, None], optional
+        :param kind: The kind of the correction, additive for interval- and multiplicative
+            for ratio-based variables, defaults to ``+``
+        :type kind: str, optional
+        :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
+        :return: The bias-corrected time series
+        :rtype: xr.core.dataarray.DataArray
+
+        .. code-block:: python
+            :linenos:
+            :caption: Example: Delta Method
+
+            >>> import xarray as xr
+            >>> from cmethods.CMethods import CMethods
+
+            >>> # Note: The data sets must contain the dimension "time"
+            >>> #       for the respective variable.
+            >>> obsh = xr.open_dataset("path/to/reference_data-control_period.nc")
+            >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
+            >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
+            >>> variable = "tas" # temperatures
+
+            >>> cm = CMethods()
+            >>> dm_adjusted = cm.delta_method(
+            ...     obs=obs[variable],
+            ...     simh=simh[variable],
+            ...     simp=simp[variable],
+            ... )
         """
-
         if group is not None:
             return cls.grouped_correction(
                 method="delta_method",
@@ -490,50 +709,89 @@ class CMethods:
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int,
-        # group: Union[str, None] = None,
         kind: str = "+",
+        detrended: bool = False,
         **kwargs,
     ) -> xr.core.dataarray.DataArray:
-        r"""Quantile Mapping Bias Correction
+        r"""
+        The Quantile Mapping bias correction technique can be used to minimize distributional
+        biases between modeled and observed time-series climate data. Its interval-independant
+        behaviour ensures that the whole time series is taken into account to redistribute
+        its values, based on the distributions of the modeled and observed/reference data of the
+        control period.
 
-        ----- P A R A M E T E R S -----
+        This method must be applied on a 1-dimensional data set i.e., there is only one
+        time-series passed for each of ``obs``, ``simh``, and ``simp``.
 
-            obs (xarray.core.dataarray.DataArray): observed / obserence Data
-            simh (xarray.core.dataarray.DataArray): simulated historical Data
-            simp (xarray.core.dataarray.DataArray): future simulated Data
-            n_quantiles (int): number of quantiles to use
-            kind (str): '+' or '*', default: '+'
-            detrended (bool): [optional] detrend by shifting mean on long term basis
+        The Quantile Mapping technique implemented here is based on the equations of
+        Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock (2015) *"Bias Correction of GCM
+        Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles
+        and Extremes?"* (https://doi.org/10.1175/JCLI-D-14-00754.1).
 
-        ----- R E T U R N -----
+        Since the regular Quantile Mapping is bounded to the value range of the modeled data of
+        the control period, the *Detrended* Quantile Mapping approach can be used by setting the
+        ``detrended`` argument to ``True``. Detrending means, that the values of :math:`X_{sim,p}`
+        are shifted to the value range of :math:`X_{sim,h}` before the Quantile Mapping is applied.
+        After the Quantile Mapping was applied, the mean is shifted back. Since it does not make sens
+        to take the whole mean to rescale the data, the month-dependent long-term mean is used.
 
-        xarray.core.dataarray.DataArray: Adjusted data
+        In the following the equations of Alex J. Cannon (2015) are shown (without detrending):
 
-        ------ E Q U A T I O N S -----
-            Add (+):
-                (1.) X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h} \left\{F_{sim,h}\left[X_{sim,p}(i)\right]\right\}
-            Mult (*):
-                (2.) X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h}
-                        \Biggl\{
-                            F_{sim,h}\left[
-                                \frac{
-                                    \mu{X_{sim,h}} \mu{X_{sim,p}(i)}
-                                }{
-                                    \mu{X_{sim,p}(i)}
-                                }
-                            \right]
-                        \Biggr\}
-                        \frac{
-                            \mu{X_{sim,p}(i)}
-                        }{
-                            \mu{X_{sim,h}}
-                        }
+        **Additive**:
 
-        ----- R E F E R E N C E S -----
-            Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock Bias Correction of GCM Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles and Extremes?
-            https://doi.org/10.1175/JCLI-D-14-00754.1)
+            .. math::
+
+                X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h} \left\{F_{sim,h}\left[X_{sim,p}(i)\right]\right\}
+
+        **Multiplicative**:
+
+            .. math::
+
+                X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot \mu{X_{sim,p}(i)}}{\mu{X_{sim,p}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}(i)}}{\mu{X_{sim,h}}}
+
+
+        :param obs: The reference data set of the control period
+            (in most cases the observational data)
+        :type obs: xr.core.dataarray.DataArray
+        :param simh: The modeled data of the control period
+        :type simh: xr.core.dataarray.DataArray
+        :param simp: The modeled data of the scenario period (this is the data set
+            on which the bias correction takes action)
+        :type simp: xr.core.dataarray.DataArray
+        :param n_quantiles: Number of quantiles to respect/use
+        :type n_quantiles: int
+        :param kind: The kind of the correction, additive for interval- and multiplicative
+            for ratio-based variables, defaults to ``+``
+        :type kind: str, optional
+        :param detrended: If the extremes should be respected by applying month-dependent
+            detrending before and after applying the Quantile Mapping
+        :type detrended: bool, optional
+        :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
+        :return: The bias-corrected time series
+        :rtype: xr.core.dataarray.DataArray
+
+        .. code-block:: python
+            :linenos:
+            :caption: Example: Quantile Mapping
+
+            >>> import xarray as xr
+            >>> from cmethods.CMethods import CMethods
+
+            >>> # Note: The data sets must contain the dimension "time"
+            >>> #       for the respective variable.
+            >>> obsh = xr.open_dataset("path/to/reference_data-control_period.nc")
+            >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
+            >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
+            >>> variable = "tas" # temperatures
+
+            >>> cm = CMethods()
+            >>> qm_adjusted = cm.quantile_mapping(
+            ...     obs=obs[variable],
+            ...     simh=simh[variable],
+            ...     simp=simp[variable],
+            ...     n_quantiles=250
+            ... )
         """
-
         res = simp.copy(deep=True)
         obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
 
@@ -545,7 +803,7 @@ class CMethods:
         cdf_obs = cls.get_cdf(obs, xbins)
         cdf_simh = cls.get_cdf(simh, xbins)
 
-        if kwargs.get("detrended", False):
+        if detrended:
             # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
             for _, idxs in res.groupby("time.month").groups.items():
                 m_simh, m_simp = [], []
@@ -604,20 +862,20 @@ class CMethods:
         )
 
     # ? -----========= E M P I R I C A L - Q U A N T I L E - M A P P I N G =========------
-    @classmethod
-    def empirical_quantile_mapping(
-        cls,
-        obs: xr.core.dataarray.DataArray,
-        simh: xr.core.dataarray.DataArray,
-        simp: xr.core.dataarray.DataArray,
-        n_quantiles: int = 10,
-        extrapolate: Union[str, None] = None,
-        **kwargs,
-    ) -> xr.core.dataarray.DataArray:
-        """Method to adjust 1 dimensional climate data by empirical quantile mapping"""
-        raise NotImplementedError(
-            "Not implemented; please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py "
-        )
+    # @classmethod
+    # def empirical_quantile_mapping(
+    #     cls,
+    #     obs: xr.core.dataarray.DataArray,
+    #     simh: xr.core.dataarray.DataArray,
+    #     simp: xr.core.dataarray.DataArray,
+    #     n_quantiles: int = 10,
+    #     extrapolate: Union[str, None] = None,
+    #     **kwargs,
+    # ) -> xr.core.dataarray.DataArray:
+    #     """Method to adjust 1 dimensional climate data by empirical quantile mapping"""
+    #     raise NotImplementedError(
+    #         "Not implemented; please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py "
+    #     )
 
     # ? -----========= Q U A N T I L E - D E L T A - M A P P I N G =========------
     @classmethod
@@ -630,49 +888,121 @@ class CMethods:
         kind: str = "+",
         **kwargs,
     ) -> xr.core.dataarray.DataArray:
-        r"""Quantile Delta Mapping bias adjustment
+        r"""
+        The Quantile Delta Mapping bias correction technique can be used to minimize distributional
+        biases between modeled and observed time-series climate data. Its interval-independant
+        behaviour ensures that the whole time series is taken into account to redistribute
+        its values, based on the distributions of the modeled and observed/reference data of the
+        control period. In contrast to the regular Quantile Mapping (:func:`cmethods.CMethods.CMethods.quantile_mapping`)
+        the Quantile Delta Mapping also takes the change between the modeled data of the control and scenario
+        period into account.
 
-        ----- P A R A M E T E R S -----
+        This method must be applied on a 1-dimensional data set i.e., there is only one
+        time-series passed for each of ``obs``, ``simh``, and ``simp``.
 
-            obs (xarray.core.dataarray.DataArray): observed / obserence Data
-            simh (xarray.core.dataarray.DataArray): simulated historical Data
-            simp (xarray.core.dataarray.DataArray): future simulated Data
-            n_quantiles (int): number of quantiles to use
-            kind (str): '+' or '*', default: '+'
-            global_min (float): this parameter can be set when kind == '*' to define a custom lower limit. Otherwise 0.0 is used.
+        The Quantile Delta Mapping technique implemented here is based on the equations of
+        Tong, Y., Gao, X., Han, Z. et al. (2021) *"Bias correction of temperature and precipitation
+        over China for RCM simulations using the QM and QDM methods"*. Clim Dyn 57, 1425–1443
+        (https://doi.org/10.1007/s00382-020-05447-4). In the following the additive and multiplicative
+        variant are shown.
 
-        ----- R E T U R N -----
+        **Additive**:
 
-            xarray.core.dataarray.DataArray: Adjusted data
+            **(1.1)** In the first step the quantile value of the time step :math:`i` to adjust is stored in
+            :math:`\varepsilon(i)`.
 
-        ------ E Q U A T I O N S -----
+            .. math::
 
-            Add (+):
-                (1.1) \varepsilon(i) = F_{sim,p}\left[X_{sim,p}(i)\right], \hspace{1em} \varepsilon(i)\in\{0,1\}
+                \varepsilon(i) = F_{sim,p}\left[X_{sim,p}(i)\right], \hspace{1em} \varepsilon(i)\in\{0,1\}
 
-                (1.2) X^{QDM(1)}_{sim,p}(i) = F^{-1}_{obs,h}\left[\varepsilon(i)\right]
 
-                (1.3) \Delta(i) & = F^{-1}_{sim,p}\left[\varepsilon(i)\right] - F^{-1}_{sim,h}\left[\varepsilon(i)\right] \\[1pt]
-                                & = X_{sim,p}(i) - F^{-1}_{sim,h}\left\{F^{}_{sim,p}\left[X_{sim,p}(i)\right]\right\}
+            **(1.2)** The bias corrected value at time step :math:`i` is now determined by inserting the
+            quantile value into the inverse cummulative distribution function of the reference data of the control
+            period. This results in a bias corrected value for time step :math:`i` but still without taking the
+            change in modeled data into account.
 
-                (1.4) X^{*QDM}_{sim,p}(i) = X^{QDM(1)}_{sim,p}(i) + \Delta(i)
+            .. math::
 
-            Mult (*):
-                (1.1) --//--
+                X^{QDM(1)}_{sim,p}(i) = F^{-1}_{obs,h}\left[\varepsilon(i)\right]
 
-                (1.2) --//--
 
-                (2.3) \Delta(i) & = \frac{ F^{-1}_{sim,p}\left[\varepsilon(i)\right] }{ F^{-1}_{sim,h}\left[\varepsilon(i)\right] } \\[1pt]
-                                & = \frac{ X_{sim,p}(i) }{ F^{-1}_{sim,h}\left\{F^{}_{sim,p}\left[X_{sim,p}(i)\right]\right\} }
+            **(1.3)** The :math:`\Delta(i)` represents the absolute change in quantiles between the modeled value
+            in the control and scenario period.
 
-                (2.4) X^{*QDM}_{sim,p}(i) = X^{QDM(1)}_{sim,p}(i) \cdot \Delta(i)
+            .. math::
 
-        ----- R E F E R E N C E S -----
-            Tong, Y., Gao, X., Han, Z. et al. Bias correction of temperature and precipitation over China for RCM simulations using the QM and QDM methods. Clim Dyn 57, 1425–1443 (2021).
-            https://doi.org/10.1007/s00382-020-05447-4
+                 \Delta(i) & = F^{-1}_{sim,p}\left[\varepsilon(i)\right] - F^{-1}_{sim,h}\left[\varepsilon(i)\right] \\[1pt]
+                           & = X_{sim,p}(i) - F^{-1}_{sim,h}\left\{F^{}_{sim,p}\left[X_{sim,p}(i)\right]\right\}
 
+
+            **(1.4)** Finally the previously calculated change can be added to the bias-corrected value.
+
+            .. math::
+
+                X^{*QDM}_{sim,p}(i) = X^{QDM(1)}_{sim,p}(i) + \Delta(i)
+
+
+        **Multiplicative**:
+
+            The first two steps of the multiplicative Quantile Delta Mapping bias correction technique are the
+            same as for the additive variant.
+
+            **(2.3)** The :math:`\Delta(i)` in the multiplicative Quantile Delta Mapping is calulated like the
+            additive variant, but using the relative than the absolute change.
+
+                .. math::
+
+                    \Delta(i) & = \frac{ F^{-1}_{sim,p}\left[\varepsilon(i)\right] }{ F^{-1}_{sim,h}\left[\varepsilon(i)\right] } \\[1pt]
+                              & = \frac{ X_{sim,p}(i) }{ F^{-1}_{sim,h}\left\{F^{}_{sim,p}\left[X_{sim,p}(i)\right]\right\} }
+
+
+            **(2.4)** The relative change between the modeled data of the control and scenario period is than
+            multiplicated with the bias-corrected value (see **1.2**).
+
+                .. math::
+
+                    X^{*QDM}_{sim,p}(i) = X^{QDM(1)}_{sim,p}(i) \cdot \Delta(i)
+
+
+        :param obs: The reference data set of the control period
+            (in most cases the observational data)
+        :type obs: xr.core.dataarray.DataArray
+        :param simh: The modeled data of the control period
+        :type simh: xr.core.dataarray.DataArray
+        :param simp: The modeled data of the scenario period (this is the data set
+            on which the bias correction takes action)
+        :type simp: xr.core.dataarray.DataArray
+        :param n_quantiles: Number of quantiles to respect/use
+        :type n_quantiles: int
+        :param kind: The kind of the correction, additive for interval- and multiplicative
+            for ratio-based variables, defaults to ``+``
+        :type kind: str, optional
+        :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
+        :return: The bias-corrected time series
+        :rtype: xr.core.dataarray.DataArray
+
+        .. code-block:: python
+            :linenos:
+            :caption: Example: Quantile Delta Mapping
+
+            >>> import xarray as xr
+            >>> from cmethods.CMethods import CMethods
+
+            >>> # Note: The data sets must contain the dimension "time"
+            >>> #       for the respective variable.
+            >>> obsh = xr.open_dataset("path/to/reference_data-control_period.nc")
+            >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
+            >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
+            >>> variable = "tas" # temperatures
+
+            >>> cm = CMethods()
+            >>> qdm_adjusted = cm.quantile_delta_mapping(
+            ...     obs=obs[variable],
+            ...     simh=simh[variable],
+            ...     simp=simp[variable],
+            ...     n_quantiles=250
+            ... )
         """
-
         if kind in cls.ADDITIVE:
             res = simp.copy(deep=True)
             obs, simh, simp = (
@@ -724,15 +1054,58 @@ class CMethods:
 
     # * -----========= G E N E R A L  =========------
     @staticmethod
-    def get_pdf(a: Union[list, np.array], xbins: Union[list, np.array]) -> np.array:
-        """returns the probability density function of a based on xbins ($P(x)$)"""
-        pdf, _ = np.histogram(a, xbins)
+    def get_pdf(x: Union[list, np.array], xbins: Union[list, np.array]) -> np.array:
+        r"""
+        Compuites and returns the the probability density function :math:`P(x)`
+        of ``x`` based on ``xbins``.
+
+        :param x: The vector to get :math:`P(x)` from
+        :type x: Union[list, np.array]
+        :param xbins: The boundaries/bins of :math:`P(x)`
+        :type xbins: Union[list, np.array]
+        :return: The probability densitiy function of ``x``
+        :rtype: np.array
+
+        .. code-block:: python
+            :linenos:
+            :caption: Compute the probability density function :math:`P(x)`
+
+            >>> from cmethods.CMethods import CMethods
+            >>> cm = CMethods()
+            >>> x = [1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9, 10]
+            >>> xbins = [0, 3, 6, 10]
+            >>> print(cm.get_pdf(x=x, xbins=xbins))
+            [2, 5, 5]
+        """
+        pdf, _ = np.histogram(x, xbins)
         return pdf
 
     @staticmethod
-    def get_cdf(a: Union[list, np.array], xbins: Union[list, np.array]) -> np.array:
-        """returns the cummulative distribution function of a based on xbins ($F_{a}$)"""
-        pdf, _ = np.histogram(a, xbins)
+    def get_cdf(x: Union[list, np.array], xbins: Union[list, np.array]) -> np.array:
+        r"""
+        Computes and returns returns the cumulative distribution function :math:`F(x)`
+        of ``x`` based on ``xbins``.
+
+        :param x: Vector to get :math:`F(x)` from
+        :type x: Union[list, np.array]
+        :param xbins: The boundaries/bins of :math:`F(x)`
+        :type xbins: Union[list, np.array]
+        :return: The cumulative distribution function of ``x``
+        :rtype: np.array
+
+
+        .. code-block:: python
+            :linenos:
+            :caption: Compute the cmmulative distribution function :math:`F(x)`
+
+            >>> from cmethods.CMethods import CMethods
+            >>> cm = CMethods()
+            >>> x = [1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9, 10]
+            >>> xbins = [0, 3, 6, 10]
+            >>> print(cm.get_cdf(x=x, xbins=xbins))
+            [0, 2, 7, 12]
+        """
+        pdf, _ = np.histogram(x, xbins)
         return np.insert(np.cumsum(pdf), 0, 0.0)
 
     @staticmethod
@@ -741,14 +1114,43 @@ class CMethods:
         insert_cdf: Union[list, np.array],
         xbins: Union[list, np.array],
     ) -> np.array:
-        r"""returns the inverse cummulative distribution function of base_cdf ($F_{base_cdf}\left[insert_cdf\right])$"""
+        r"""
+        Returns the inverse cumulative distribution function of with the following
+        :math:`F^{-1}_{x}\left[y\right]` where :math:`x` represents ``base_cdf`` and
+        ``insert_cdf`` is represented by :math:`y`.
+
+        :param base_cdf: The basis
+        :type base_cdf: Union[list, np.array]
+        :param insert_cdf: The CDF that gets inserted
+        :type insert_cdf: Union[list, np.array]
+        :param xbins: Probability boundaries
+        :type xbins: Union[list, np.array]
+        :return: The inverse CDF
+        :rtype: np.array
+        """
         return np.interp(insert_cdf, base_cdf, xbins)
 
     @staticmethod
     def get_adjusted_scaling_factor(
         factor: Union[int, float], max_scaling_factor: Union[int, float]
     ) -> float:
-        """Checks if scaling factor is within the desired range"""
+        r"""
+        Returns:
+            - :math:`x` if :math:`-|y| \le x \le |y|`,
+            - :math:`|y|` if :math:`x > |y|`, or
+            - :math:`-|y|` if :math:`x < -|y|`
+
+            where:
+                - :math:`x` is ``factor``
+                - :math:`y` is ``max_scaling_factor``.
+
+        :param factor: The value to check for
+        :type factor: Union[int, float]
+        :param max_scaling_factor: The maximum/minimum allowed value
+        :type max_scaling_factor: Union[int, float]
+        :return: The correct value
+        :rtype: float
+        """
         if factor > 0 and factor > abs(max_scaling_factor):
             return abs(max_scaling_factor)
         if factor < 0 and factor < -abs(max_scaling_factor):

@@ -176,6 +176,7 @@ function-naming-style=snake_case
 
 # Good variable names which should always be accepted, separated by a comma.
 good-names=i,
+           x,
            j,
            k,
            ex,
@@ -183,7 +184,6 @@ good-names=i,
            _,
            X,
            QDM1,
-           a,
            LS_simh,LS_simp,VS_1_simh,VS_2_simp,VS_1_simp,
            CMethods
 
@@ -335,7 +335,7 @@ indent-string='    '
 max-line-length=100
 
 # Maximum number of lines in a module.
-max-module-lines=1000
+max-module-lines=10000
 
 # Allow the body of a class to be on the same line as the declaration if body
 # contains single statement.
