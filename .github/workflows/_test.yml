@@ -18,7 +18,7 @@ on:
         required: true
 
 jobs:
-  Test-Spot:
+  Test:
     name: Test ${{ inputs.os }} ${{ inputs.python-version }}
     runs-on: ${{ inputs.os }}
     steps:
@@ -37,5 +37,5 @@ jobs:
       - name: Install package
         run: python -m pip install ".[dev]"
 
-      - name: Testing Spot REST endpoints
+      - name: Run unit tests
         run: pytest tests/

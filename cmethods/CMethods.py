@@ -119,8 +119,8 @@ class CMethods:
             return cls.delta_method
         if method == "quantile_mapping":
             return cls.quantile_mapping
-        # if method == "empirical_quantile_mapping":
-        #     return cls.empirical_quantile_mapping
+        if method == "empirical_quantile_mapping":
+            return cls.empirical_quantile_mapping
         if method == "quantile_delta_mapping":
             return cls.quantile_delta_mapping
         raise UnknownMethodError(method, cls.METHODS)
@@ -862,20 +862,39 @@ class CMethods:
         )
 
     # ? -----========= E M P I R I C A L - Q U A N T I L E - M A P P I N G =========------
-    # @classmethod
-    # def empirical_quantile_mapping(
-    #     cls,
-    #     obs: xr.core.dataarray.DataArray,
-    #     simh: xr.core.dataarray.DataArray,
-    #     simp: xr.core.dataarray.DataArray,
-    #     n_quantiles: int = 10,
-    #     extrapolate: Union[str, None] = None,
-    #     **kwargs,
-    # ) -> xr.core.dataarray.DataArray:
-    #     """Method to adjust 1 dimensional climate data by empirical quantile mapping"""
-    #     raise NotImplementedError(
-    #         "Not implemented; please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py "
-    #     )
+    @classmethod
+    def empirical_quantile_mapping(
+        cls,
+        obs: xr.core.dataarray.DataArray,
+        simh: xr.core.dataarray.DataArray,
+        simp: xr.core.dataarray.DataArray,
+        n_quantiles: int = 100,
+        extrapolate: Union[str, None] = None,
+        **kwargs,
+    ) -> xr.core.dataarray.DataArray:
+        """
+        Method to adjust 1-dimensional climate data by empirical quantile mapping
+
+        :param obs: The reference data set of the control period
+            (in most cases the observational data)
+        :type obs: xr.core.dataarray.DataArray
+        :param simh: The modeled data of the control period
+        :type simh: xr.core.dataarray.DataArray
+        :param simp: The modeled data of the scenario period (this is the data set
+            on which the bias correction takes action)
+        :type simp: xr.core.dataarray.DataArray
+        :param n_quantiles: Number of quantiles to respect/use, defaults to ``100``
+        :type n_quantiles: int, optional
+        :type kind: str, optional
+        :param extrapolate: Bounded range or extrapolate, defaults to ``None``
+        :type extrapolate: Union[str, None], optional
+        :return: The bias-corrected time series
+        :rtype: xr.core.dataarray.DataArray
+        :raises NotImplementedError: This method is not implemented
+        """
+        raise NotImplementedError(
+            "Not implemented; please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py "
+        )
 
     # ? -----========= Q U A N T I L E - D E L T A - M A P P I N G =========------
     @classmethod

@@ -15,9 +15,3 @@ Welcome to python-cmethods's documentation!
    src/cmethods.rst
    src/issues.rst
    src/license.rst
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
