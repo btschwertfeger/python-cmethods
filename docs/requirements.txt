@@ -1,0 +1,7 @@
+netCDF4>=1.6.1
+numpy
+setuptools_scm
+sphinx
+sphinx-rtd-theme
+tqdm
+xarray>=2022.11.0
