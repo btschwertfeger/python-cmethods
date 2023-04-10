@@ -22,7 +22,7 @@ This Python module contains a collection of different scale- and distribution-ba
 
 The documentation can be found here: [https://python-kraken-sdk.readthedocs.io/en/stable/](https://python-kraken-sdk.readthedocs.io/en/stable/)
 
-> ⚠️ For the application of bias corrections on _lage data sets_ it is recomanded to use the C++ tool [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX) since bias corrections are complex statistical transformation which are very slow in Python compared to the C++ implementation.
+> ⚠️ For the application of bias corrections on _lage data sets_ it is recomanded to use the command-line tool [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX) since bias corrections are complex statistical transformation which are very slow in Python compared to the C++ implementation.
 
 ---
 
