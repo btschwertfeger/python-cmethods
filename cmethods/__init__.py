@@ -53,7 +53,7 @@ class CMethods:
     The following bias correction techniques are available:
         Scaling-based techniques:
             * Linear Scaling :func:`cmethods.CMethods.linear_scaling`
-            * Vairance Scaling :func:`cmethods.CMethods.variance_scaling`
+            * Variance Scaling :func:`cmethods.CMethods.variance_scaling`
             * Delta (change) Method :func:`cmethods.CMethods.delta_method`
 
         Distribution-based techniques:
@@ -137,9 +137,13 @@ class CMethods:
         group: Union[str, None] = None,
         n_jobs: int = 1,
         **kwargs,
-    ) -> xr.core.dataarray.Dataset:
+    ) -> xr.core.dataarray.DataArray:
         """
         Function to apply a bias correction method on 3-dimensional climate data.
+
+        *It is very important to pass ``group="time.month`` for scaling-based
+        techniques if the correction should be performed as described in the
+        referenced articles!* It is wanted to be the default.
 
         :param method: The bias correction method to use
         :type method: str
@@ -162,7 +166,7 @@ class CMethods:
         :type n_jobs: int, optional
         :raises UnknownMethodError: If the correction method is not implemented
         :return: The bias-corrected time series
-        :rtype: xr.core.dataarray.Dataset
+        :rtype: xr.core.dataarray.DataArray
 
         .. code-block:: python
             :linenos:
@@ -247,7 +251,7 @@ class CMethods:
                             "simp": simp[lat],
                             "group": group,
                             "kind": kind,
-                            "n_quaniles": n_quantiles,
+                            "n_quantiles": n_quantiles,
                             "kwargs": kwargs,
                         }
                         for lat in range(len_lat)
@@ -344,7 +348,7 @@ class CMethods:
             for i, index in enumerate(groups[month]):
                 result[index] = computed_result[i]
 
-        return result
+        return np.array(result)
 
     # ? -----========= L I N E A R - S C A L I N G =========------
     @classmethod
@@ -356,7 +360,7 @@ class CMethods:
         group: Union[str, None] = "time.month",
         kind: str = "+",
         **kwargs,
-    ) -> xr.core.dataarray.DataArray:
+    ) -> np.array:
         r"""
         The Linear Scaling bias correction technique can be applied on interval- and
         ratio-based climate variables to minimize deviations in the mean values
@@ -413,7 +417,7 @@ class CMethods:
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
-        :rtype: xr.core.dataarray.DataArray
+        :rtype: np.array
 
         .. code-block:: python
             :linenos:
@@ -468,7 +472,7 @@ class CMethods:
         group: Union[str, None] = "time.month",
         kind: str = "+",
         **kwargs,
-    ) -> xr.core.dataarray.DataArray:
+    ) -> np.array:
         r"""
         The Variance Scaling bias correction technique can be applied on interval-based
         climate variables to minimize deviations in the mean and variance
@@ -533,7 +537,7 @@ class CMethods:
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``add``)
         :return: The bias-corrected time series
-        :rtype: xr.core.dataarray.DataArray
+        :rtype: np.array
 
         .. code-block:: python
             :linenos:
@@ -573,7 +577,7 @@ class CMethods:
             VS_1_simp = LS_simp - np.nanmean(LS_simp)  # Eq. 4
 
             adj_scaling_factor = cls.get_adjusted_scaling_factor(
-                np.std(obs) / np.std(VS_1_simh),
+                np.std(np.array(obs)) / np.std(VS_1_simh),
                 kwargs.get("max_scaling_factor", cls.MAX_SCALING_FACTOR),
             )
 
@@ -594,7 +598,7 @@ class CMethods:
         group: Union[str, None] = "time.month",
         kind: str = "+",
         **kwargs,
-    ) -> xr.core.dataarray.DataArray:
+    ) -> np.array:
         r"""
         The Delta Method bias correction technique can be applied on interval- and
         ratio-based climate variables to minimize deviations in the mean values
@@ -652,7 +656,7 @@ class CMethods:
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
-        :rtype: xr.core.dataarray.DataArray
+        :rtype: np.array
 
         .. code-block:: python
             :linenos:
@@ -707,7 +711,7 @@ class CMethods:
         kind: str = "+",
         detrended: bool = False,
         **kwargs,
-    ) -> xr.core.dataarray.DataArray:
+    ) -> np.array:
         r"""
         The Quantile Mapping bias correction technique can be used to minimize distributional
         biases between modeled and observed time-series climate data. Its interval-independant
@@ -763,7 +767,7 @@ class CMethods:
         :type detrended: bool, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
-        :rtype: xr.core.dataarray.DataArray
+        :rtype: np.array
 
         .. code-block:: python
             :linenos:
@@ -786,8 +790,7 @@ class CMethods:
             ...     n_quantiles=250
             ... )
         """
-        res = simp.copy(deep=True)
-        obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
+        obs, simh, simp_ = np.array(obs), np.array(simh), np.array(simp)
 
         global_max = max(np.amax(obs), np.amax(simh))
         global_min = min(np.amin(obs), np.amin(simh))
@@ -799,7 +802,9 @@ class CMethods:
 
         if detrended:
             # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
-            for _, idxs in res.groupby("time.month").groups.items():
+            res = np.zeros(len(simp.values))
+            for _, idxs in simp.groupby("time.month").groups.items():
+                # detrended by long-term month
                 m_simh, m_simp = [], []
                 for idx in idxs:
                     m_simh.append(simh[idx])
@@ -832,24 +837,22 @@ class CMethods:
                         m_simp_mean / m_simh_mean
                     )  # Eq. 2
                 for i, idx in enumerate(idxs):
-                    res.values[idx] = X[i]
+                    res[idx] = X[i]
             return res
 
         if kind in cls.ADDITIVE:
-            epsilon = np.interp(simp, xbins, cdf_simh)  # Eq. 1
-            res.values = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 1
-            return res
+            epsilon = np.interp(simp_, xbins, cdf_simh)  # Eq. 1
+            return cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 1
 
         if kind in cls.MULTIPLICATIVE:
             epsilon = np.interp(  # Eq. 2
-                simp,
+                simp_,
                 xbins,
                 cdf_simh,
                 left=kwargs.get("val_min", 0.0),
                 right=kwargs.get("val_max", None),
             )
-            res.values = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 2
-            return res
+            return cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 2
 
         raise NotImplementedError(
             f"{kind} for quantile_mapping is not available. Use '+' or '*' instead."
@@ -900,7 +903,7 @@ class CMethods:
         n_quantiles: int,
         kind: str = "+",
         **kwargs,
-    ) -> xr.core.dataarray.DataArray:
+    ) -> np.array:
         r"""
         The Quantile Delta Mapping bias correction technique can be used to minimize distributional
         biases between modeled and observed time-series climate data. Its interval-independant
@@ -992,7 +995,7 @@ class CMethods:
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
-        :rtype: xr.core.dataarray.DataArray
+        :rtype: np.array
 
         .. code-block:: python
             :linenos:
@@ -1016,7 +1019,6 @@ class CMethods:
             ... )
         """
         if kind in cls.ADDITIVE:
-            res = simp.copy(deep=True)
             obs, simh, simp = (
                 np.array(obs),
                 np.array(simh),
@@ -1035,11 +1037,9 @@ class CMethods:
             epsilon = np.interp(simp, xbins, cdf_simp)  # Eq. 1.1
             QDM1 = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 1.2
             delta = simp - cls.get_inverse_of_cdf(cdf_simh, epsilon, xbins)  # Eq. 1.3
-            res.values = QDM1 + delta  # Eq. 1.4
-            return res
+            return QDM1 + delta  # Eq. 1.4
 
         if kind in cls.MULTIPLICATIVE:
-            res = simp.copy(deep=True)
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
             global_max = kwargs.get("global_max", max(np.amax(obs), np.amax(simh)))
             wide = global_max / n_quantiles
@@ -1058,13 +1058,11 @@ class CMethods:
                 )  # Eq. 2.3
             delta[np.isnan(delta)] = 0
 
-            res.values = QDM1 * delta  # Eq. 2.4
-            return res
+            return QDM1 * delta  # Eq. 2.4
         raise NotImplementedError(
             f"{kind} not available for quantile_delta_mapping. Use '+' or '*' instead."
         )
 
-    # * -----========= G E N E R A L  =========------
     @staticmethod
     def get_pdf(x: Union[list, np.array], xbins: Union[list, np.array]) -> np.array:
         r"""

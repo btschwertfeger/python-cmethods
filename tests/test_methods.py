@@ -122,7 +122,7 @@ class TestMethods(unittest.TestCase):
                 simp=self.data[kind]["simp"][:, 0, 0],
                 kind=kind,
             )
-            assert isinstance(ls_result, xr.core.dataarray.DataArray)
+            assert isinstance(ls_result, (np.ndarray, np.generic))
             assert mean_squared_error(
                 ls_result, self.data[kind]["obsp"][:, 0, 0], squared=False
             ) < mean_squared_error(
@@ -140,7 +140,7 @@ class TestMethods(unittest.TestCase):
             simp=self.data[kind]["simp"][:, 0, 0],
             kind="+",
         )
-        assert isinstance(vs_result, xr.core.dataarray.DataArray)
+        assert isinstance(vs_result, (np.ndarray, np.generic))
         assert mean_squared_error(
             vs_result, self.data[kind]["obsp"][:, 0, 0], squared=False
         ) < mean_squared_error(
@@ -159,7 +159,7 @@ class TestMethods(unittest.TestCase):
                 simp=self.data[kind]["simp"][:, 0, 0],
                 kind=kind,
             )
-            assert isinstance(dm_result, xr.core.dataarray.DataArray)
+            assert isinstance(dm_result, (np.ndarray, np.generic))
             assert mean_squared_error(
                 dm_result, self.data[kind]["obsp"][:, 0, 0], squared=False
             ) < mean_squared_error(
@@ -179,7 +179,7 @@ class TestMethods(unittest.TestCase):
                 n_quantiles=100,
                 kind=kind,
             )
-            assert isinstance(qm_result, xr.core.dataarray.DataArray)
+            assert isinstance(qm_result, (np.ndarray, np.generic))
             assert mean_squared_error(
                 qm_result, self.data[kind]["obsp"][:, 0, 0], squared=False
             ) < mean_squared_error(
@@ -200,7 +200,7 @@ class TestMethods(unittest.TestCase):
                 kind=kind,
                 detrended=True,
             )
-            assert isinstance(dqm_result, xr.core.dataarray.DataArray)
+            assert isinstance(dqm_result, (np.ndarray, np.generic))
             assert mean_squared_error(
                 dqm_result, self.data[kind]["obsp"][:, 0, 0], squared=False
             ) < mean_squared_error(
@@ -221,7 +221,7 @@ class TestMethods(unittest.TestCase):
                 kind=kind,
             )
 
-            assert isinstance(qdm_result, xr.core.dataarray.DataArray)
+            assert isinstance(qdm_result, (np.ndarray, np.generic))
             assert mean_squared_error(
                 qdm_result, self.data[kind]["obsp"][:, 0, 0], squared=False
             ) < mean_squared_error(

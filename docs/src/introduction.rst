@@ -45,7 +45,7 @@ Available Methods
 The following bias correction techniques are available:
     Scaling-based techniques:
         * Linear Scaling :func:`cmethods.CMethods.linear_scaling`
-        * Vairance Scaling :func:`cmethods.CMethods.variance_scaling`
+        * Variance Scaling :func:`cmethods.CMethods.variance_scaling`
         * Delta (change) Method :func:`cmethods.CMethods.delta_method`
 
     Distribution-based techniques:

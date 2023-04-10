@@ -1,0 +1,5 @@
+click
+matplotlib
+netCDF4
+python-cmethods
+xarray
