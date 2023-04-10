@@ -1,4 +1,4 @@
-# Bias correction/adjustment procedures for climatic reasearch
+# python-cmethods: A collection of bias correction techniques wirtten in Python
 
 <div align="center">
 
