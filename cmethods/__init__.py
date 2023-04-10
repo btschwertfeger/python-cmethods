@@ -218,7 +218,7 @@ class CMethods:
         """
         obs = obs.transpose("lat", "lon", "time")
         simh = simh.transpose("lat", "lon", "time")
-        simp = simp.transpose("lat", "lon", "time").load()  # if not loaded ""
+        simp = simp.transpose("lat", "lon", "time").load()
 
         result = simp.copy(deep=True)
         len_lat, len_lon = len(simp.lat), len(simp.lon)
