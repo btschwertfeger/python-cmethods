@@ -1,0 +1,74 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2023 Benjamin Thomas Schwertfeger
+# Github: https://github.com/btschwertfeger
+#
+# Workflow to apply pre-commit, build, test and upload the package
+# to the test index of PyPI.
+
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - "**"
+
+concurrency:
+  group: CICD-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ##    Checks the code logic, style and more
+  ##
+  Pre-Commit:
+    uses: ./.github/workflows/_pre_commit.yml
+
+  ##    Builds the package on multiple OS for multiple
+  ##    Python versions
+  ##
+  Build:
+    needs: [Pre-Commit]
+    uses: ./.github/workflows/_build.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest] # todo: windows-latest
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    with:
+      os: ${{ matrix.os }}
+      python-version: ${{ matrix.python-version }}
+
+  ##    Run the unit tests for Python 3.8 until 3.11
+  ##
+  Test:
+    needs: [Build]
+    uses: ./.github/workflows/_test.yml
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    with:
+      os: ${{ matrix.os }}
+      python-version: ${{ matrix.python-version }}
+
+  ##    Uploads the package to test.pypi.org on master if triggered by
+  ##    a regular commit/push.
+  ##
+  UploadTestPyPI:
+    if: success() && github.ref == 'refs/heads/master'
+    needs: [Test]
+    name: Upload current development version to Test PyPI
+    uses: ./.github/workflows/_pypi_publish.yml
+    with:
+      REPOSITORY_URL: https://test.pypi.org/legacy/
+    secrets:
+      API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+
+  ##    Generates and uploads the coverage statistics to codecov
+  ##
+  CodeCov:
+    needs: [Test]
+    uses: ./.github/workflows/_codecov.yml
+    with:
+      os: "ubuntu-latest"
+      python-version: "3.11"
+    secrets: inherit
