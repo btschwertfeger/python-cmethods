@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-cmethods"
+dynamic = ["version"]
+authors = [
+  { name="Benjamin Thomas Schwertfeger", email="development@b-schwertfeger.de" },
+]
+description = "Collection of bias correction procedures for 1- and 3-dimensional climate data"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.8"
+dependencies = [
+    "xarray>=2022.11.0",
+    "netCDF4>=1.6.1",
+    "numpy",
+    "tqdm",
+]
+keywords = [
+    "climate-science",
+    "bias",
+    "bias-correction",
+    "bias-adjustment",
+    "climate-reanalysis",
+    "reanalysis",
+    "linear-scaling",
+    "variance-scaling",
+    "delta-method",
+    "delta-change-method",
+    "quantile-mapping",
+    "quantile-delta-mapping"
+]
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Natural Language :: English",
+    "Operating System :: MacOS",
+    "Operating System :: Unix"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/btschwertfeger/python-cmethods"
+"Bug Tracker" = "https://github.com/btschwertfeger/python-cmethods/issues"
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+include = ["cmethods*"]
+exclude = [
+  "docs*",
+  "tests*",
+  "examples*",
+  ".env",
+]
+
+[tool.setuptools_scm]
+write_to = "cmethods/_version.py"
+version_scheme = "guess-next-dev"
+local_scheme = "no-local-version"
+
+[tool.pytest]
+junit_family = "xunit2"
+testpaths = ["tests"]
+
+[project.optional-dependencies]
+dev = [
+  "pytest", "pytest-cov",
+  "scikit-learn", "scipy",
+  "sphinx", "sphinx-rtd-theme"
+]
+examples = ["matplotlib"]
