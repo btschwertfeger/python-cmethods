@@ -53,7 +53,7 @@ class CMethods:
     The following bias correction techniques are available:
         Scaling-based techniques:
             * Linear Scaling :func:`cmethods.CMethods.linear_scaling`
-            * Vairance Scaling :func:`cmethods.CMethods.variance_scaling`
+            * Variance Scaling :func:`cmethods.CMethods.variance_scaling`
             * Delta (change) Method :func:`cmethods.CMethods.delta_method`
 
         Distribution-based techniques:
@@ -137,7 +137,7 @@ class CMethods:
         group: Union[str, None] = None,
         n_jobs: int = 1,
         **kwargs,
-    ) -> xr.core.dataarray.Dataset:
+    ) -> xr.core.dataarray.DataArray:
         """
         Function to apply a bias correction method on 3-dimensional climate data.
 
@@ -166,7 +166,7 @@ class CMethods:
         :type n_jobs: int, optional
         :raises UnknownMethodError: If the correction method is not implemented
         :return: The bias-corrected time series
-        :rtype: xr.core.dataarray.Dataset
+        :rtype: xr.core.dataarray.DataArray
 
         .. code-block:: python
             :linenos:
@@ -348,7 +348,7 @@ class CMethods:
             for i, index in enumerate(groups[month]):
                 result[index] = computed_result[i]
 
-        return result
+        return np.array(result)
 
     # ? -----========= L I N E A R - S C A L I N G =========------
     @classmethod
@@ -711,7 +711,7 @@ class CMethods:
         kind: str = "+",
         detrended: bool = False,
         **kwargs,
-    ) -> xr.core.dataarray.DataArray:
+    ) -> np.array:
         r"""
         The Quantile Mapping bias correction technique can be used to minimize distributional
         biases between modeled and observed time-series climate data. Its interval-independant
@@ -767,7 +767,7 @@ class CMethods:
         :type detrended: bool, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
-        :rtype: xr.core.dataarray.DataArray
+        :rtype: np.array
 
         .. code-block:: python
             :linenos:
@@ -903,7 +903,7 @@ class CMethods:
         n_quantiles: int,
         kind: str = "+",
         **kwargs,
-    ) -> xr.core.dataarray.DataArray:
+    ) -> np.array:
         r"""
         The Quantile Delta Mapping bias correction technique can be used to minimize distributional
         biases between modeled and observed time-series climate data. Its interval-independant
@@ -1019,7 +1019,6 @@ class CMethods:
             ... )
         """
         if kind in cls.ADDITIVE:
-            # res = simp.copy(deep=True)
             obs, simh, simp = (
                 np.array(obs),
                 np.array(simh),

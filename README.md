@@ -1,4 +1,4 @@
-# python-cmethods: A collection of bias correction techniques wirtten in Python
+# python-cmethods
 
 <div align="center">
 
@@ -18,7 +18,7 @@
 
 </div>
 
-This Python module contains a collection of different scale- and distribution-based bias adjustment techniques for climatic research (see `/examples/examples.ipynb` for help).
+This Python module serves as a collection of different scale- and distribution-based bias correction techniques for climatic research
 
 The documentation is available at: [https://python-kraken-sdk.readthedocs.io/en/stable/](https://python-kraken-sdk.readthedocs.io/en/stable/)
 
@@ -67,7 +67,7 @@ In this way, for example, modeled data, which on average represent values that a
 
 ## 2. Available methods
 
-All methods except the `adjust_3d` function requires the application on one time series.
+All methods except the `adjust_3d` function requires that the input data sets only contain one dimension.
 
 | Function name            | Description                                                                                                                                                  |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -149,7 +149,7 @@ Help:
     --scen input_data/scenario.nc     \
     --kind "+"                        \
     --variable "tas"                  \
-    -method quantile_mapping
+    --method quantile_mapping
 ```
 
 (2.) Example - Linear Scaling bias correction on the provided example data:
@@ -162,7 +162,7 @@ Help:
     --kind "+"                        \
     --variable "tas"                  \
     --group "time.month"              \
-    -method linear_scaling
+    --method linear_scaling
 ```
 
 Notes:
