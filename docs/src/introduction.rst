@@ -16,7 +16,7 @@ time periods. Data from past periods are used to adjust variables
 from current and future time series so that their distributional
 properties approximate possible actual values.
 
-.. figure:: ../images/biasCdiagram.png
+.. figure:: ../_static/images/biasCdiagram.png
     :width: 600
     :align: center
     :alt: Schematic representation of a bias adjustment procedure
@@ -31,7 +31,7 @@ It is directly visible that the delta adjusted time series
 (:math:`T^{*DM}_{sim,p}`) are much more similar to the observed data (:math:`T_{obs,p}`)
 than the raw modeled data (:math:`T_{sim,p}`).
 
-.. figure:: ../images/dm-doy-plot.png
+.. figure:: ../_static/images/dm-doy-plot.png
     :width: 600
     :align: center
     :alt: Temperature per day of year in modeled, observed and bias-adjusted climate data
@@ -55,6 +55,17 @@ The following bias correction techniques are available:
 All of these methods are intended to be applied on 1-dimensional time-series climate data.
 This module also provides the function :func:`cmethods.CMethods.adjust_3d` that enables
 the application of the desired bias correction method on 3-dimensinoal data sets.
+
+Except for the variance scaling, all methods can be applied on stochastic and non-stochastic
+climate variables. Variance scaling can only be applied on non-stochastic climate variables.
+
+- Stochastic climate variables are those that are subject to random fluctuations
+  and are not predictable. They have no predictable trend or pattern. Examples of
+  stochastic climate variables include precipitation, air temperature, and humidity.
+
+- Non-stochastic climate variables, on the other hand, have clear trend and pattern histories
+  and can be readily predicted. They are often referred to as climate elements and include
+  variables such as water temperature and air pressure.
 
 Examples can be found in the `python-cmethods`_ repository and of course
 within this documentation.

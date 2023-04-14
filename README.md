@@ -20,7 +20,7 @@
 
 This Python module serves as a collection of different scale- and distribution-based bias correction techniques for climatic research
 
-The documentation is available at: [https://python-kraken-sdk.readthedocs.io/en/stable/](https://python-kraken-sdk.readthedocs.io/en/stable/)
+The documentation is available at: [https://python-cmethods.readthedocs.io/en/stable/](https://python-cmethods.readthedocs.io/en/stable/)
 
 > ⚠️ For the application of bias corrections on _lage data sets_ it is recomanded to use the command-line tool [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX) since bias corrections are complex statistical transformation which are very slow in Python compared to the C++ implementation.
 
@@ -78,6 +78,17 @@ All methods except the `adjust_3d` function requires that the input data sets on
 | `quantile_delta_mapping` | Quantile Delta Mapping (additive and multiplicative)                                                                                                         |
 | `adjust_3d`              | requires a method name and the respective parameters to adjust all time series of a 3-dimensional data set                                                   |
 
+Except for the variance scaling, all methods can be applied on stochastic and non-stochastic
+climate variables. Variance scaling can only be applied on non-stochastic climate variables.
+
+- Stochastic climate variables are those that are subject to random fluctuations
+  and are not predictable. They have no predictable trend or pattern. Examples of
+  stochastic climate variables include precipitation, air temperature, and humidity.
+
+- Non-stochastic climate variables, on the other hand, have clear trend and pattern histories
+  and can be readily predicted. They are often referred to as climate elements and include
+  variables such as water temperature and air pressure.
+
 ---
 
 <a name="installation"></a>
@@ -119,7 +130,7 @@ qdm_result = cm.adjust_3d( # 3d = 2 spatial and 1 time dimension
 )
 # to calculate the relative rather than the absolute change,
 # '*' can be used instead of '+' (this is prefered when adjusting
-# ratio based variables like precipitation)
+# stochastic variables like precipitation)
 ```
 
 Notes:
