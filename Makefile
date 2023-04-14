@@ -17,7 +17,7 @@ build:
 ##		Installs the package in edit mode
 ##
 dev:
-	$(PYTHON) -m pip install -e .[dev]
+	$(PYTHON) -m pip install -e ".[dev]"
 
 ##		Install the package
 ##
@@ -42,6 +42,20 @@ doctest:
 ##		Pre-Commit
 pre-commit:
 	@pre-commit run -a
+
+## 		Create the changelog
+##
+##		Generate the changelog
+##
+changelog:
+	docker run -it --rm \
+		-v "$(pwd)":/usr/local/src/python-cmethods \
+		githubchangeloggenerator/github-changelog-generator \
+		-u btschwertfeger \
+		-p python-cmethods \
+		-t $(GHTOKEN)  \
+		--breaking-labels Breaking \
+		--enhancement-labels Feature
 
 ##		Clean the workspace
 ##
