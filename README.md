@@ -45,7 +45,7 @@ These programs and data structures are designed to help minimize discrepancies b
 
 <figure>
   <img
-  src="docs/images/biasCdiagram.png?raw=true"
+  src="docs/_static/images/biasCdiagram.png?raw=true"
   alt="Schematic representation of a bias adjustment procedure"
   style="background-color: white; border-radius: 7px">
   <figcaption>Figure 1: Schematic representation of a bias adjustment procedure</figcaption>
@@ -55,7 +55,7 @@ In this way, for example, modeled data, which on average represent values that a
 
 <figure>
   <img
-  src="docs/images/dm-doy-plot.png?raw=true"
+  src="docs/_static/images/dm-doy-plot.png?raw=true"
   alt="Temperature per day of year in modeled, observed and bias-adjusted climate data"
   style="background-color: white; border-radius: 7px">
   <figcaption>Figure 2: Temperature per day of year in observed, modeled, and bias-adjusted climate data</figcaption>
