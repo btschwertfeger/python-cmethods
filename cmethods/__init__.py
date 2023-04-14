@@ -60,8 +60,16 @@ class CMethods:
             * Quantile Mapping :func:`cmethods.CMethods.quantile_mapping`
             * Quantile Delta Mapping :func:`cmethods.CMethods.quantile_delta_mapping`
 
-    Except for the Variance Scaling all methods can be applied on both, interval- and ratio- based
-    variables. The Variance Scaling can only be applied on interval-based variables.
+    Except for the Variance Scaling all methods can be applied on both, stochastic and non-stochastic
+    variables. The Variance Scaling can only be applied on stochastic climate variables.
+
+    Stochastic climate variables are those that are subject to random fluctuations
+    and are not predictable. They have no predictable trend or pattern. Examples of
+    stochastic climate variables include precipitation, air temperature, and humidity.
+
+    Non-stochastic climate variables, on the other hand, have clear trend and pattern histories
+    and can be readily predicted. They are often referred to as climate elements and include
+    variables such as water temperature and air pressure.
     """
 
     SCALING_METHODS = ["linear_scaling", "variance_scaling", "delta_method"]
@@ -362,8 +370,8 @@ class CMethods:
         **kwargs,
     ) -> np.array:
         r"""
-        The Linear Scaling bias correction technique can be applied on interval- and
-        ratio-based climate variables to minimize deviations in the mean values
+        The Linear Scaling bias correction technique can be applied on stochastic and
+        non-stochastic climate variables to minimize deviations in the mean values
         between predicted and observed time-series of past and future time periods.
 
         Since the multiplicative scaling can result in very high scaling factors,
@@ -412,8 +420,8 @@ class CMethods:
         :type simp: xr.core.dataarray.DataArray
         :param group: The grouping defines the basis of the mean, defaults to ``time.month``
         :type group: Union[str, None], optional
-        :param kind: The kind of the correction, additive for interval- and multiplicative
-            for ratio-based variables, defaults to ``+``
+        :param kind: The kind of the correction, additive for non-stochastic and multiplicative
+            for stochastic climate variables, defaults to ``+``
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
@@ -474,7 +482,7 @@ class CMethods:
         **kwargs,
     ) -> np.array:
         r"""
-        The Variance Scaling bias correction technique can be applied on interval-based
+        The Variance Scaling bias correction technique can be applied only on non-stochastic
         climate variables to minimize deviations in the mean and variance
         between predicted and observed time-series of past and future time periods.
 
@@ -532,7 +540,7 @@ class CMethods:
         :type simp: xr.core.dataarray.DataArray
         :param group: The grouping defines the basis of the mean, defaults to ``time.month``
         :type group: Union[str, None], optional
-        :param kind: The kind of the correction, additive for interval-based variables,
+        :param kind: The kind of the correction, additive for non-stochastic climate variables
             no other kind is available so far, defaults to ``+``
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``add``)
@@ -600,8 +608,8 @@ class CMethods:
         **kwargs,
     ) -> np.array:
         r"""
-        The Delta Method bias correction technique can be applied on interval- and
-        ratio-based climate variables to minimize deviations in the mean values
+        The Delta Method bias correction technique can be applied on stochastic and
+        non-stochastic climate variables to minimize deviations in the mean values
         between predicted and observed time-series of past and future time periods.
 
         Since the multiplicative scaling can result in very high scaling factors,
@@ -651,8 +659,8 @@ class CMethods:
         :type simp: xr.core.dataarray.DataArray
         :param group: The grouping defines the basis of the mean, defaults to ``time.month``
         :type group: Union[str, None], optional
-        :param kind: The kind of the correction, additive for interval- and multiplicative
-            for ratio-based variables, defaults to ``+``
+        :param kind: The kind of the correction, additive for non-stochastic and multiplicative
+            for stochastic climate variables, defaults to ``+``
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
@@ -734,13 +742,38 @@ class CMethods:
         After the Quantile Mapping was applied, the mean is shifted back. Since it does not make sens
         to take the whole mean to rescale the data, the month-dependent long-term mean is used.
 
-        In the following the equations of Alex J. Cannon (2015) are shown (without detrending):
+        In the following the equations of Alex J. Cannon (2015) are shown and explained (without detrending):
 
         **Additive**:
 
             .. math::
 
                 X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h} \left\{F_{sim,h}\left[X_{sim,p}(i)\right]\right\}
+
+
+            The additive quantile mapping procedure consists of inserting the value to be
+            adjusted (:math:`X_{sim,p}(i)`) into the cumulative distribution function
+            of the modeled data of the control period (:math:`F_{sim,h}`). This determines,
+            in which quantile the value to be adjusted can be found in the modeled data of the control period
+            The following images show this by using :math:`T` for temperatures.
+
+            .. figure:: ../_static/images/qm-cdf-plot-1.png
+                :width: 600
+                :align: center
+                :alt: Determination of the quantile value
+
+                Fig 1: Inserting :math:`X_{sim,p}(i)` into :math:`F_{sim,h}` to determine the quantile value
+
+            This value, which of course lies between 0 and 1, is subsequently inserted
+            into the inverse cumulative distribution function of the reference data of the control period to
+            determine the bias-corrected value at time step :math:`i`.
+
+            .. figure:: ../_static/images/qm-cdf-plot-2.png
+                :width: 600
+                :align: center
+                :alt: Determination of the QM bias-corrected value
+
+                Fig 1: Inserting the quantile value into :math:`F^{-1}_{obs,h}` to determine the bias-corrected value for time step :math:`i`
 
         **Multiplicative**:
 
@@ -759,12 +792,16 @@ class CMethods:
         :type simp: xr.core.dataarray.DataArray
         :param n_quantiles: Number of quantiles to respect/use
         :type n_quantiles: int
-        :param kind: The kind of the correction, additive for interval- and multiplicative
-            for ratio-based variables, defaults to ``+``
+        :param kind: The kind of the correction, additive for non-stochastic and multiplicative
+            for stochastic climate variables, defaults to ``+``
         :type kind: str, optional
         :param detrended: If the extremes should be respected by applying month-dependent
             detrending before and after applying the Quantile Mapping
         :type detrended: bool, optional
+        :param val_min: Lower boundary for interpolation (only if ``kind="*"``, default: ``0``)
+        :type val_min: float, optional
+        :param val_max: Upper boundary for interpolation (only if ``kind="*"``, default: ``None``)
+        :type val_max: float, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
         :rtype: np.array
@@ -990,8 +1027,8 @@ class CMethods:
         :type simp: xr.core.dataarray.DataArray
         :param n_quantiles: Number of quantiles to respect/use
         :type n_quantiles: int
-        :param kind: The kind of the correction, additive for interval- and multiplicative
-            for ratio-based variables, defaults to ``+``
+        :param kind: The kind of the correction, additive for non-stochastic and multiplicative
+            for non-stochastic climate variables, defaults to ``+``
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
@@ -1125,7 +1162,7 @@ class CMethods:
         xbins: Union[list, np.array],
     ) -> np.array:
         r"""
-        Returns the inverse cumulative distribution function of with the following
+        Returns the inverse cumulative distribution function as:
         :math:`F^{-1}_{x}\left[y\right]` where :math:`x` represents ``base_cdf`` and
         ``insert_cdf`` is represented by :math:`y`.
 
@@ -1152,7 +1189,7 @@ class CMethods:
 
             where:
                 - :math:`x` is ``factor``
-                - :math:`y` is ``max_scaling_factor``.
+                - :math:`y` is ``max_scaling_factor``
 
         :param factor: The value to check for
         :type factor: Union[int, float]
