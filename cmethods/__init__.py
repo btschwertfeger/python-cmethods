@@ -58,6 +58,7 @@ class CMethods:
 
         Distribution-based techniques:
             * Quantile Mapping :func:`cmethods.CMethods.quantile_mapping`
+            * Detrended Quantile Mapping :func:`cmethods.CMethods.detrended_quantile_mapping`
             * Quantile Delta Mapping :func:`cmethods.CMethods.quantile_delta_mapping`
 
     Except for the Variance Scaling all methods can be applied on both, stochastic and non-stochastic
@@ -73,7 +74,11 @@ class CMethods:
     """
 
     SCALING_METHODS = ["linear_scaling", "variance_scaling", "delta_method"]
-    DISTRIBUTION_METHODS = ["quantile_mapping", "quantile_delta_mapping"]
+    DISTRIBUTION_METHODS = [
+        "quantile_mapping",
+        "detrended_quantile_mapping",
+        "quantile_delta_mapping",
+    ]
 
     CUSTOM_METHODS = SCALING_METHODS + DISTRIBUTION_METHODS
     METHODS = CUSTOM_METHODS
@@ -127,6 +132,8 @@ class CMethods:
             return cls.delta_method
         if method == "quantile_mapping":
             return cls.quantile_mapping
+        if method == "detrended_quantile_mapping":
+            return cls.detrended_quantile_mapping
         if method == "empirical_quantile_mapping":
             return cls.empirical_quantile_mapping
         if method == "quantile_delta_mapping":
@@ -717,7 +724,6 @@ class CMethods:
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int,
         kind: str = "+",
-        detrended: bool = False,
         **kwargs,
     ) -> np.array:
         r"""
@@ -735,14 +741,10 @@ class CMethods:
         Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles
         and Extremes?"* (https://doi.org/10.1175/JCLI-D-14-00754.1).
 
-        Since the regular Quantile Mapping is bounded to the value range of the modeled data of
-        the control period, the *Detrended* Quantile Mapping approach can be used by setting the
-        ``detrended`` argument to ``True``. Detrending means, that the values of :math:`X_{sim,p}`
-        are shifted to the value range of :math:`X_{sim,h}` before the Quantile Mapping is applied.
-        After the Quantile Mapping was applied, the mean is shifted back. Since it does not make sens
-        to take the whole mean to rescale the data, the month-dependent long-term mean is used.
+        The regular Quantile Mapping is bounded to the value range of the modeled data
+        of the control period. To avoid this, the Detrended Quantile Mapping can be used.
 
-        In the following the equations of Alex J. Cannon (2015) are shown and explained (without detrending):
+        In the following the equations of Alex J. Cannon (2015) are shown and explained:
 
         **Additive**:
 
@@ -795,10 +797,7 @@ class CMethods:
         :param kind: The kind of the correction, additive for non-stochastic and multiplicative
             for stochastic climate variables, defaults to ``+``
         :type kind: str, optional
-        :param detrended: If the extremes should be respected by applying month-dependent
-            detrending before and after applying the Quantile Mapping
-        :type detrended: bool, optional
-        :param val_min: Lower boundary for interpolation (only if ``kind="*"``, default: ``0``)
+        :param val_min: Lower boundary for interpolation (only if ``kind="*"``, default: ``0.0``)
         :type val_min: float, optional
         :param val_max: Upper boundary for interpolation (only if ``kind="*"``, default: ``None``)
         :type val_max: float, optional
@@ -827,7 +826,7 @@ class CMethods:
             ...     n_quantiles=250
             ... )
         """
-        obs, simh, simp_ = np.array(obs), np.array(simh), np.array(simp)
+        obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
 
         global_max = max(np.amax(obs), np.amax(simh))
         global_min = min(np.amin(obs), np.amin(simh))
@@ -837,53 +836,13 @@ class CMethods:
         cdf_obs = cls.get_cdf(obs, xbins)
         cdf_simh = cls.get_cdf(simh, xbins)
 
-        if detrended:
-            # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
-            res = np.zeros(len(simp.values))
-            for _, idxs in simp.groupby("time.month").groups.items():
-                # detrended by long-term month
-                m_simh, m_simp = [], []
-                for idx in idxs:
-                    m_simh.append(simh[idx])
-                    m_simp.append(simp[idx])
-
-                m_simh = np.array(m_simh)
-                m_simp = np.array(m_simp)
-                m_simh_mean = np.nanmean(m_simh)
-                m_simp_mean = np.nanmean(m_simp)
-
-                if kind in cls.ADDITIVE:
-                    epsilon = np.interp(
-                        m_simp - m_simp_mean + m_simh_mean, xbins, cdf_simh
-                    )  # Eq. 1
-                    X = (
-                        cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)
-                        + m_simp_mean
-                        - m_simh_mean
-                    )  # Eq. 1
-
-                elif kind in cls.MULTIPLICATIVE:
-                    epsilon = np.interp(  # Eq. 2
-                        cls.ensure_devidable((m_simh_mean * m_simp), m_simp_mean),
-                        xbins,
-                        cdf_simh,
-                        left=kwargs.get("val_min", 0.0),
-                        right=kwargs.get("val_max", None),
-                    )
-                    X = np.interp(epsilon, cdf_obs, xbins) * (
-                        cls.ensure_devidable(m_simp_mean, m_simh_mean)
-                    )  # Eq. 2
-                for i, idx in enumerate(idxs):
-                    res[idx] = X[i]
-            return res
-
         if kind in cls.ADDITIVE:
-            epsilon = np.interp(simp_, xbins, cdf_simh)  # Eq. 1
+            epsilon = np.interp(simp, xbins, cdf_simh)  # Eq. 1
             return cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 1
 
         if kind in cls.MULTIPLICATIVE:
             epsilon = np.interp(  # Eq. 2
-                simp_,
+                simp,
                 xbins,
                 cdf_simh,
                 left=kwargs.get("val_min", 0.0),
@@ -894,6 +853,145 @@ class CMethods:
         raise NotImplementedError(
             f"{kind} for quantile_mapping is not available. Use '+' or '*' instead."
         )
+
+    @classmethod
+    def detrended_quantile_mapping(
+        cls,
+        obs: xr.core.dataarray.DataArray,
+        simh: xr.core.dataarray.DataArray,
+        simp: xr.core.dataarray.DataArray,
+        n_quantiles: int,
+        kind: str = "+",
+        **kwargs,
+    ) -> np.array:
+        r"""
+        The Detrended Quantile Mapping bias correction technique can be used to minimize distributional
+        biases between modeled and observed time-series climate data like the regular Quantile Mapping.
+        Detrending means, that the values of :math:`X_{sim,p}` are shifted to the value range of
+        :math:`X_{sim,h}` before the regular Quantile Mapping is applied.
+        After the Quantile Mapping was applied, the mean is shifted back. Since it does not make sens
+        to take the whole mean to rescale the data, the month-dependent long-term mean is used.
+
+        This method must be applied on a 1-dimensional data set i.e., there is only one
+        time-series passed for each of ``obs``, ``simh``, and ``simp``. Also this method requires
+        that the time series are groupable by ``time.month``.
+
+        The Detrended Quantile Mapping technique implemented here is based on the equations of
+        Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock (2015) *"Bias Correction of GCM
+        Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles
+        and Extremes?"* (https://doi.org/10.1175/JCLI-D-14-00754.1).
+
+        In the following the equations of Alex J. Cannon (2015) are shown and explained (without detrending):
+
+        **Additive**:
+
+            .. math::
+
+                X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h} \left\{F_{sim,h}\left[X_{sim,p}(i)\right]\right\}
+
+
+        **Multiplicative**:
+
+            .. math::
+
+                X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot \mu{X_{sim,p}(i)}}{\mu{X_{sim,p}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}(i)}}{\mu{X_{sim,h}}}
+
+
+        :param obs: The reference data set of the control period
+            (in most cases the observational data)
+        :type obs: xr.core.dataarray.DataArray
+        :param simh: The modeled data of the control period
+        :type simh: xr.core.dataarray.DataArray
+        :param simp: The modeled data of the scenario period (this is the data set
+            on which the bias correction takes action)
+        :type simp: xr.core.dataarray.DataArray
+        :param n_quantiles: Number of quantiles to respect/use
+        :type n_quantiles: int
+        :param kind: The kind of the correction, additive for non-stochastic and multiplicative
+            for stochastic climate variables, defaults to ``+``
+        :type kind: str, optional
+        :param val_min: Lower boundary for interpolation (only if ``kind="*"``, default: ``0.0``)
+        :type val_min: float, optional
+        :param val_max: Upper boundary for interpolation (only if ``kind="*"``, default: ``None``)
+        :type val_max: float, optional
+        :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
+        :return: The bias-corrected time series
+        :rtype: np.array
+
+        .. code-block:: python
+            :linenos:
+            :caption: Example: Quantile Mapping
+
+            >>> import xarray as xr
+            >>> from cmethods import CMethods as cm
+
+            >>> # Note: The data sets must contain the dimension "time"
+            >>> #       for the respective variable.
+            >>> obsh = xr.open_dataset("path/to/reference_data-control_period.nc")
+            >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
+            >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
+            >>> variable = "tas" # temperatures
+
+            >>> qm_adjusted = cm.detrended_quantile_mapping(
+            ...     obs=obs[variable],
+            ...     simh=simh[variable],
+            ...     simp=simp[variable],
+            ...     n_quantiles=250
+            ... )
+        """
+        if kind not in cls.MULTIPLICATIVE and kind not in cls.ADDITIVE:
+            raise NotImplementedError(
+                f"{kind} for detrended_quantile_mapping is not available. Use '+' or '*' instead."
+            )
+
+        obs, simh = np.array(obs), np.array(simh)
+
+        global_max = max(np.amax(obs), np.amax(simh))
+        global_min = min(np.amin(obs), np.amin(simh))
+        wide = abs(global_max - global_min) / n_quantiles
+        xbins = np.arange(global_min, global_max + wide, wide)
+
+        cdf_obs = cls.get_cdf(obs, xbins)
+        cdf_simh = cls.get_cdf(simh, xbins)
+
+        # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
+        res = np.zeros(len(simp.values))
+        for _, idxs in simp.groupby("time.month").groups.items():
+            # detrended by long-term month
+            m_simh, m_simp = [], []
+            for idx in idxs:
+                m_simh.append(simh[idx])
+                m_simp.append(simp[idx])
+
+            m_simh = np.array(m_simh)
+            m_simp = np.array(m_simp)
+            m_simh_mean = np.nanmean(m_simh)
+            m_simp_mean = np.nanmean(m_simp)
+
+            if kind in cls.ADDITIVE:
+                epsilon = np.interp(
+                    m_simp - m_simp_mean + m_simh_mean, xbins, cdf_simh
+                )  # Eq. 1
+                X = (
+                    cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)
+                    + m_simp_mean
+                    - m_simh_mean
+                )  # Eq. 1
+
+            elif kind in cls.MULTIPLICATIVE:
+                epsilon = np.interp(  # Eq. 2
+                    cls.ensure_devidable((m_simh_mean * m_simp), m_simp_mean),
+                    xbins,
+                    cdf_simh,
+                    left=kwargs.get("val_min", 0.0),
+                    right=kwargs.get("val_max", None),
+                )
+                X = np.interp(epsilon, cdf_obs, xbins) * cls.ensure_devidable(
+                    m_simp_mean, m_simh_mean
+                )  # Eq. 2
+            for i, idx in enumerate(idxs):
+                res[idx] = X[i]
+        return res
 
     # ? -----========= E M P I R I C A L - Q U A N T I L E - M A P P I N G =========------
     @classmethod

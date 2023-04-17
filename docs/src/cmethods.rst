@@ -5,7 +5,7 @@ Classes and Functions
 .. currentmodule:: cmethods
 
 .. autoclass:: CMethods
-   :members: linear_scaling, variance_scaling, delta_method, quantile_mapping, quantile_delta_mapping, adjust_3d
+   :members: linear_scaling, variance_scaling, delta_method, quantile_mapping, detrended_quantile_mapping, quantile_delta_mapping, adjust_3d
 
 
 Some helpful additional methods

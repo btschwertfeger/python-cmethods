@@ -50,6 +50,7 @@ The following bias correction techniques are available:
 
     Distribution-based techniques:
         * Quantile Mapping :func:`cmethods.CMethods.quantile_mapping`
+        * Detrended Quantile Mapping :func:`cmethods.CMethods.detrended_quantile_mapping`
         * Quantile Delta Mapping :func:`cmethods.CMethods.quantile_delta_mapping`
 
 All of these methods are intended to be applied on 1-dimensional time-series climate data.
