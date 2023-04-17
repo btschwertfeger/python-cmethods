@@ -881,7 +881,8 @@ class CMethods:
         Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles
         and Extremes?"* (https://doi.org/10.1175/JCLI-D-14-00754.1).
 
-        In the following the equations of Alex J. Cannon (2015) are shown and explained (without detrending):
+        In the following the equations of Alex J. Cannon (2015) are shown (without detrending; see QM
+        for explainations):
 
         **Additive**:
 
@@ -1104,7 +1105,7 @@ class CMethods:
                 .. math::
 
                     \Delta(i) & = \frac{ F^{-1}_{sim,p}\left[\varepsilon(i)\right] }{ F^{-1}_{sim,h}\left[\varepsilon(i)\right] } \\[1pt]
-                              & = \frac{ X_{sim,p}(i) }{ F^{-1}_{sim,h}\left\{F^_{sim,p}\left[X_{sim,p}(i)\right]\right\} }
+                              & = \frac{ X_{sim,p}(i) }{ F^{-1}_{sim,h}\left\{F_{sim,p}\left[X_{sim,p}(i)\right]\right\} }
 
 
             **(2.4)** The relative change between the modeled data of the control and scenario period is than
@@ -1201,7 +1202,7 @@ class CMethods:
     ) -> np.array:
         """
         Ensures that the arrays can be devided. The numerator will be multiplied by
-        the maximum scaling factor of the CMethods class.
+        the maximum scaling factor of the CMethods class if division by zero.
 
         :param numerator: Numerator to use
         :type numerator: np.array
