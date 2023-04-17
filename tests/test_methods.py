@@ -222,6 +222,8 @@ class TestMethods(unittest.TestCase):
             )
 
             assert isinstance(qdm_result, (np.ndarray, np.generic))
+            if np.isnan(qdm_result).any():
+                raise ValueError(qdm_result)
             assert mean_squared_error(
                 qdm_result, self.data[kind]["obsp"][:, 0, 0], squared=False
             ) < mean_squared_error(
@@ -396,6 +398,14 @@ class TestMethods(unittest.TestCase):
         assert cm.get_adjusted_scaling_factor(10, 11) == 10
         assert cm.get_adjusted_scaling_factor(-10, -11) == -10
         assert cm.get_adjusted_scaling_factor(-11, -10) == -10
+
+    def test_ensure_devidable(self) -> None:
+        assert np.array_equal(
+            cm.ensure_devidable(
+                np.array((1, 2, 3, 4, 5, 0)), np.array((0, 1, 0, 2, 3, 0))
+            ),
+            np.array((10, 2, 30, 2, 5 / 3, 0)),
+        )
 
 
 if __name__ == "__main__":

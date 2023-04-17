@@ -462,7 +462,7 @@ class CMethods:
             return np.array(simp) + (np.nanmean(obs) - np.nanmean(simh))  # Eq. 1
         if kind in cls.MULTIPLICATIVE:
             adj_scaling_factor = cls.get_adjusted_scaling_factor(
-                np.nanmean(obs) / np.nanmean(simh),
+                cls.ensure_devidable(np.nanmean(obs), np.nanmean(simh)),
                 kwargs.get("max_scaling_factor", cls.MAX_SCALING_FACTOR),
             )
             return np.array(simp) * adj_scaling_factor  # Eq. 2
@@ -585,7 +585,7 @@ class CMethods:
             VS_1_simp = LS_simp - np.nanmean(LS_simp)  # Eq. 4
 
             adj_scaling_factor = cls.get_adjusted_scaling_factor(
-                np.std(np.array(obs)) / np.std(VS_1_simh),
+                cls.ensure_devidable(np.std(np.array(obs)), np.std(VS_1_simh)),
                 kwargs.get("max_scaling_factor", cls.MAX_SCALING_FACTOR),
             )
 
@@ -700,7 +700,7 @@ class CMethods:
             return np.array(obs) + (np.nanmean(simp) - np.nanmean(simh))  # Eq. 1
         if kind in cls.MULTIPLICATIVE:
             adj_scaling_factor = cls.get_adjusted_scaling_factor(
-                np.nanmean(simp) / np.nanmean(simh),
+                cls.ensure_devidable(np.nanmean(simp), np.nanmean(simh)),
                 kwargs.get("max_scaling_factor", cls.MAX_SCALING_FACTOR),
             )
             return np.array(obs) * adj_scaling_factor  # Eq. 2
@@ -864,14 +864,14 @@ class CMethods:
 
                 elif kind in cls.MULTIPLICATIVE:
                     epsilon = np.interp(  # Eq. 2
-                        (m_simh_mean * m_simp) / m_simp_mean,
+                        cls.ensure_devidable((m_simh_mean * m_simp), m_simp_mean),
                         xbins,
                         cdf_simh,
                         left=kwargs.get("val_min", 0.0),
                         right=kwargs.get("val_max", None),
                     )
                     X = np.interp(epsilon, cdf_obs, xbins) * (
-                        m_simp_mean / m_simh_mean
+                        cls.ensure_devidable(m_simp_mean, m_simh_mean)
                     )  # Eq. 2
                 for i, idx in enumerate(idxs):
                     res[idx] = X[i]
@@ -1006,7 +1006,7 @@ class CMethods:
                 .. math::
 
                     \Delta(i) & = \frac{ F^{-1}_{sim,p}\left[\varepsilon(i)\right] }{ F^{-1}_{sim,h}\left[\varepsilon(i)\right] } \\[1pt]
-                              & = \frac{ X_{sim,p}(i) }{ F^{-1}_{sim,h}\left\{F^{}_{sim,p}\left[X_{sim,p}(i)\right]\right\} }
+                              & = \frac{ X_{sim,p}(i) }{ F^{-1}_{sim,h}\left\{F^_{sim,p}\left[X_{sim,p}(i)\right]\right\} }
 
 
             **(2.4)** The relative change between the modeled data of the control and scenario period is than
@@ -1089,16 +1089,45 @@ class CMethods:
             epsilon = np.interp(simp, xbins, cdf_simp)  # Eq. 1.1
             QDM1 = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 1.2
 
-            with np.errstate(divide="ignore", invalid="ignore"):
-                delta = simp / cls.get_inverse_of_cdf(
-                    cdf_simh, epsilon, xbins
-                )  # Eq. 2.3
-            delta[np.isnan(delta)] = 0
-
+            delta = cls.ensure_devidable(
+                simp, cls.get_inverse_of_cdf(cdf_simh, epsilon, xbins)
+            )  # Eq. 2.3
             return QDM1 * delta  # Eq. 2.4
         raise NotImplementedError(
             f"{kind} not available for quantile_delta_mapping. Use '+' or '*' instead."
         )
+
+    @classmethod
+    def ensure_devidable(
+        cls, numerator: Union[float, np.array], denominator: Union[float, np.array]
+    ) -> np.array:
+        """
+        Ensures that the arrays can be devided. The numerator will be multiplied by
+        the maximum scaling factor of the CMethods class.
+
+        :param numerator: Numerator to use
+        :type numerator: np.array
+        :param denominator: Denominator that can be zero
+        :type denominator: np.array
+        :return: Zero-ensured devision
+        :rtype: np.array
+        """
+        with np.errstate(divide="ignore", invalid="ignore"):
+            result = numerator / denominator
+
+        if isinstance(numerator, np.ndarray):
+            mask_inf = np.isinf(result)
+            result[mask_inf] = numerator[mask_inf] * cls.MAX_SCALING_FACTOR
+
+            mask_nan = np.isnan(result)
+            result[mask_nan] = 0
+        else:
+            if np.isinf(result):
+                result = numerator * cls.MAX_SCALING_FACTOR
+            elif np.isnan(result):
+                result = 0
+
+        return result
 
     @staticmethod
     def get_pdf(x: Union[list, np.array], xbins: Union[list, np.array]) -> np.array:
