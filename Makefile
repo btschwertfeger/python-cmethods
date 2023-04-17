@@ -45,8 +45,6 @@ pre-commit:
 
 ## 		Create the changelog
 ##
-##		Generate the changelog
-##
 changelog:
 	docker run -it --rm \
 		-v "$(pwd)":/usr/local/src/python-cmethods \
