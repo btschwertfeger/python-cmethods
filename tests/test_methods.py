@@ -192,7 +192,7 @@ class TestMethods(unittest.TestCase):
         """Tests the detrendeed quantile mapping method"""
 
         for kind in ("+", "*"):
-            dqm_result = cm.quantile_mapping(
+            dqm_result = cm.detrended_quantile_mapping(
                 obs=self.data[kind]["obsh"][:, 0, 0],
                 simh=self.data[kind]["simh"][:, 0, 0],
                 simp=self.data[kind]["simp"][:, 0, 0],
@@ -222,6 +222,8 @@ class TestMethods(unittest.TestCase):
             )
 
             assert isinstance(qdm_result, (np.ndarray, np.generic))
+            if np.isnan(qdm_result).any():
+                raise ValueError(qdm_result)
             assert mean_squared_error(
                 qdm_result, self.data[kind]["obsp"][:, 0, 0], squared=False
             ) < mean_squared_error(
@@ -233,28 +235,31 @@ class TestMethods(unittest.TestCase):
     def test_3d_sclaing_methods(self) -> None:
         """Tests the scaling based methods for 3-dimentsional data sets"""
 
-        kind = "+"
-        for method in cm.SCALING_METHODS:
-            result = cm.adjust_3d(
-                method=method,
-                obs=self.data[kind]["obsh"],
-                simh=self.data[kind]["simh"],
-                simp=self.data[kind]["simp"],
-                kind=kind,
-                group="time.month",  # default
-            )
-            assert isinstance(result, xr.core.dataarray.DataArray)
-            for lat in range(len(self.data[kind]["obsh"].lat)):
-                for lon in range(len(self.data[kind]["obsh"].lon)):
-                    assert mean_squared_error(
-                        result[:, lat, lon],
-                        self.data[kind]["obsp"][:, lat, lon],
-                        squared=False,
-                    ) < mean_squared_error(
-                        self.data[kind]["simp"][:, lat, lon],
-                        self.data[kind]["obsp"][:, lat, lon],
-                        squared=False,
-                    )
+        for kind in ("+", "*"):
+            for method in cm.SCALING_METHODS:
+                if kind == "*" and method == "variance_scaling":
+                    continue
+
+                result = cm.adjust_3d(
+                    method=method,
+                    obs=self.data[kind]["obsh"],
+                    simh=self.data[kind]["simh"],
+                    simp=self.data[kind]["simp"],
+                    kind=kind,
+                    group="time.month",  # default
+                )
+                assert isinstance(result, xr.core.dataarray.DataArray)
+                for lat in range(len(self.data[kind]["obsh"].lat)):
+                    for lon in range(len(self.data[kind]["obsh"].lon)):
+                        assert mean_squared_error(
+                            result[:, lat, lon],
+                            self.data[kind]["obsp"][:, lat, lon],
+                            squared=False,
+                        ) < mean_squared_error(
+                            self.data[kind]["simp"][:, lat, lon],
+                            self.data[kind]["obsp"][:, lat, lon],
+                            squared=False,
+                        )
 
     def test_3d_distribution_methods(self) -> None:
         """Tests the distribution based methods for 3-dimentsional data sets"""
@@ -310,6 +315,7 @@ class TestMethods(unittest.TestCase):
             "variance_scaling",
             "delta_method",
             "quantile_mapping",
+            "detrended_quantile_mapping",
             "quantile_delta_mapping",
         ]
 
@@ -357,6 +363,7 @@ class TestMethods(unittest.TestCase):
                 self.data[kind]["simp"],
                 kind="/",
             )
+
         with pytest.raises(NotImplementedError):
             cm.variance_scaling(
                 self.data[kind]["obsh"],
@@ -364,6 +371,7 @@ class TestMethods(unittest.TestCase):
                 self.data[kind]["simp"],
                 kind="*",
             )
+
         with pytest.raises(NotImplementedError):
             cm.delta_method(
                 self.data[kind]["obsh"],
@@ -371,6 +379,7 @@ class TestMethods(unittest.TestCase):
                 self.data[kind]["simp"],
                 kind="/",
             )
+
         with pytest.raises(NotImplementedError):
             cm.quantile_mapping(
                 self.data[kind]["obsh"],
@@ -379,6 +388,15 @@ class TestMethods(unittest.TestCase):
                 kind="/",
                 n_quantiles=10,
             )
+        with pytest.raises(NotImplementedError):
+            cm.detrended_quantile_mapping(
+                self.data[kind]["obsh"],
+                self.data[kind]["simh"],
+                self.data[kind]["simp"],
+                kind="/",
+                n_quantiles=10,
+            )
+
         with pytest.raises(NotImplementedError):
             cm.quantile_delta_mapping(
                 self.data[kind]["obsh"],
@@ -396,6 +414,14 @@ class TestMethods(unittest.TestCase):
         assert cm.get_adjusted_scaling_factor(10, 11) == 10
         assert cm.get_adjusted_scaling_factor(-10, -11) == -10
         assert cm.get_adjusted_scaling_factor(-11, -10) == -10
+
+    def test_ensure_devidable(self) -> None:
+        assert np.array_equal(
+            cm.ensure_devidable(
+                np.array((1, 2, 3, 4, 5, 0)), np.array((0, 1, 0, 2, 3, 0))
+            ),
+            np.array((10, 2, 30, 2, 5 / 3, 0)),
+        )
 
 
 if __name__ == "__main__":

@@ -41,7 +41,7 @@ The documentation is available at: [https://python-cmethods.readthedocs.io/en/st
 
 ## 1. About
 
-These programs and data structures are designed to help minimize discrepancies between modeled and observed climate data. Data from past periods are used to adjust variables from current and future time series so that their distributional properties approximate possible actual values.
+These programs and data structures are developed with the aim of reducing discrepancies between modeled and observed climate data. Historical data is utilized to calibrate variables from current and future time series to achieve distributional properties that closely resemble the possible actual values.
 
 <figure>
   <img
@@ -51,7 +51,7 @@ These programs and data structures are designed to help minimize discrepancies b
   <figcaption>Figure 1: Schematic representation of a bias adjustment procedure</figcaption>
 </figure>
 
-In this way, for example, modeled data, which on average represent values that are too cold, can be adjusted by applying an adjustment procedure. The following figure shows the observed, the modeled, and the adjusted values. It is directly visible that the delta adjusted time series ($T^{\*DM}_{sim,p}$) are much more similar to the observed data ($T_{obs,p}$) than the raw modeled data ($T_{sim,p}$).
+For instance, modeled data typically indicate values that are colder than the actual values. To address this issue, an adjustment procedure is employed. The figure below illustrates the observed, modeled, and adjusted values, revealing that the delta adjusted time series ($T^{*DM}_{sim,p}$) are significantly more similar to the observed data ($T{obs,p}$) than the raw modeled data ($T_{sim,p}$).
 
 <figure>
   <img
@@ -136,7 +136,7 @@ qdm_result = cm.adjust_3d( # 3d = 2 spatial and 1 time dimension
 Notes:
 
 - When using the `adjust_3d` method you have to specify the method by name.
-- For the multiplicative linear scaling and the delta method as well as the variance scaling method a maximum scaling factor of 10 is defined. This can be changed by the parameter `max_scaling_factor`.
+- For the multiplicative techniques a maximum scaling factor of 10 is defined. This can be changed by the attribute `max_scaling_factor`.
 
 ## Examples (see repository on [GitHub](https://github.com/btschwertfeger/python-cmethods))
 

@@ -469,7 +469,7 @@ class CMethods:
             return np.array(simp) + (np.nanmean(obs) - np.nanmean(simh))  # Eq. 1
         if kind in cls.MULTIPLICATIVE:
             adj_scaling_factor = cls.get_adjusted_scaling_factor(
-                np.nanmean(obs) / np.nanmean(simh),
+                cls.ensure_devidable(np.nanmean(obs), np.nanmean(simh)),
                 kwargs.get("max_scaling_factor", cls.MAX_SCALING_FACTOR),
             )
             return np.array(simp) * adj_scaling_factor  # Eq. 2
@@ -592,7 +592,7 @@ class CMethods:
             VS_1_simp = LS_simp - np.nanmean(LS_simp)  # Eq. 4
 
             adj_scaling_factor = cls.get_adjusted_scaling_factor(
-                np.std(np.array(obs)) / np.std(VS_1_simh),
+                cls.ensure_devidable(np.std(np.array(obs)), np.std(VS_1_simh)),
                 kwargs.get("max_scaling_factor", cls.MAX_SCALING_FACTOR),
             )
 
@@ -707,7 +707,7 @@ class CMethods:
             return np.array(obs) + (np.nanmean(simp) - np.nanmean(simh))  # Eq. 1
         if kind in cls.MULTIPLICATIVE:
             adj_scaling_factor = cls.get_adjusted_scaling_factor(
-                np.nanmean(simp) / np.nanmean(simh),
+                cls.ensure_devidable(np.nanmean(simp), np.nanmean(simh)),
                 kwargs.get("max_scaling_factor", cls.MAX_SCALING_FACTOR),
             )
             return np.array(obs) * adj_scaling_factor  # Eq. 2
@@ -797,7 +797,7 @@ class CMethods:
         :param kind: The kind of the correction, additive for non-stochastic and multiplicative
             for stochastic climate variables, defaults to ``+``
         :type kind: str, optional
-        :param val_min: Lower boundary for interpolation (only if ``kind="*"``, default: ``0``)
+        :param val_min: Lower boundary for interpolation (only if ``kind="*"``, default: ``0.0``)
         :type val_min: float, optional
         :param val_max: Upper boundary for interpolation (only if ``kind="*"``, default: ``None``)
         :type val_max: float, optional
@@ -867,8 +867,8 @@ class CMethods:
         r"""
         The Detrended Quantile Mapping bias correction technique can be used to minimize distributional
         biases between modeled and observed time-series climate data like the regular Quantile Mapping.
-        Detrending means, that the values of :math:`X_{sim,p}`
-        are shifted to the value range of :math:`X_{sim,h}` before the regular Quantile Mapping is applied.
+        Detrending means, that the values of :math:`X_{sim,p}` are shifted to the value range of
+        :math:`X_{sim,h}` before the regular Quantile Mapping is applied.
         After the Quantile Mapping was applied, the mean is shifted back. Since it does not make sens
         to take the whole mean to rescale the data, the month-dependent long-term mean is used.
 
@@ -890,30 +890,6 @@ class CMethods:
                 X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h} \left\{F_{sim,h}\left[X_{sim,p}(i)\right]\right\}
 
 
-            The additive quantile mapping procedure consists of inserting the value to be
-            adjusted (:math:`X_{sim,p}(i)`) into the cumulative distribution function
-            of the modeled data of the control period (:math:`F_{sim,h}`). This determines,
-            in which quantile the value to be adjusted can be found in the modeled data of the control period
-            The following images show this by using :math:`T` for temperatures.
-
-            .. figure:: ../_static/images/qm-cdf-plot-1.png
-                :width: 600
-                :align: center
-                :alt: Determination of the quantile value
-
-                Fig 1: Inserting :math:`X_{sim,p}(i)` into :math:`F_{sim,h}` to determine the quantile value
-
-            This value, which of course lies between 0 and 1, is subsequently inserted
-            into the inverse cumulative distribution function of the reference data of the control period to
-            determine the bias-corrected value at time step :math:`i`.
-
-            .. figure:: ../_static/images/qm-cdf-plot-2.png
-                :width: 600
-                :align: center
-                :alt: Determination of the QM bias-corrected value
-
-                Fig 1: Inserting the quantile value into :math:`F^{-1}_{obs,h}` to determine the bias-corrected value for time step :math:`i`
-
         **Multiplicative**:
 
             .. math::
@@ -934,7 +910,7 @@ class CMethods:
         :param kind: The kind of the correction, additive for non-stochastic and multiplicative
             for stochastic climate variables, defaults to ``+``
         :type kind: str, optional
-        :param val_min: Lower boundary for interpolation (only if ``kind="*"``, default: ``0``)
+        :param val_min: Lower boundary for interpolation (only if ``kind="*"``, default: ``0.0``)
         :type val_min: float, optional
         :param val_max: Upper boundary for interpolation (only if ``kind="*"``, default: ``None``)
         :type val_max: float, optional
@@ -963,7 +939,7 @@ class CMethods:
             ...     n_quantiles=250
             ... )
         """
-        if kind not in cls.MULTIPLICATIVE or kind not in cls.ADDITIVE:
+        if kind not in cls.MULTIPLICATIVE and kind not in cls.ADDITIVE:
             raise NotImplementedError(
                 f"{kind} for detrended_quantile_mapping is not available. Use '+' or '*' instead."
             )
@@ -1004,14 +980,14 @@ class CMethods:
 
             elif kind in cls.MULTIPLICATIVE:
                 epsilon = np.interp(  # Eq. 2
-                    (m_simh_mean * m_simp) / m_simp_mean,
+                    cls.ensure_devidable((m_simh_mean * m_simp), m_simp_mean),
                     xbins,
                     cdf_simh,
                     left=kwargs.get("val_min", 0.0),
                     right=kwargs.get("val_max", None),
                 )
-                X = np.interp(epsilon, cdf_obs, xbins) * (
-                    m_simp_mean / m_simh_mean
+                X = np.interp(epsilon, cdf_obs, xbins) * cls.ensure_devidable(
+                    m_simp_mean, m_simh_mean
                 )  # Eq. 2
             for i, idx in enumerate(idxs):
                 res[idx] = X[i]
@@ -1128,7 +1104,7 @@ class CMethods:
                 .. math::
 
                     \Delta(i) & = \frac{ F^{-1}_{sim,p}\left[\varepsilon(i)\right] }{ F^{-1}_{sim,h}\left[\varepsilon(i)\right] } \\[1pt]
-                              & = \frac{ X_{sim,p}(i) }{ F^{-1}_{sim,h}\left\{F^{}_{sim,p}\left[X_{sim,p}(i)\right]\right\} }
+                              & = \frac{ X_{sim,p}(i) }{ F^{-1}_{sim,h}\left\{F^_{sim,p}\left[X_{sim,p}(i)\right]\right\} }
 
 
             **(2.4)** The relative change between the modeled data of the control and scenario period is than
@@ -1211,16 +1187,45 @@ class CMethods:
             epsilon = np.interp(simp, xbins, cdf_simp)  # Eq. 1.1
             QDM1 = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 1.2
 
-            with np.errstate(divide="ignore", invalid="ignore"):
-                delta = simp / cls.get_inverse_of_cdf(
-                    cdf_simh, epsilon, xbins
-                )  # Eq. 2.3
-            delta[np.isnan(delta)] = 0
-
+            delta = cls.ensure_devidable(
+                simp, cls.get_inverse_of_cdf(cdf_simh, epsilon, xbins)
+            )  # Eq. 2.3
             return QDM1 * delta  # Eq. 2.4
         raise NotImplementedError(
             f"{kind} not available for quantile_delta_mapping. Use '+' or '*' instead."
         )
+
+    @classmethod
+    def ensure_devidable(
+        cls, numerator: Union[float, np.array], denominator: Union[float, np.array]
+    ) -> np.array:
+        """
+        Ensures that the arrays can be devided. The numerator will be multiplied by
+        the maximum scaling factor of the CMethods class.
+
+        :param numerator: Numerator to use
+        :type numerator: np.array
+        :param denominator: Denominator that can be zero
+        :type denominator: np.array
+        :return: Zero-ensured devision
+        :rtype: np.array
+        """
+        with np.errstate(divide="ignore", invalid="ignore"):
+            result = numerator / denominator
+
+        if isinstance(numerator, np.ndarray):
+            mask_inf = np.isinf(result)
+            result[mask_inf] = numerator[mask_inf] * cls.MAX_SCALING_FACTOR
+
+            mask_nan = np.isnan(result)
+            result[mask_nan] = 0
+        else:
+            if np.isinf(result):
+                result = numerator * cls.MAX_SCALING_FACTOR
+            elif np.isnan(result):
+                result = 0
+
+        return result
 
     @staticmethod
     def get_pdf(x: Union[list, np.array], xbins: Union[list, np.array]) -> np.array:
