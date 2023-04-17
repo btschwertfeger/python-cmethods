@@ -4,9 +4,24 @@
 
 [Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v1.0.0...HEAD)
 
+**Breaking changes:**
+
+- Split Quantile Mapping into Quantile Mapping and Detrended Quantile Mapping [\#34](https://github.com/btschwertfeger/python-cmethods/pull/34) ([btschwertfeger](https://github.com/btschwertfeger))
+
 **Fixed bugs:**
 
+- Multiplicative Quantile Delta Mapping is not applying scaling where the delta is infinite [\#32](https://github.com/btschwertfeger/python-cmethods/issues/32)
+- Fixed bug where division lead to nan or inf values [\#33](https://github.com/btschwertfeger/python-cmethods/pull/33) ([btschwertfeger](https://github.com/btschwertfeger))
 - Fixed PyPI repository URL [\#16](https://github.com/btschwertfeger/python-cmethods/pull/16) ([btschwertfeger](https://github.com/btschwertfeger))
+
+**Closed issues:**
+
+- Create a changelog [\#19](https://github.com/btschwertfeger/python-cmethods/issues/19)
+
+**Merged pull requests:**
+
+- Create a Changelog [\#21](https://github.com/btschwertfeger/python-cmethods/pull/21) ([btschwertfeger](https://github.com/btschwertfeger))
+- Extended the description of quantile mapping with text and images [\#20](https://github.com/btschwertfeger/python-cmethods/pull/20) ([btschwertfeger](https://github.com/btschwertfeger))
 
 ## [v1.0.0](https://github.com/btschwertfeger/python-cmethods/tree/v1.0.0) (2023-04-10)
 

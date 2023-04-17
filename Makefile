@@ -47,7 +47,7 @@ pre-commit:
 ##
 changelog:
 	docker run -it --rm \
-		-v "$(pwd)":/usr/local/src/python-cmethods \
+		-v "$(PWD)":/usr/local/src/your-app/ \
 		githubchangeloggenerator/github-changelog-generator \
 		-u btschwertfeger \
 		-p python-cmethods \
