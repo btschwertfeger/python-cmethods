@@ -47,31 +47,31 @@ class UnknownMethodError(Exception):
 
 class CMethods:
     """
-    The CMethods class serves a collection of bias correction procedures to adjust
-    time-series of climate data.
+     The CMethods class serves a collection of bias correction procedures to adjust
+     time-series of climate data.
 
-    The following bias correction techniques are available:
-        Scaling-based techniques:
-            * Linear Scaling :func:`cmethods.CMethods.linear_scaling`
-            * Variance Scaling :func:`cmethods.CMethods.variance_scaling`
-            * Delta (change) Method :func:`cmethods.CMethods.delta_method`
+     The following bias correction techniques are available:
+         Scaling-based techniques:
+             * Linear Scaling :func:`cmethods.CMethods.linear_scaling`
+             * Variance Scaling :func:`cmethods.CMethods.variance_scaling`
+             * Delta (change) Method :func:`cmethods.CMethods.delta_method`
 
-        Distribution-based techniques:
-            * Quantile Mapping :func:`cmethods.CMethods.quantile_mapping`
-            * Detrended Quantile Mapping :func:`cmethods.CMethods.detrended_quantile_mapping`
-            * Quantile Delta Mapping :func:`cmethods.CMethods.quantile_delta_mapping`
+         Distribution-based techniques:
+             * Quantile Mapping :func:`cmethods.CMethods.quantile_mapping`
+             * Detrended Quantile Mapping :func:`cmethods.CMethods.detrended_quantile_mapping`
+             * Quantile Delta Mapping :func:`cmethods.CMethods.quantile_delta_mapping`
 
-    Except for the Variance Scaling all methods can be applied on both, stochastic and non-stochastic
-    variables. The Variance Scaling can only be applied on stochastic climate variables.
-
-    - Stochastic climate variables, on the other hand, are those that exhibit a high degree of
-      variability and unpredictability, making them difficult to forecast accurately.
-      Precipitation is an example of a stochastic climate variable because it can vary greatly in timing,
-      intensity, and location due to complex atmospheric and meteorological processes.
+     Except for the Variance Scaling all methods can be applied on both, stochastic and non-stochastic
+     variables. The Variance Scaling can only be applied on stochastic climate variables.
 
     - Non-stochastic climate variables are those that can be predicted with relative certainty based
-      on factors such as location, elevation, and season. Examples of non-stochastic climate variables
-      include air temperature, air pressure, and solar radiation.
+     on factors such as location, elevation, and season. Examples of non-stochastic climate variables
+     include air temperature, air pressure, and solar radiation.
+
+     - Stochastic climate variables, on the other hand, are those that exhibit a high degree of
+       variability and unpredictability, making them difficult to forecast accurately.
+       Precipitation is an example of a stochastic climate variable because it can vary greatly in timing,
+       intensity, and location due to complex atmospheric and meteorological processes.
     """
 
     SCALING_METHODS = ["linear_scaling", "variance_scaling", "delta_method"]

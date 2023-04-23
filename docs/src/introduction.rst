@@ -60,15 +60,14 @@ the application of the desired bias correction method on 3-dimensional data sets
 Except for the variance scaling, all methods can be applied on stochastic and non-stochastic
 climate variables. Variance scaling can only be applied on non-stochastic climate variables.
 
+- Non-stochastic climate variables are those that can be predicted with relative certainty based
+  on factors such as location, elevation, and season. Examples of non-stochastic climate variables
+  include air temperature, air pressure, and solar radiation.
 
 - Stochastic climate variables, on the other hand, are those that exhibit a high degree of
   variability and unpredictability, making them difficult to forecast accurately.
   Precipitation is an example of a stochastic climate variable because it can vary greatly in timing,
   intensity, and location due to complex atmospheric and meteorological processes.
-
-- Non-stochastic climate variables are those that can be predicted with relative certainty based
-  on factors such as location, elevation, and season. Examples of non-stochastic climate variables
-  include air temperature, air pressure, and solar radiation.
 
 Examples can be found in the `python-cmethods`_ repository and of course
 within this documentation.
