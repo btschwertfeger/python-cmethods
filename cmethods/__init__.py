@@ -64,13 +64,14 @@ class CMethods:
     Except for the Variance Scaling all methods can be applied on both, stochastic and non-stochastic
     variables. The Variance Scaling can only be applied on stochastic climate variables.
 
-    Stochastic climate variables are those that are subject to random fluctuations
-    and are not predictable. They have no predictable trend or pattern. Examples of
-    stochastic climate variables include precipitation, air temperature, and humidity.
+    - Stochastic climate variables, on the other hand, are those that exhibit a high degree of
+      variability and unpredictability, making them difficult to forecast accurately.
+      Precipitation is an example of a stochastic climate variable because it can vary greatly in timing,
+      intensity, and location due to complex atmospheric and meteorological processes.
 
-    Non-stochastic climate variables, on the other hand, have clear trend and pattern histories
-    and can be readily predicted. They are often referred to as climate elements and include
-    variables such as water temperature and air pressure.
+    - Non-stochastic climate variables are those that can be predicted with relative certainty based
+      on factors such as location, elevation, and season. Examples of non-stochastic climate variables
+      include air temperature, air pressure, and solar radiation.
     """
 
     SCALING_METHODS = ["linear_scaling", "variance_scaling", "delta_method"]
@@ -397,10 +398,10 @@ class CMethods:
 
         **Additive**:
 
-            In Linear Scaling, the long-term monthly mean (:math:`\mu_m`) of the modeled data :math:`T_{sim,h}` is subtracted
-            from the long-term monthly mean of the reference data :math:`T_{obs,h}` at time step :math:`i`.
-            This difference in month-dependent long-term mean is than added to the long-term monthly mean for time step :math:`i`,
-            in the time-series that is to be adjusted (:math:`T_{sim,p}`).
+            In Linear Scaling, the long-term monthly mean (:math:`\mu_m`) of the modeled data :math:`X_{sim,h}` is subtracted
+            from the long-term monthly mean of the reference data :math:`X_{obs,h}` at time step :math:`i`.
+            This difference in month-dependent long-term mean is than added to the value of time step :math:`i`,
+            in the time-series that is to be adjusted (:math:`X_{sim,p}`).
 
             .. math::
 
@@ -504,7 +505,7 @@ class CMethods:
         of the Variance Scaling approach are shown:
 
         **(1)** First, the modeled data of the control and scenario period must be bias-corrected using
-        the Linear Scaling technique. This corrects the deviation in the mean.
+        the additive linear scaling technique. This adjusts the deviation in the mean.
 
         .. math::
 
