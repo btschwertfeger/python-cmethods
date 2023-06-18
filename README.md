@@ -22,7 +22,7 @@ This Python module serves as a collection of different scale- and distribution-b
 
 The documentation is available at: [https://python-cmethods.readthedocs.io/en/stable/](https://python-cmethods.readthedocs.io/en/stable/)
 
-> ⚠️ For the application of bias corrections on _lage data sets_ it is recomanded to use the command-line tool [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX) since bias corrections are complex statistical transformation which are very slow in Python compared to the C++ implementation.
+> ⚠️ For the application of bias corrections on _lage data sets_ it is recommended to use the command-line tool [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX) since bias corrections are complex statistical transformation which are very slow in Python compared to the C++ implementation.
 
 ---
 
@@ -130,7 +130,7 @@ qdm_result = cm.adjust_3d( # 3d = 2 spatial and 1 time dimension
     kind = '+'
 )
 # to calculate the relative rather than the absolute change,
-# '*' can be used instead of '+' (this is prefered when adjusting
+# '*' can be used instead of '+' (this is preferred when adjusting
 # stochastic variables like precipitation)
 ```
 
@@ -143,7 +143,7 @@ Notes:
 
 Notebook with different methods and plots: `/examples/examples.ipynb`
 
-There is also an exmple script (`/examples/biasadjust.py`) that can be used to apply the available bias correction methods
+There is also an example script (`/examples/biasadjust.py`) that can be used to apply the available bias correction methods
 on 1- and 3-dimensional data sets (see `/examples/input_data/*.nc`).
 
 Help:
