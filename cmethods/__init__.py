@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (C) 2023 Benjamin Thomas Schwertfeger
-# Github: https://github.com/btschwertfeger
+# GitHub: https://github.com/btschwertfeger
 #
 
 r"""
@@ -20,8 +20,11 @@ r"""
     i = index
     _{m} = long-term monthly interval
 """
+
+from __future__ import annotations
+
 import multiprocessing
-from typing import List, Union
+from typing import Any, Callable, List, Optional, Union
 
 import numpy as np
 import xarray as xr
@@ -39,7 +42,7 @@ class UnknownMethodError(Exception):
     Exception raised for errors if unknown method called in CMethods class.
     """
 
-    def __init__(self, method: str, available_methods: list):
+    def __init__(self: "UnknownMethodError", method: str, available_methods: list):
         super().__init__(
             f'Unknown method "{method}"! Available methods: {available_methods}'
         )
@@ -74,26 +77,23 @@ class CMethods:
        intensity, and location due to complex atmospheric and meteorological processes.
     """
 
-    SCALING_METHODS = ["linear_scaling", "variance_scaling", "delta_method"]
-    DISTRIBUTION_METHODS = [
+    SCALING_METHODS: List[str] = ["linear_scaling", "variance_scaling", "delta_method"]
+    DISTRIBUTION_METHODS: List[str] = [
         "quantile_mapping",
         "detrended_quantile_mapping",
         "quantile_delta_mapping",
     ]
 
-    CUSTOM_METHODS = SCALING_METHODS + DISTRIBUTION_METHODS
-    METHODS = CUSTOM_METHODS
+    CUSTOM_METHODS: List[str] = SCALING_METHODS + DISTRIBUTION_METHODS
+    METHODS: List[str] = CUSTOM_METHODS
 
-    ADDITIVE = ["+", "add"]
-    MULTIPLICATIVE = ["*", "mult"]
+    ADDITIVE: List[str] = ["+", "add"]
+    MULTIPLICATIVE: List[str] = ["*", "mult"]
 
-    MAX_SCALING_FACTOR = 10
-
-    def __init__(self):
-        pass
+    MAX_SCALING_FACTOR: Union[int, float] = 10
 
     @classmethod
-    def get_available_methods(cls) -> list:
+    def get_available_methods(cls: "CMethods") -> List[str]:
         """
         Function to return the available adjustment methods of the CMethods class.
 
@@ -115,7 +115,7 @@ class CMethods:
         return cls.METHODS
 
     @classmethod
-    def get_function(cls, method: str):
+    def get_function(cls: "CMethods", method: str) -> Callable:
         """
         Returns the bias correction function corresponding to the ``method`` name.
 
@@ -143,16 +143,16 @@ class CMethods:
 
     @classmethod
     def adjust_3d(
-        cls,
+        cls: "CMethods",
         method: str,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int = 100,
         kind: str = "+",
-        group: Union[str, None] = None,
+        group: Optional[str] = None,
         n_jobs: int = 1,
-        **kwargs,
+        **kwargs: Any,
     ) -> xr.core.dataarray.DataArray:
         """
         Function to apply a bias correction method on 3-dimensional climate data.
@@ -172,13 +172,13 @@ class CMethods:
             on which the bias correction takes action)
         :type simp: xr.core.dataarray.DataArray
         :param n_quantiles: Number of quantiles to respect. Only applies to
-            distribution-based bias correction techniques, defaults to 100
+            distribution-based bias correction techniques, defaults to ``100``
         :type n_quantiles: int, optional
-        :param kind: The kind of adjustment - additive or multiplicative, defaults to "+"
+        :param kind: The kind of adjustment - additive or multiplicative, defaults to ``"+"``
         :type kind: str, optional
-        :param group: The grouping base, Only applies to scaling-based techniques, defaults to None
-        :type group: Union[str, None], optional
-        :param n_jobs: Number of parallels jobs to run the correction, defaults to 1
+        :param group: The grouping base, Only applies to scaling-based techniques, defaults to ``None``
+        :type group: str, optional
+        :param n_jobs: Number of parallels jobs to run the correction, defaults to ``1``
         :type n_jobs: int, optional
         :raises UnknownMethodError: If the correction method is not implemented
         :return: The bias-corrected time series
@@ -186,7 +186,7 @@ class CMethods:
 
         .. code-block:: python
             :linenos:
-            :caption: Example application - 3-dimensinoal bias correction
+            :caption: Example application - 3-dimensional bias correction
 
             >>> import xarray as xr
             >>> from cmethods import CMethods as cm
@@ -220,8 +220,8 @@ class CMethods:
             ... )
 
             '''
-            The next exampke shows how to apply the Linear Scaling bias correction
-            techqnique based on long-term monthly means.
+            The next example shows how to apply the Linear Scaling bias correction
+            technique based on long-term monthly means.
             '''
             >>> ls_adjusted = cm.adjust_3d(
             ...     method="linear_scaling",
@@ -241,10 +241,10 @@ class CMethods:
 
         if method in cls.CUSTOM_METHODS:
             if n_jobs == 1:
-                method = cls.get_function(method)
+                func = cls.get_function(method)
                 for lat in tqdm(range(len_lat)):
                     for lon in range(len_lon):
-                        result[lat, lon] = method(
+                        result[lat, lon] = func(
                             obs=obs[lat, lon],
                             simh=simh[lat, lon],
                             simp=simp[lat, lon],
@@ -257,7 +257,7 @@ class CMethods:
                 try:
                     pool = multiprocessing.Pool(processes=n_jobs)
                     # with multiprocessing.Pool(processes=n_jobs) as pool:
-                    # conntext manager is not used because than the coverage does not work.
+                    # context manager is not used because than the coverage does not work.
                     # this may change when upgrading to only support Python 3.11+
                     params: List[dict] = [
                         {
@@ -282,20 +282,20 @@ class CMethods:
         raise UnknownMethodError(method, cls.METHODS)
 
     @classmethod
-    def pool_adjust(cls, params: dict) -> np.array:
+    def pool_adjust(cls: "CMethods", params: dict) -> np.ndarray:
         """
         Adjustment along the longitudes for one specific latitude
         used by :func:`cmethods.CMethods.adjust_3d`
         as callback function for :class:`multiprocessing.Pool`.
 
-        **Not intended to be executed somwhere else.**
+        **Not intended to be executed somewhere else.**
 
         :params params: The method specific parameters
         :type params: dict
         :raises UnknownMethodError: If the specified method is not implemented
         :return: The bias-corrected time series as 2-dimensional (longitudes x time)
             numpy array
-        :rtype: np.array
+        :rtype: np.ndarray
         """
         kwargs = params.get("kwargs", {})
 
@@ -321,20 +321,20 @@ class CMethods:
 
     @classmethod
     def grouped_correction(
-        cls,
+        cls: "CMethods",
         method: str,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
         group: str,
         kind: str = "+",
-        **kwargs,
+        **kwargs: Any,
     ) -> xr.core.dataarray.DataArray:
         """Method to adjust 1 dimensional climate data while respecting adjustment groups.
 
         ----- P A R A M E T E R S -----
             method (str): adjustment method name
-            obs (xarray.core.dataarray.DataArray): observed / obserence Data
+            obs (xarray.core.dataarray.DataArray): observed / reference Data
             simh (xarray.core.dataarray.DataArray): simulated historical Data
             simp (xarray.core.dataarray.DataArray): future simulated Data
             method (str): Scaling method (e.g.: 'linear_scaling')
@@ -369,14 +369,14 @@ class CMethods:
     # ? -----========= L I N E A R - S C A L I N G =========------
     @classmethod
     def linear_scaling(
-        cls,
+        cls: "CMethods",
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
-        group: Union[str, None] = "time.month",
+        group: Optional[str] = "time.month",
         kind: str = "+",
-        **kwargs,
-    ) -> np.array:
+        **kwargs: Any,
+    ) -> np.ndarray:
         r"""
         The Linear Scaling bias correction technique can be applied on stochastic and
         non-stochastic climate variables to minimize deviations in the mean values
@@ -427,13 +427,13 @@ class CMethods:
             on which the bias correction takes action)
         :type simp: xr.core.dataarray.DataArray
         :param group: The grouping defines the basis of the mean, defaults to ``time.month``
-        :type group: Union[str, None], optional
+        :type group: str | None
         :param kind: The kind of the correction, additive for non-stochastic and multiplicative
             for stochastic climate variables, defaults to ``+``
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
-        :rtype: np.array
+        :rtype: np.ndarray
 
         .. code-block:: python
             :linenos:
@@ -481,14 +481,14 @@ class CMethods:
     # ? -----========= V A R I A N C E - S C A L I N G =========------
     @classmethod
     def variance_scaling(
-        cls,
+        cls: "CMethods",
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
-        group: Union[str, None] = "time.month",
+        group: Optional[str] = "time.month",
         kind: str = "+",
-        **kwargs,
-    ) -> np.array:
+        **kwargs: Any,
+    ) -> np.ndarray:
         r"""
         The Variance Scaling bias correction technique can be applied only on non-stochastic
         climate variables to minimize deviations in the mean and variance
@@ -531,7 +531,7 @@ class CMethods:
             X^{VS(2)}_{sim,p}(i) = X^{VS(1)}_{sim,p}(i) \cdot \left[\frac{\sigma_{m}(X_{obs,h}(i))}{\sigma_{m}(X^{VS(1)}_{sim,h}(i))}\right]
 
 
-        **(4)** Finally the prevously removed mean is shifted back
+        **(4)** Finally the previously removed mean is shifted back
 
         .. math::
 
@@ -547,13 +547,13 @@ class CMethods:
             on which the bias correction takes action)
         :type simp: xr.core.dataarray.DataArray
         :param group: The grouping defines the basis of the mean, defaults to ``time.month``
-        :type group: Union[str, None], optional
+        :type group: str | None
         :param kind: The kind of the correction, additive for non-stochastic climate variables
             no other kind is available so far, defaults to ``+``
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``add``)
         :return: The bias-corrected time series
-        :rtype: np.array
+        :rtype: np.ndarray
 
         .. code-block:: python
             :linenos:
@@ -607,14 +607,14 @@ class CMethods:
     # ? -----========= D E L T A - M E T H O D =========------
     @classmethod
     def delta_method(
-        cls,
+        cls: "CMethods",
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
-        group: Union[str, None] = "time.month",
+        group: Optional[str] = "time.month",
         kind: str = "+",
-        **kwargs,
-    ) -> np.array:
+        **kwargs: Any,
+    ) -> np.ndarray:
         r"""
         The Delta Method bias correction technique can be applied on stochastic and
         non-stochastic climate variables to minimize deviations in the mean values
@@ -629,7 +629,7 @@ class CMethods:
 
         The Delta Method bias correction technique implemented here is based on the
         method described in the equations of Beyer, R. and Krapp, M. and Manica, A. (2020)
-        *"An empirical evaluation of bias correction methods for palaeoclimate simulations"*
+        *"An empirical evaluation of bias correction methods for paleoclimate simulations"*
         (https://doi.org/10.5194/cp-16-1493-2020). In the following the equations
         for both additive and multiplicative Delta Method are shown:
 
@@ -666,13 +666,13 @@ class CMethods:
             on which the bias correction takes action)
         :type simp: xr.core.dataarray.DataArray
         :param group: The grouping defines the basis of the mean, defaults to ``time.month``
-        :type group: Union[str, None], optional
+        :type group: str | None
         :param kind: The kind of the correction, additive for non-stochastic and multiplicative
             for stochastic climate variables, defaults to ``+``
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
-        :rtype: np.array
+        :rtype: np.ndarray
 
         .. code-block:: python
             :linenos:
@@ -719,18 +719,18 @@ class CMethods:
     # ? -----========= Q U A N T I L E - M A P P I N G =========------
     @classmethod
     def quantile_mapping(
-        cls,
+        cls: "CMethods",
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int,
         kind: str = "+",
-        **kwargs,
-    ) -> np.array:
+        **kwargs: Any,
+    ) -> np.ndarray:
         r"""
         The Quantile Mapping bias correction technique can be used to minimize distributional
-        biases between modeled and observed time-series climate data. Its interval-independant
-        behaviour ensures that the whole time series is taken into account to redistribute
+        biases between modeled and observed time-series climate data. Its interval-independent
+        behavior ensures that the whole time series is taken into account to redistribute
         its values, based on the distributions of the modeled and observed/reference data of the
         control period.
 
@@ -804,7 +804,7 @@ class CMethods:
         :type val_max: float, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
-        :rtype: np.array
+        :rtype: np.ndarray
 
         .. code-block:: python
             :linenos:
@@ -857,14 +857,14 @@ class CMethods:
 
     @classmethod
     def detrended_quantile_mapping(
-        cls,
+        cls: "CMethods",
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int,
         kind: str = "+",
-        **kwargs,
-    ) -> np.array:
+        **kwargs: Any,
+    ) -> np.ndarray:
         r"""
         The Detrended Quantile Mapping bias correction technique can be used to minimize distributional
         biases between modeled and observed time-series climate data like the regular Quantile Mapping.
@@ -883,7 +883,7 @@ class CMethods:
         and Extremes?"* (https://doi.org/10.1175/JCLI-D-14-00754.1).
 
         In the following the equations of Alex J. Cannon (2015) are shown (without detrending; see QM
-        for explainations):
+        for explanations):
 
         **Additive**:
 
@@ -918,7 +918,7 @@ class CMethods:
         :type val_max: float, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
-        :rtype: np.array
+        :rtype: np.ndarray
 
         .. code-block:: python
             :linenos:
@@ -980,7 +980,7 @@ class CMethods:
                     - m_simh_mean
                 )  # Eq. 1
 
-            elif kind in cls.MULTIPLICATIVE:
+            else:  # kind in cls.MULTIPLICATIVE:
                 epsilon = np.interp(  # Eq. 2
                     cls.ensure_devidable((m_simh_mean * m_simp), m_simp_mean),
                     xbins,
@@ -998,13 +998,13 @@ class CMethods:
     # ? -----========= E M P I R I C A L - Q U A N T I L E - M A P P I N G =========------
     @classmethod
     def empirical_quantile_mapping(
-        cls,
+        cls: "CMethods",
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int = 100,
-        extrapolate: Union[str, None] = None,
-        **kwargs,
+        extrapolate: Optional[str] = None,
+        **kwargs: Any,
     ) -> xr.core.dataarray.DataArray:
         """
         Method to adjust 1-dimensional climate data by empirical quantile mapping
@@ -1021,7 +1021,7 @@ class CMethods:
         :type n_quantiles: int, optional
         :type kind: str, optional
         :param extrapolate: Bounded range or extrapolate, defaults to ``None``
-        :type extrapolate: Union[str, None], optional
+        :type extrapolate: str | None
         :return: The bias-corrected time series
         :rtype: xr.core.dataarray.DataArray
         :raises NotImplementedError: This method is not implemented
@@ -1033,14 +1033,14 @@ class CMethods:
     # ? -----========= Q U A N T I L E - D E L T A - M A P P I N G =========------
     @classmethod
     def quantile_delta_mapping(
-        cls,
+        cls: "CMethods",
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
         n_quantiles: int,
         kind: str = "+",
-        **kwargs,
-    ) -> np.array:
+        **kwargs: Any,
+    ) -> np.ndarray:
         r"""
         The Quantile Delta Mapping bias correction technique can be used to minimize distributional
         biases between modeled and observed time-series climate data. Its interval-independant
@@ -1132,7 +1132,7 @@ class CMethods:
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
-        :rtype: np.array
+        :rtype: np.ndarray
 
         .. code-block:: python
             :linenos:
@@ -1189,9 +1189,9 @@ class CMethods:
             epsilon = np.interp(simp, xbins, cdf_simp)  # Eq. 1.1
             QDM1 = cls.get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 1.2
 
-            delta = cls.ensure_devidable(
+            delta = cls.ensure_devidable(  # Eq. 2.3
                 simp, cls.get_inverse_of_cdf(cdf_simh, epsilon, xbins)
-            )  # Eq. 2.3
+            )
             return QDM1 * delta  # Eq. 2.4
         raise NotImplementedError(
             f"{kind} not available for quantile_delta_mapping. Use '+' or '*' instead."
@@ -1199,18 +1199,20 @@ class CMethods:
 
     @classmethod
     def ensure_devidable(
-        cls, numerator: Union[float, np.array], denominator: Union[float, np.array]
-    ) -> np.array:
+        cls: "CMethods",
+        numerator: Union[float, np.ndarray],
+        denominator: Union[float, np.ndarray],
+    ) -> np.ndarray:
         """
         Ensures that the arrays can be devided. The numerator will be multiplied by
         the maximum scaling factor of the CMethods class if division by zero.
 
         :param numerator: Numerator to use
-        :type numerator: np.array
+        :type numerator: np.ndarray
         :param denominator: Denominator that can be zero
-        :type denominator: np.array
+        :type denominator: np.ndarray
         :return: Zero-ensured devision
-        :rtype: np.array
+        :rtype: np.ndarray | float
         """
         with np.errstate(divide="ignore", invalid="ignore"):
             result = numerator / denominator
@@ -1225,22 +1227,24 @@ class CMethods:
             if np.isinf(result):
                 result = numerator * cls.MAX_SCALING_FACTOR
             elif np.isnan(result):
-                result = 0
+                result = 0.0
 
         return result
 
     @staticmethod
-    def get_pdf(x: Union[list, np.array], xbins: Union[list, np.array]) -> np.array:
+    def get_pdf(
+        x: Union[list, np.ndarray], xbins: Union[list, np.ndarray]
+    ) -> np.ndarray:
         r"""
         Compuites and returns the the probability density function :math:`P(x)`
         of ``x`` based on ``xbins``.
 
         :param x: The vector to get :math:`P(x)` from
-        :type x: Union[list, np.array]
+        :type x: Union[list, np.ndarray]
         :param xbins: The boundaries/bins of :math:`P(x)`
-        :type xbins: Union[list, np.array]
+        :type xbins: Union[list, np.ndarray]
         :return: The probability densitiy function of ``x``
-        :rtype: np.array
+        :rtype: np.ndarray
 
         .. code-block:: python
             :linenos:
@@ -1257,17 +1261,19 @@ class CMethods:
         return pdf
 
     @staticmethod
-    def get_cdf(x: Union[list, np.array], xbins: Union[list, np.array]) -> np.array:
+    def get_cdf(
+        x: Union[list, np.ndarray], xbins: Union[list, np.ndarray]
+    ) -> np.ndarray:
         r"""
         Computes and returns returns the cumulative distribution function :math:`F(x)`
         of ``x`` based on ``xbins``.
 
         :param x: Vector to get :math:`F(x)` from
-        :type x: Union[list, np.array]
+        :type x: Union[list, np.ndarray]
         :param xbins: The boundaries/bins of :math:`F(x)`
-        :type xbins: Union[list, np.array]
+        :type xbins: Union[list, np.ndarray]
         :return: The cumulative distribution function of ``x``
-        :rtype: np.array
+        :rtype: np.ndarray
 
 
         .. code-block:: python
@@ -1286,23 +1292,23 @@ class CMethods:
 
     @staticmethod
     def get_inverse_of_cdf(
-        base_cdf: Union[list, np.array],
-        insert_cdf: Union[list, np.array],
-        xbins: Union[list, np.array],
-    ) -> np.array:
+        base_cdf: Union[list, np.ndarray],
+        insert_cdf: Union[list, np.ndarray],
+        xbins: Union[list, np.ndarray],
+    ) -> np.ndarray:
         r"""
         Returns the inverse cumulative distribution function as:
         :math:`F^{-1}_{x}\left[y\right]` where :math:`x` represents ``base_cdf`` and
         ``insert_cdf`` is represented by :math:`y`.
 
         :param base_cdf: The basis
-        :type base_cdf: Union[list, np.array]
+        :type base_cdf: Union[list, np.ndarray]
         :param insert_cdf: The CDF that gets inserted
-        :type insert_cdf: Union[list, np.array]
+        :type insert_cdf: Union[list, np.ndarray]
         :param xbins: Probability boundaries
-        :type xbins: Union[list, np.array]
+        :type xbins: Union[list, np.ndarray]
         :return: The inverse CDF
-        :rtype: np.array
+        :rtype: np.ndarray
         """
         return np.interp(insert_cdf, base_cdf, xbins)
 

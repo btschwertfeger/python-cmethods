@@ -71,8 +71,19 @@ testpaths = ["tests"]
 
 [project.optional-dependencies]
 dev = [
-  "pytest", "pytest-cov", "setuptools_scm",
-  "scikit-learn", "scipy", "click",
-  "sphinx", "sphinx-rtd-theme"
+  # testing
+  "pytest",
+  "pytest-cov",
+  "scikit-learn",
+  "scipy",
+  # building
+  "setuptools_scm",
+  # examples
+  "click",
+  # ducumentatoin
+  "sphinx",
+  "sphinx-rtd-theme"
 ]
-examples = ["matplotlib"]
+examples = [
+  "matplotlib"
+]

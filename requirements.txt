@@ -1,4 +1,0 @@
-netCDF4>=1.6.1
-numpy
-tqdm
-xarray>=2022.11.0
