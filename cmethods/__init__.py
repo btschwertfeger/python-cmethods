@@ -828,9 +828,11 @@ class CMethods:
             ... )
         """
         obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
-        xbins: np.ndarray = cls.get_xbins(
-            timeseries1=obs, timeseries2=simh, n_quantiles=n_quantiles
-        )
+
+        global_max = max(np.nanmax(obs), np.nanmax(simh))
+        global_min = min(np.nanmin(obs), np.nanmin(simh))
+        wide = abs(global_max - global_min) / n_quantiles
+        xbins = np.arange(global_min, global_max + wide, wide)
 
         cdf_obs = cls.get_cdf(obs, xbins)
         cdf_simh = cls.get_cdf(simh, xbins)
@@ -945,9 +947,11 @@ class CMethods:
             )
 
         obs, simh = np.array(obs), np.array(simh)
-        xbins: np.ndarray = cls.get_xbins(
-            timeseries1=obs, timeseries2=simh, n_quantiles=n_quantiles
-        )
+
+        global_max = max(np.nanmax(obs), np.nanmax(simh))
+        global_min = min(np.nanmin(obs), np.nanmin(simh))
+        wide = abs(global_max - global_min) / n_quantiles
+        xbins = np.arange(global_min, global_max + wide, wide)
 
         cdf_obs = cls.get_cdf(obs, xbins)
         cdf_simh = cls.get_cdf(simh, xbins)
@@ -1157,12 +1161,8 @@ class CMethods:
                 np.array(simh),
                 np.array(simp),
             )  # to achieve higher accuracy
-            global_max = kwargs.get(
-                "global_max", max(abs(np.nanmax(obs)), abs(np.nanmax(simh)))
-            )
-            global_min = kwargs.get(
-                "global_min", min(abs(np.nanmin(obs)), abs(np.nanmin(simh)))
-            )
+            global_max = kwargs.get("global_max", max(np.nanmax(obs), np.nanmax(simh)))
+            global_min = kwargs.get("global_min", min(np.nanmin(obs), np.nanmin(simh)))
             wide = abs(global_max - global_min) / n_quantiles
             xbins = np.arange(global_min, global_max + wide, wide)
 
@@ -1178,9 +1178,7 @@ class CMethods:
 
         if kind in cls.MULTIPLICATIVE:
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
-            global_max = kwargs.get(
-                "global_max", max(abs(np.nanmax(obs)), abs(np.nanmax(simh)))
-            )
+            global_max = kwargs.get("global_max", max(np.nanmax(obs), np.nanmax(simh)))
             wide = global_max / n_quantiles
             xbins = np.arange(kwargs.get("global_min", 0.0), global_max + wide, wide)
 
@@ -1232,28 +1230,6 @@ class CMethods:
                 result = 0.0
 
         return result
-
-    @classmethod
-    def get_xbins(
-        cls, timeseries1: np.ndarray, timeseries2: np.ndarray, n_quantiles: int
-    ) -> np.ndarray:
-        """
-        Returns :math:`n` boundaries between the absolut minimum and maximum
-        where :math:`n` is the number of quantiles.
-
-        :param timeseries1: First time series
-        :type timeseries1: np.ndarray
-        :param timeseries2: Second time series
-        :type timeseries2: np.ndarray
-        :param n_quantiles: The number of boundaries to use
-        :type n_quantiles: int
-        :return: The boundaries
-        :rtype: np.ndarray
-        """
-        global_max = max(abs(np.nanmax(timeseries1)), abs(np.nanmax(timeseries2)))
-        global_min = min(abs(np.nanmin(timeseries1)), abs(np.nanmin(timeseries2)))
-        wide = abs(global_max - global_min) / n_quantiles
-        return np.arange(global_min, global_max + wide, wide)
 
     @staticmethod
     def get_pdf(
