@@ -93,7 +93,7 @@ class CMethods:
     MAX_SCALING_FACTOR: Union[int, float] = 10
 
     @classmethod
-    def get_available_methods(cls: "CMethods") -> List[str]:
+    def get_available_methods(cls) -> List[str]:
         """
         Function to return the available adjustment methods of the CMethods class.
 
@@ -828,11 +828,9 @@ class CMethods:
             ... )
         """
         obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
-
-        global_max = max(np.amax(obs), np.amax(simh))
-        global_min = min(np.amin(obs), np.amin(simh))
-        wide = abs(global_max - global_min) / n_quantiles
-        xbins = np.arange(global_min, global_max + wide, wide)
+        xbins: np.ndarray = cls.get_xbins(
+            timeseries1=obs, timeseries2=simh, n_quantiles=n_quantiles
+        )
 
         cdf_obs = cls.get_cdf(obs, xbins)
         cdf_simh = cls.get_cdf(simh, xbins)
@@ -947,23 +945,21 @@ class CMethods:
             )
 
         obs, simh = np.array(obs), np.array(simh)
-
-        global_max = max(np.amax(obs), np.amax(simh))
-        global_min = min(np.amin(obs), np.amin(simh))
-        wide = abs(global_max - global_min) / n_quantiles
-        xbins = np.arange(global_min, global_max + wide, wide)
+        xbins: np.ndarray = cls.get_xbins(
+            timeseries1=obs, timeseries2=simh, n_quantiles=n_quantiles
+        )
 
         cdf_obs = cls.get_cdf(obs, xbins)
         cdf_simh = cls.get_cdf(simh, xbins)
 
         # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
         res = np.zeros(len(simp.values))
-        for _, idxs in simp.groupby("time.month").groups.items():
+        for _, indices in simp.groupby("time.month").groups.items():
             # detrended by long-term month
             m_simh, m_simp = [], []
-            for idx in idxs:
-                m_simh.append(simh[idx])
-                m_simp.append(simp[idx])
+            for index in indices:
+                m_simh.append(simh[index])
+                m_simp.append(simp[index])
 
             m_simh = np.array(m_simh)
             m_simp = np.array(m_simp)
@@ -991,8 +987,8 @@ class CMethods:
                 X = np.interp(epsilon, cdf_obs, xbins) * cls.ensure_devidable(
                     m_simp_mean, m_simh_mean
                 )  # Eq. 2
-            for i, idx in enumerate(idxs):
-                res[idx] = X[i]
+            for i, index in enumerate(indices):
+                res[index] = X[i]
         return res
 
     # ? -----========= E M P I R I C A L - Q U A N T I L E - M A P P I N G =========------
@@ -1043,8 +1039,8 @@ class CMethods:
     ) -> np.ndarray:
         r"""
         The Quantile Delta Mapping bias correction technique can be used to minimize distributional
-        biases between modeled and observed time-series climate data. Its interval-independant
-        behaviour ensures that the whole time series is taken into account to redistribute
+        biases between modeled and observed time-series climate data. Its interval-independent
+        behavior ensures that the whole time series is taken into account to redistribute
         its values, based on the distributions of the modeled and observed/reference data of the
         control period. In contrast to the regular Quantile Mapping (:func:`cmethods.CMethods.quantile_mapping`)
         the Quantile Delta Mapping also takes the change between the modeled data of the control and scenario
@@ -1161,8 +1157,12 @@ class CMethods:
                 np.array(simh),
                 np.array(simp),
             )  # to achieve higher accuracy
-            global_max = kwargs.get("global_max", max(np.amax(obs), np.amax(simh)))
-            global_min = kwargs.get("global_min", min(np.amin(obs), np.amin(simh)))
+            global_max = kwargs.get(
+                "global_max", max(abs(np.nanmax(obs)), abs(np.nanmax(simh)))
+            )
+            global_min = kwargs.get(
+                "global_min", min(abs(np.nanmin(obs)), abs(np.nanmin(simh)))
+            )
             wide = abs(global_max - global_min) / n_quantiles
             xbins = np.arange(global_min, global_max + wide, wide)
 
@@ -1178,7 +1178,9 @@ class CMethods:
 
         if kind in cls.MULTIPLICATIVE:
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
-            global_max = kwargs.get("global_max", max(np.amax(obs), np.amax(simh)))
+            global_max = kwargs.get(
+                "global_max", max(abs(np.nanmax(obs)), abs(np.nanmax(simh)))
+            )
             wide = global_max / n_quantiles
             xbins = np.arange(kwargs.get("global_min", 0.0), global_max + wide, wide)
 
@@ -1230,6 +1232,28 @@ class CMethods:
                 result = 0.0
 
         return result
+
+    @classmethod
+    def get_xbins(
+        cls, timeseries1: np.ndarray, timeseries2: np.ndarray, n_quantiles: int
+    ) -> np.ndarray:
+        """
+        Returns :math:`n` boundaries between the absolut minimum and maximum
+        where :math:`n` is the number of quantiles.
+
+        :param timeseries1: First time series
+        :type timeseries1: np.ndarray
+        :param timeseries2: Second time series
+        :type timeseries2: np.ndarray
+        :param n_quantiles: The number of boundaries to use
+        :type n_quantiles: int
+        :return: The boundaries
+        :rtype: np.ndarray
+        """
+        global_max = max(abs(np.nanmax(timeseries1)), abs(np.nanmax(timeseries2)))
+        global_min = min(abs(np.nanmin(timeseries1)), abs(np.nanmin(timeseries2)))
+        wide = abs(global_max - global_min) / n_quantiles
+        return np.arange(global_min, global_max + wide, wide)
 
     @staticmethod
     def get_pdf(
