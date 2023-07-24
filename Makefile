@@ -1,13 +1,13 @@
 #!make
 # -*- coding: utf-8 -*-
 # Copyright (C) 2023 Benjamin Thomas Schwertfeger
-# Github: https://github.com/btschwertfeger
+# GitHub: https://github.com/btschwertfeger
 
 VENV := venv
 GLOBAL_PYTHON := $(shell which python3)
 PYTHON := $(VENV)/bin/python3
 
-.PHONY := build dev install test test_upload live_upload clean
+.PHONY := build dev install test tests doc doctest pre-commit changelog clean
 
 ##		Builds the python-kraken-sdk
 ##
@@ -24,10 +24,12 @@ dev:
 install:
 	$(PYTHON) -m pip install .
 
-##		Run the unittests
+##		Run the unit tests
 ##
 test:
 	$(PYTHON) -m pytest tests/
+
+tests: test
 
 ##		Build the documentation
 ##
@@ -58,7 +60,12 @@ changelog:
 ##		Clean the workspace
 ##
 clean:
-	rm -rf .pytest_cache build/ dist/ python_cmethods.egg-info docs/_build examples/.ipynb_checkpoints
+	rm -rf .pytest_cache \
+		build/ dist/ python_cmethods.egg-info \
+		docs/_build \
+		examples/.ipynb_checkpoints .ipynb_checkpoints \
+		.mypy_cache .pytest_cache
+
 	rm -f .coverage cmethods/_version.py
 
 	find tests -name "__pycache__" | xargs rm -rf
