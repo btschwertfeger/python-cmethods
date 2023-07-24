@@ -56,4 +56,5 @@ repos:
     rev: v2.7.1
     hooks:
       - id: prettier
-        exclude: (\.ipynb$)
+
+exclude: (\.ipynb$)
