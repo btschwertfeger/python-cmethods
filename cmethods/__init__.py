@@ -115,7 +115,7 @@ class CMethods:
         return cls.METHODS
 
     @classmethod
-    def get_function(cls: "CMethods", method: str) -> Callable:
+    def get_function(cls: CMethods, method: str) -> Callable:
         """
         Returns the bias correction function corresponding to the ``method`` name.
 
@@ -143,7 +143,7 @@ class CMethods:
 
     @classmethod
     def adjust_3d(
-        cls: "CMethods",
+        cls: CMethods,
         method: str,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
@@ -282,7 +282,7 @@ class CMethods:
         raise UnknownMethodError(method, cls.METHODS)
 
     @classmethod
-    def pool_adjust(cls: "CMethods", params: dict) -> np.ndarray:
+    def pool_adjust(cls: CMethods, params: dict) -> np.ndarray:
         """
         Adjustment along the longitudes for one specific latitude
         used by :func:`cmethods.CMethods.adjust_3d`
@@ -321,7 +321,7 @@ class CMethods:
 
     @classmethod
     def grouped_correction(
-        cls: "CMethods",
+        cls: CMethods,
         method: str,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
@@ -369,7 +369,7 @@ class CMethods:
     # ? -----========= L I N E A R - S C A L I N G =========------
     @classmethod
     def linear_scaling(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -481,7 +481,7 @@ class CMethods:
     # ? -----========= V A R I A N C E - S C A L I N G =========------
     @classmethod
     def variance_scaling(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -607,7 +607,7 @@ class CMethods:
     # ? -----========= D E L T A - M E T H O D =========------
     @classmethod
     def delta_method(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -719,7 +719,7 @@ class CMethods:
     # ? -----========= Q U A N T I L E - M A P P I N G =========------
     @classmethod
     def quantile_mapping(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -831,6 +831,10 @@ class CMethods:
 
         global_max = max(np.nanmax(obs), np.nanmax(simh))
         global_min = min(np.nanmin(obs), np.nanmin(simh))
+
+        if cls.nan_or_equal(value1=global_max, value2=global_min):
+            return simp
+
         wide = abs(global_max - global_min) / n_quantiles
         xbins = np.arange(global_min, global_max + wide, wide)
 
@@ -857,7 +861,7 @@ class CMethods:
 
     @classmethod
     def detrended_quantile_mapping(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -950,6 +954,10 @@ class CMethods:
 
         global_max = max(np.nanmax(obs), np.nanmax(simh))
         global_min = min(np.nanmin(obs), np.nanmin(simh))
+
+        if cls.nan_or_equal(value1=global_max, value2=global_min):
+            return np.array(simp.values)
+
         wide = abs(global_max - global_min) / n_quantiles
         xbins = np.arange(global_min, global_max + wide, wide)
 
@@ -998,7 +1006,7 @@ class CMethods:
     # ? -----========= E M P I R I C A L - Q U A N T I L E - M A P P I N G =========------
     @classmethod
     def empirical_quantile_mapping(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -1033,7 +1041,7 @@ class CMethods:
     # ? -----========= Q U A N T I L E - D E L T A - M A P P I N G =========------
     @classmethod
     def quantile_delta_mapping(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -1163,6 +1171,10 @@ class CMethods:
             )  # to achieve higher accuracy
             global_max = kwargs.get("global_max", max(np.nanmax(obs), np.nanmax(simh)))
             global_min = kwargs.get("global_min", min(np.nanmin(obs), np.nanmin(simh)))
+
+            if cls.nan_or_equal(value1=global_max, value2=global_min):
+                return simp
+
             wide = abs(global_max - global_min) / n_quantiles
             xbins = np.arange(global_min, global_max + wide, wide)
 
@@ -1179,8 +1191,12 @@ class CMethods:
         if kind in cls.MULTIPLICATIVE:
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
             global_max = kwargs.get("global_max", max(np.nanmax(obs), np.nanmax(simh)))
+            global_min = kwargs.get("global_min", 0.0)
+            if cls.nan_or_equal(value1=global_max, value2=global_min):
+                return simp
+
             wide = global_max / n_quantiles
-            xbins = np.arange(kwargs.get("global_min", 0.0), global_max + wide, wide)
+            xbins = np.arange(global_min, global_max + wide, wide)
 
             cdf_obs = cls.get_cdf(obs, xbins)
             cdf_simh = cls.get_cdf(simh, xbins)
@@ -1197,9 +1213,23 @@ class CMethods:
             f"{kind} not available for quantile_delta_mapping. Use '+' or '*' instead."
         )
 
+    @staticmethod
+    def nan_or_equal(value1: float, value2: float) -> bool:
+        """
+        Returns True if the values are equal or at least one is NaN
+
+        :param value1: First value to check
+        :type value1: float
+        :param value2: Second value to check
+        :type value2: float
+        :return: If any value is NaN or values are equal
+        :rtype: bool
+        """
+        return np.isnan(value1) or np.isnan(value2) or value1 == value2
+
     @classmethod
     def ensure_devidable(
-        cls: "CMethods",
+        cls: CMethods,
         numerator: Union[float, np.ndarray],
         denominator: Union[float, np.ndarray],
     ) -> np.ndarray:

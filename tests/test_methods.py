@@ -423,6 +423,11 @@ class TestMethods(unittest.TestCase):
             np.array((10, 2, 30, 2, 5 / 3, 0)),
         )
 
+    def test_nan_or_equal(self) -> None:
+        assert cm.nan_or_equal(0, 0)
+        assert cm.nan_or_equal(np.NaN, np.NaN)
+        assert not cm.nan_or_equal(0, 1)
+
 
 if __name__ == "__main__":
     unittest.main()
