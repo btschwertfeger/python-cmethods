@@ -32,8 +32,8 @@ from tqdm import tqdm
 
 __author__ = "Benjamin Thomas Schwertfeger"
 __copyright__ = __author__
-__email__ = "development@b-schwertfeger.de"
-__link__ = "https://b-schwertfeger.de"
+__email__ = "contact@b-schwertfeger.de"
+__link__ = "https://github.com/btschwertfeger"
 __github__ = "https://github.com/btschwertfeger/python-cmethods"
 
 
@@ -42,7 +42,7 @@ class UnknownMethodError(Exception):
     Exception raised for errors if unknown method called in CMethods class.
     """
 
-    def __init__(self: "UnknownMethodError", method: str, available_methods: list):
+    def __init__(self: UnknownMethodError, method: str, available_methods: list):
         super().__init__(
             f'Unknown method "{method}"! Available methods: {available_methods}'
         )

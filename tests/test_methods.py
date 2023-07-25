@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2023 Benjamin Thomas Schwertfegerr
-# Github: https://github.com/btschwertfeger
+# Copyright (C) 2023 Benjamin Thomas Schwertfeger
+# GitGub: https://github.com/btschwertfeger
 #
 
 """Module to to test the bias adjustment methods"""
+
 import unittest
 from typing import List, Tuple
 
@@ -111,6 +112,9 @@ class TestMethods(unittest.TestCase):
             simp = get_dataset(data * 0.09, future_time, kind=kind)
 
         return obsh, obsp, simh, simp
+
+    # --------------------------------------------------------------------------
+    # 1-dimensional
 
     def test_linear_scaling(self) -> None:
         """Tests the linear scaling method"""
@@ -232,8 +236,11 @@ class TestMethods(unittest.TestCase):
                 squared=False,
             )
 
+    # --------------------------------------------------------------------------
+    # 3-dimensional
+
     def test_3d_sclaing_methods(self) -> None:
-        """Tests the scaling based methods for 3-dimentsional data sets"""
+        """Tests the scaling based methods for 3-dimensional data sets"""
 
         for kind in ("+", "*"):
             for method in cm.SCALING_METHODS:
@@ -262,7 +269,7 @@ class TestMethods(unittest.TestCase):
                         )
 
     def test_3d_distribution_methods(self) -> None:
-        """Tests the distribution based methods for 3-dimentsional data sets"""
+        """Tests the distribution based methods for 3-dimensional data sets"""
 
         for kind in ("+", "*"):
             for method in cm.DISTRIBUTION_METHODS:
@@ -286,6 +293,8 @@ class TestMethods(unittest.TestCase):
                             squared=False,
                         )
 
+    # --------------------------------------------------------------------------
+    # misc
     def test_n_jobs(self) -> None:
         kind = "+"
         result = cm.adjust_3d(
@@ -309,16 +318,8 @@ class TestMethods(unittest.TestCase):
                     squared=False,
                 )
 
-    def test_get_available_methods(self) -> None:
-        assert cm.get_available_methods() == [
-            "linear_scaling",
-            "variance_scaling",
-            "delta_method",
-            "quantile_mapping",
-            "detrended_quantile_mapping",
-            "quantile_delta_mapping",
-        ]
-
+    # --------------------------------------------------------------------------
+    # test failures
     def test_unknown_method(self) -> None:
         with pytest.raises(UnknownMethodError):
             cm.get_function("LOCI_INTENSITY_SCALING")
@@ -405,28 +406,6 @@ class TestMethods(unittest.TestCase):
                 kind="/",
                 n_quantiles=10,
             )
-
-    def test_get_pdf(self) -> None:
-        assert (cm.get_pdf(np.arange(10), [0, 5, 11]) == np.array((5, 5))).all()
-
-    def test_get_adjusted_scaling_factor(self) -> None:
-        assert cm.get_adjusted_scaling_factor(10, 5) == 5
-        assert cm.get_adjusted_scaling_factor(10, 11) == 10
-        assert cm.get_adjusted_scaling_factor(-10, -11) == -10
-        assert cm.get_adjusted_scaling_factor(-11, -10) == -10
-
-    def test_ensure_devidable(self) -> None:
-        assert np.array_equal(
-            cm.ensure_devidable(
-                np.array((1, 2, 3, 4, 5, 0)), np.array((0, 1, 0, 2, 3, 0))
-            ),
-            np.array((10, 2, 30, 2, 5 / 3, 0)),
-        )
-
-    def test_nan_or_equal(self) -> None:
-        assert cm.nan_or_equal(0, 0)
-        assert cm.nan_or_equal(np.NaN, np.NaN)
-        assert not cm.nan_or_equal(0, 1)
 
 
 if __name__ == "__main__":

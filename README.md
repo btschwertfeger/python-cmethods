@@ -3,7 +3,7 @@
 <div align="center">
 
 [![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/btschwertfeger/Bias-Adjustment-Python)
-[![Generic badge](https://img.shields.io/badge/python-3.8_|_3.9_|_3.10_|_3.11-yellow.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/python-3.8_|_3.9_|_3.10_|_3.11-blue.svg)](https://shields.io/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Downloads](https://pepy.tech/badge/python-cmethods)](https://pepy.tech/project/python-cmethods)
 
