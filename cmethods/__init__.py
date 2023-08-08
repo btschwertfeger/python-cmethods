@@ -93,7 +93,7 @@ class CMethods:
     MAX_SCALING_FACTOR: Union[int, float] = 10
 
     @classmethod
-    def get_available_methods(cls) -> List[str]:
+    def get_available_methods(cls: CMethods) -> List[str]:
         """
         Function to return the available adjustment methods of the CMethods class.
 
@@ -232,6 +232,18 @@ class CMethods:
             ...     kind="+"
             ... )
         """
+
+        if not isinstance(obs, xr.core.dataarray.DataArray):
+            raise TypeError("'obs' must be type xarray.core.dataarray.DataArray")
+        if not isinstance(simh, xr.core.dataarray.DataArray):
+            raise TypeError("'simh' must be type xarray.core.dataarray.DataArray")
+        if not isinstance(simp, xr.core.dataarray.DataArray):
+            raise TypeError("'simp' must be type xarray.core.dataarray.DataArray")
+        if not isinstance(n_quantiles, int):
+            raise TypeError("'n_quantiles' must be type int")
+        if not isinstance(n_jobs, int):
+            raise TypeError("'n_jobs' must be type int")
+
         obs = obs.transpose("lat", "lon", "time")
         simh = simh.transpose("lat", "lon", "time")
         simp = simp.transpose("lat", "lon", "time").load()
@@ -343,8 +355,9 @@ class CMethods:
         ----- R E T U R N -----
 
             xarray.core.dataarray.DataArray: Adjusted data
-
         """
+        if not isinstance(simp, xr.core.dataarray.DataArray):
+            raise TypeError("'simp' must be type xarray.core.dataarray.DataArray")
 
         func_adjustment = cls.get_function(method)
         result = simp.copy(deep=True).load()
@@ -373,7 +386,7 @@ class CMethods:
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
-        group: Optional[str] = "time.month",
+        group: str = "time.month",
         kind: str = "+",
         **kwargs: Any,
     ) -> np.ndarray:
@@ -456,6 +469,8 @@ class CMethods:
             ...     kind="+"
             ... )
         """
+        cls.check_types(obs=obs, simh=simh, simp=simp)
+
         if group is not None:
             return cls.grouped_correction(
                 method="linear_scaling",
@@ -466,6 +481,7 @@ class CMethods:
                 kind=kind,
                 **kwargs,
             )
+
         if kind in cls.ADDITIVE:
             return np.array(simp) + (np.nanmean(obs) - np.nanmean(simh))  # Eq. 1
         if kind in cls.MULTIPLICATIVE:
@@ -575,6 +591,8 @@ class CMethods:
             ...     simp=simp[variable],
             ... )
         """
+        cls.check_types(obs=obs, simh=simh, simp=simp)
+
         if group is not None:
             return cls.grouped_correction(
                 method="variance_scaling",
@@ -585,6 +603,7 @@ class CMethods:
                 kind=kind,
                 **kwargs,
             )
+
         if kind in cls.ADDITIVE:
             LS_simh = cls.linear_scaling(obs, simh, simh, group=None)  # Eq. 1
             LS_simp = cls.linear_scaling(obs, simh, simp, group=None)  # Eq. 2
@@ -694,6 +713,8 @@ class CMethods:
             ...     simp=simp[variable],
             ... )
         """
+        cls.check_types(obs=obs, simh=simh, simp=simp)
+
         if group is not None:
             return cls.grouped_correction(
                 method="delta_method",
@@ -704,6 +725,7 @@ class CMethods:
                 kind=kind,
                 **kwargs,
             )
+
         if kind in cls.ADDITIVE:
             return np.array(obs) + (np.nanmean(simp) - np.nanmean(simh))  # Eq. 1
         if kind in cls.MULTIPLICATIVE:
@@ -827,6 +849,10 @@ class CMethods:
             ...     n_quantiles=250
             ... )
         """
+        cls.check_types(obs=obs, simh=simh, simp=simp)
+        if not isinstance(n_quantiles, int):
+            raise TypeError("'n_quantiles' must be type int")
+
         obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
 
         global_max = max(np.nanmax(obs), np.nanmax(simh))
@@ -949,6 +975,12 @@ class CMethods:
             raise NotImplementedError(
                 f"{kind} for detrended_quantile_mapping is not available. Use '+' or '*' instead."
             )
+
+        cls.check_types(obs=obs, simh=simh, simp=simp)
+        if not isinstance(n_quantiles, int):
+            raise TypeError("'n_quantiles' must be type int")
+        if not isinstance(simp, xr.core.dataarray.DataArray):
+            raise TypeError("'simp' must be type xarray.core.dataarray.DataArray")
 
         obs, simh = np.array(obs), np.array(simh)
 
@@ -1163,6 +1195,11 @@ class CMethods:
             ...     n_quantiles=250
             ... )
         """
+        cls.check_types(obs=obs, simh=simh, simp=simp)
+
+        if not isinstance(n_quantiles, int):
+            raise TypeError("'n_quantiles' must be type int")
+
         if kind in cls.ADDITIVE:
             obs, simh, simp = (
                 np.array(obs),
@@ -1212,6 +1249,26 @@ class CMethods:
         raise NotImplementedError(
             f"{kind} not available for quantile_delta_mapping. Use '+' or '*' instead."
         )
+
+    @classmethod
+    def check_types(
+        cls: CMethods,
+        obs: Union[list, np.ndarray, np.generic, xr.core.dataarray.DataArray],
+        simh: Union[list, np.ndarray, np.generic, xr.core.dataarray.DataArray],
+        simp: Union[list, np.ndarray, np.generic, xr.core.dataarray.DataArray],
+    ) -> None:
+        """
+        Checks if the parameters are in the correct type. **only used internally**
+        """
+        phrase: str = "must be type list, np.ndarray or xarray.core.dataarray.DataArray"
+        valid_types: tuple = (list, np.ndarray, np.generic, xr.core.dataarray.DataArray)
+
+        if not isinstance(obs, valid_types):
+            raise TypeError(f"'obs' {phrase}")
+        if not isinstance(simh, valid_types):
+            raise TypeError(f"'simh'{phrase}")
+        if not isinstance(simp, valid_types):
+            raise TypeError(f"'simp' {phrase}")
 
     @staticmethod
     def nan_or_equal(value1: float, value2: float) -> bool:
