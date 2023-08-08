@@ -65,7 +65,7 @@ markers = ["wip: Used to run a specific test by hand."]
 [tool.coverage.run]
 source = ["cmethods"]
 omit = ["*tests*"]
-concurrency = "multiprocessing"
+concurrency = ["multiprocessing"]
 
 [tool.coverage.report]
 exclude_lines = ["coverage: disable", "if TYPE_CHECKING:"]
