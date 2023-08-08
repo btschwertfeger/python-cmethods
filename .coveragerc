@@ -1,4 +1,0 @@
-[run]
-concurrency = multiprocessing
-source = cmethods
-omit = *tests*
