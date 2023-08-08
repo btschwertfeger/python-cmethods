@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "python-cmethods"
 dynamic = ["version"]
 authors = [
-  { name="Benjamin Thomas Schwertfeger", email="development@b-schwertfeger.de" },
+  { name="Benjamin Thomas Schwertfeger", email="contact@b-schwertfeger.de" },
 ]
 description = "Collection of bias correction procedures for 1- and 3-dimensional climate data"
 readme = "README.md"
@@ -68,6 +68,11 @@ local_scheme = "no-local-version"
 [tool.pytest]
 junit_family = "xunit2"
 testpaths = ["tests"]
+
+[tool.pytest.ini_options]
+markers = [
+    "wip: Used to run a specific test by hand.",
+]
 
 [project.optional-dependencies]
 dev = [

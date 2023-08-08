@@ -32,8 +32,8 @@ from tqdm import tqdm
 
 __author__ = "Benjamin Thomas Schwertfeger"
 __copyright__ = __author__
-__email__ = "development@b-schwertfeger.de"
-__link__ = "https://b-schwertfeger.de"
+__email__ = "contact@b-schwertfeger.de"
+__link__ = "https://github.com/btschwertfeger"
 __github__ = "https://github.com/btschwertfeger/python-cmethods"
 
 
@@ -42,7 +42,7 @@ class UnknownMethodError(Exception):
     Exception raised for errors if unknown method called in CMethods class.
     """
 
-    def __init__(self: "UnknownMethodError", method: str, available_methods: list):
+    def __init__(self: UnknownMethodError, method: str, available_methods: list):
         super().__init__(
             f'Unknown method "{method}"! Available methods: {available_methods}'
         )
@@ -93,7 +93,7 @@ class CMethods:
     MAX_SCALING_FACTOR: Union[int, float] = 10
 
     @classmethod
-    def get_available_methods(cls: "CMethods") -> List[str]:
+    def get_available_methods(cls) -> List[str]:
         """
         Function to return the available adjustment methods of the CMethods class.
 
@@ -115,7 +115,7 @@ class CMethods:
         return cls.METHODS
 
     @classmethod
-    def get_function(cls: "CMethods", method: str) -> Callable:
+    def get_function(cls: CMethods, method: str) -> Callable:
         """
         Returns the bias correction function corresponding to the ``method`` name.
 
@@ -143,7 +143,7 @@ class CMethods:
 
     @classmethod
     def adjust_3d(
-        cls: "CMethods",
+        cls: CMethods,
         method: str,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
@@ -282,7 +282,7 @@ class CMethods:
         raise UnknownMethodError(method, cls.METHODS)
 
     @classmethod
-    def pool_adjust(cls: "CMethods", params: dict) -> np.ndarray:
+    def pool_adjust(cls: CMethods, params: dict) -> np.ndarray:
         """
         Adjustment along the longitudes for one specific latitude
         used by :func:`cmethods.CMethods.adjust_3d`
@@ -321,7 +321,7 @@ class CMethods:
 
     @classmethod
     def grouped_correction(
-        cls: "CMethods",
+        cls: CMethods,
         method: str,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
@@ -369,7 +369,7 @@ class CMethods:
     # ? -----========= L I N E A R - S C A L I N G =========------
     @classmethod
     def linear_scaling(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -481,7 +481,7 @@ class CMethods:
     # ? -----========= V A R I A N C E - S C A L I N G =========------
     @classmethod
     def variance_scaling(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -607,7 +607,7 @@ class CMethods:
     # ? -----========= D E L T A - M E T H O D =========------
     @classmethod
     def delta_method(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -719,7 +719,7 @@ class CMethods:
     # ? -----========= Q U A N T I L E - M A P P I N G =========------
     @classmethod
     def quantile_mapping(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -829,8 +829,12 @@ class CMethods:
         """
         obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
 
-        global_max = max(np.amax(obs), np.amax(simh))
-        global_min = min(np.amin(obs), np.amin(simh))
+        global_max = max(np.nanmax(obs), np.nanmax(simh))
+        global_min = min(np.nanmin(obs), np.nanmin(simh))
+
+        if cls.nan_or_equal(value1=global_max, value2=global_min):
+            return simp
+
         wide = abs(global_max - global_min) / n_quantiles
         xbins = np.arange(global_min, global_max + wide, wide)
 
@@ -857,7 +861,7 @@ class CMethods:
 
     @classmethod
     def detrended_quantile_mapping(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -948,8 +952,12 @@ class CMethods:
 
         obs, simh = np.array(obs), np.array(simh)
 
-        global_max = max(np.amax(obs), np.amax(simh))
-        global_min = min(np.amin(obs), np.amin(simh))
+        global_max = max(np.nanmax(obs), np.nanmax(simh))
+        global_min = min(np.nanmin(obs), np.nanmin(simh))
+
+        if cls.nan_or_equal(value1=global_max, value2=global_min):
+            return np.array(simp.values)
+
         wide = abs(global_max - global_min) / n_quantiles
         xbins = np.arange(global_min, global_max + wide, wide)
 
@@ -958,12 +966,12 @@ class CMethods:
 
         # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
         res = np.zeros(len(simp.values))
-        for _, idxs in simp.groupby("time.month").groups.items():
+        for _, indices in simp.groupby("time.month").groups.items():
             # detrended by long-term month
             m_simh, m_simp = [], []
-            for idx in idxs:
-                m_simh.append(simh[idx])
-                m_simp.append(simp[idx])
+            for index in indices:
+                m_simh.append(simh[index])
+                m_simp.append(simp[index])
 
             m_simh = np.array(m_simh)
             m_simp = np.array(m_simp)
@@ -991,14 +999,14 @@ class CMethods:
                 X = np.interp(epsilon, cdf_obs, xbins) * cls.ensure_devidable(
                     m_simp_mean, m_simh_mean
                 )  # Eq. 2
-            for i, idx in enumerate(idxs):
-                res[idx] = X[i]
+            for i, index in enumerate(indices):
+                res[index] = X[i]
         return res
 
     # ? -----========= E M P I R I C A L - Q U A N T I L E - M A P P I N G =========------
     @classmethod
     def empirical_quantile_mapping(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -1033,7 +1041,7 @@ class CMethods:
     # ? -----========= Q U A N T I L E - D E L T A - M A P P I N G =========------
     @classmethod
     def quantile_delta_mapping(
-        cls: "CMethods",
+        cls: CMethods,
         obs: xr.core.dataarray.DataArray,
         simh: xr.core.dataarray.DataArray,
         simp: xr.core.dataarray.DataArray,
@@ -1043,8 +1051,8 @@ class CMethods:
     ) -> np.ndarray:
         r"""
         The Quantile Delta Mapping bias correction technique can be used to minimize distributional
-        biases between modeled and observed time-series climate data. Its interval-independant
-        behaviour ensures that the whole time series is taken into account to redistribute
+        biases between modeled and observed time-series climate data. Its interval-independent
+        behavior ensures that the whole time series is taken into account to redistribute
         its values, based on the distributions of the modeled and observed/reference data of the
         control period. In contrast to the regular Quantile Mapping (:func:`cmethods.CMethods.quantile_mapping`)
         the Quantile Delta Mapping also takes the change between the modeled data of the control and scenario
@@ -1161,8 +1169,12 @@ class CMethods:
                 np.array(simh),
                 np.array(simp),
             )  # to achieve higher accuracy
-            global_max = kwargs.get("global_max", max(np.amax(obs), np.amax(simh)))
-            global_min = kwargs.get("global_min", min(np.amin(obs), np.amin(simh)))
+            global_max = kwargs.get("global_max", max(np.nanmax(obs), np.nanmax(simh)))
+            global_min = kwargs.get("global_min", min(np.nanmin(obs), np.nanmin(simh)))
+
+            if cls.nan_or_equal(value1=global_max, value2=global_min):
+                return simp
+
             wide = abs(global_max - global_min) / n_quantiles
             xbins = np.arange(global_min, global_max + wide, wide)
 
@@ -1178,9 +1190,13 @@ class CMethods:
 
         if kind in cls.MULTIPLICATIVE:
             obs, simh, simp = np.array(obs), np.array(simh), np.array(simp)
-            global_max = kwargs.get("global_max", max(np.amax(obs), np.amax(simh)))
+            global_max = kwargs.get("global_max", max(np.nanmax(obs), np.nanmax(simh)))
+            global_min = kwargs.get("global_min", 0.0)
+            if cls.nan_or_equal(value1=global_max, value2=global_min):
+                return simp
+
             wide = global_max / n_quantiles
-            xbins = np.arange(kwargs.get("global_min", 0.0), global_max + wide, wide)
+            xbins = np.arange(global_min, global_max + wide, wide)
 
             cdf_obs = cls.get_cdf(obs, xbins)
             cdf_simh = cls.get_cdf(simh, xbins)
@@ -1197,9 +1213,23 @@ class CMethods:
             f"{kind} not available for quantile_delta_mapping. Use '+' or '*' instead."
         )
 
+    @staticmethod
+    def nan_or_equal(value1: float, value2: float) -> bool:
+        """
+        Returns True if the values are equal or at least one is NaN
+
+        :param value1: First value to check
+        :type value1: float
+        :param value2: Second value to check
+        :type value2: float
+        :return: If any value is NaN or values are equal
+        :rtype: bool
+        """
+        return np.isnan(value1) or np.isnan(value2) or value1 == value2
+
     @classmethod
     def ensure_devidable(
-        cls: "CMethods",
+        cls: CMethods,
         numerator: Union[float, np.ndarray],
         denominator: Union[float, np.ndarray],
     ) -> np.ndarray:
