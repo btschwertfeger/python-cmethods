@@ -998,7 +998,7 @@ class CMethods:
 
         # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
         res = np.zeros(len(simp.values))
-        for _, indices in simp.groupby("time.month").groups.values():
+        for indices in simp.groupby("time.month").groups.values():
             # detrended by long-term month
             m_simh, m_simp = [], []
             for index in indices:
