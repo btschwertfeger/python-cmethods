@@ -998,7 +998,7 @@ class CMethods:
 
         # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
         res = np.zeros(len(simp.values))
-        for _, indices in simp.groupby("time.month").groups.items():
+        for _, indices in simp.groupby("time.month").groups.values():
             # detrended by long-term month
             m_simh, m_simp = [], []
             for index in indices:
@@ -1095,7 +1095,7 @@ class CMethods:
 
         The Quantile Delta Mapping technique implemented here is based on the equations of
         Tong, Y., Gao, X., Han, Z. et al. (2021) *"Bias correction of temperature and precipitation
-        over China for RCM simulations using the QM and QDM methods"*. Clim Dyn 57, 1425–1443
+        over China for RCM simulations using the QM and QDM methods"*. Clim Dyn 57, 1425-1443
         (https://doi.org/10.1007/s00382-020-05447-4). In the following the additive and multiplicative
         variant are shown.
 
@@ -1266,7 +1266,7 @@ class CMethods:
         if not isinstance(obs, valid_types):
             raise TypeError(f"'obs' {phrase}")
         if not isinstance(simh, valid_types):
-            raise TypeError(f"'simh'{phrase}")
+            raise TypeError(f"'simh' {phrase}")
         if not isinstance(simp, valid_types):
             raise TypeError(f"'simp' {phrase}")
 
@@ -1310,11 +1310,10 @@ class CMethods:
 
             mask_nan = np.isnan(result)
             result[mask_nan] = 0
-        else:
-            if np.isinf(result):
-                result = numerator * cls.MAX_SCALING_FACTOR
-            elif np.isnan(result):
-                result = 0.0
+        elif np.isinf(result):
+            result = numerator * cls.MAX_SCALING_FACTOR
+        elif np.isnan(result):
+            result = 0.0
 
         return result
 
