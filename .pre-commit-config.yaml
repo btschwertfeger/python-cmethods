@@ -38,7 +38,7 @@ repos:
     rev: 5.12.0
     hooks:
       - id: isort
-        args: ["--profile", "black"] # solves conflicts between black and isort
+        args: ["--profile=black"] # solves conflicts between black and isort
   - repo: https://github.com/pycqa/flake8
     rev: 6.0.0
     hooks:
@@ -51,10 +51,9 @@ repos:
         name: pylint
         types: [python]
         exclude: ^examples/|^tests/|^setup.py$
-        args: ["--rcfile=.pylintrc"]
+        args: ["--rcfile=pyproject.toml"]
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.7.1
+    rev: v3.0.1
     hooks:
       - id: prettier
-
 exclude: (\.ipynb$)

@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased](https://github.com/btschwertfeger/python-cmethods/tree/HEAD)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v1.0.2...HEAD)
+
+**Fixed bugs:**
+
+- The tool fails when input time series include np.nan for distribution-based methods [\#41](https://github.com/btschwertfeger/python-cmethods/issues/41)
+- Fix error when time series includes nan values [\#40](https://github.com/btschwertfeger/python-cmethods/pull/40) ([btschwertfeger](https://github.com/btschwertfeger))
+
 ## [v1.0.2](https://github.com/btschwertfeger/python-cmethods/tree/v1.0.2) (2023-06-18)
 
 [Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v1.0.1...v1.0.2)
