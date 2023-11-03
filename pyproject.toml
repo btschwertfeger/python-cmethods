@@ -72,6 +72,7 @@ exclude_lines = ["coverage: disable", "if TYPE_CHECKING:"]
 skip_empty = true
 
 [project.optional-dependencies]
+jupyter = ["venv-kernel", "jupyterlab"]
 dev = [
   # testing
   "pytest",
@@ -82,9 +83,13 @@ dev = [
   "setuptools_scm",
   # examples
   "click",
-  # ducumentatoin
+  # ducumentation
   "sphinx",
   "sphinx-rtd-theme",
+  # linting
+  "pylint",
+  "flake8",
+  "mypy",
 ]
 examples = ["matplotlib"]
 
