@@ -25,7 +25,7 @@ def test_quantile_mapping_single_nan() -> None:
     obs[0] = np.nan
     expected = np.array([0.0, 1.9, 2.9, 3.9, 4.9, 5.9, 6.9, 7.9, 8.9, 9.0])
 
-    res = cm.quantile_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
+    res = cm.__quantile_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
     assert np.allclose(res, expected)
 
 
@@ -36,7 +36,7 @@ def test_quantile_mapping_all_nan() -> None:
         list(np.arange(10)),
         list(np.arange(10)),
     )
-    res = cm.quantile_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
+    res = cm.__quantile_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
     assert np.allclose(res, simp)
 
 
@@ -45,7 +45,7 @@ def test_quantile_delta_mapping_single_nan() -> None:
     obs[0] = np.nan
     expected = np.array([0.0, 1.9, 2.9, 3.9, 4.9, 5.9, 6.9, 7.9, 8.9, 9.0])
 
-    res = cm.quantile_delta_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
+    res = cm.__quantile_delta_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
     assert np.allclose(res, expected)
 
 
@@ -56,7 +56,7 @@ def test_quantile_delta_mapping_all_nan() -> None:
         list(np.arange(10)),
         list(np.arange(10)),
     )
-    res = cm.quantile_delta_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
+    res = cm.__quantile_delta_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
     assert np.allclose(res, simp)
 
 
@@ -135,7 +135,7 @@ def test_type_check_failing() -> None:
 def test_quantile_mapping_type_check_n_quantiles_failing() -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
-        cm.quantile_delta_mapping(obs=[], simh=[], simp=[], n_quantiles="100")
+        cm.__quantile_delta_mapping(obs=[], simh=[], simp=[], n_quantiles="100")
 
 
 def test_detrended_quantile_mapping_type_check_n_quantiles_failing() -> None:
@@ -155,7 +155,7 @@ def test_detrended_quantile_mapping_type_check_simp_failing() -> None:
 def test_quantile_delta_mapping_type_check_n_quantiles_failing() -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
-        cm.quantile_delta_mapping(obs=[], simh=[], simp=[], n_quantiles="100")
+        cm.__quantile_delta_mapping(obs=[], simh=[], simp=[], n_quantiles="100")
 
 
 def test_grouped_correction_worng_type_failing() -> None:
@@ -163,7 +163,9 @@ def test_grouped_correction_worng_type_failing() -> None:
     with pytest.raises(
         TypeError, match="'simp' must be type xarray.core.dataarray.DataArray"
     ):
-        cm.linear_scaling(obs=[], simh=[], simp=[], n_quantiles=100, group="time.month")
+        cm.__linear_scaling(
+            obs=[], simh=[], simp=[], n_quantiles=100, group="time.month"
+        )
 
 
 @pytest.mark.wip()

@@ -23,7 +23,7 @@ r"""
 
 from __future__ import annotations
 
-from typing import Any, List, Optional, Union
+from typing import Any, Callable, List, Optional, Tuple, TypeVar, Union
 
 import numpy as np
 import xarray as xr
@@ -34,10 +34,13 @@ __email__ = "contact@b-schwertfeger.de"
 __link__ = "https://github.com/btschwertfeger"
 __github__ = "https://github.com/btschwertfeger/python-cmethods"
 
+
 from cmethods.static import ADDITIVE, METHODS, MULTIPLICATIVE
+from cmethods.types import NPData, XRData
 from cmethods.utils import (
     UnknownMethodError,
-    check_types,
+    check_np_types,
+    check_xr_types,
     ensure_devidable,
     get_adjusted_scaling_factor,
     get_cdf,
@@ -46,20 +49,51 @@ from cmethods.utils import (
 )
 
 
-class CMethods2:
+class CMethods:
+    """
+    The CMethods class serves a collection of bias correction procedures to
+    adjust time-series of climate data.
+
+    The following bias correction techniques are available:
+
+    *Scaling-based techniques*:
+        * Linear Scaling :func:`cmethods.CMethods.linear_scaling`
+        * Variance Scaling :func:`cmethods.CMethods.variance_scaling`
+        * Delta (change) Method :func:`cmethods.CMethods.delta_method`
+    *Distribution-based techniques*:
+        * Quantile Mapping :func:`cmethods.CMethods.quantile_mapping`
+        * Detrended Quantile Mapping :func:`cmethods.CMethods.detrended_quantile_mapping`
+        * Quantile Delta Mapping
+            :func:`cmethods.CMethods.quantile_delta_mapping`
+
+    Except for the Variance Scaling all methods can be applied on both,
+    stochastic and non-stochastic variables. The Variance Scaling can only be
+    applied on stochastic climate variables.
+    - Non-stochastic climate variables are those that can be predicted with
+      relative certainty based on factors such as location, elevation, and
+      season. Examples of non-stochastic climate variables include air
+      temperature, air pressure, and solar radiation.
+    - Stochastic climate variables, on the other hand, are those that exhibit a
+      high degree of variability and unpredictability, making them difficult to
+      forecast accurately. Precipitation is an example of a stochastic climate
+      variable because it can vary greatly in timing, intensity, and location
+      due to complex atmospheric and meteorological processes.
+    """
+
     MAX_SCALING_FACTOR: Union[int, float] = 10
 
     # ? -----========= L I N E A R - S C A L I N G =========------
-    @classmethod
-    def linear_scaling(
-        cls,
-        obs,
-        simh,
-        simp,
+    def __linear_scaling(
+        self,
+        obs: NPData,
+        simh: NPData,
+        simp: NPData,
         kind: str = "+",
         **kwargs: Any,
-    ) -> np.ndarray:
+    ) -> NPData:
         r"""
+        **Do not call this function directly, please use :func:`cmethods.CMethhods.adjust`**
+
         The Linear Scaling bias correction technique can be applied on stochastic and
         non-stochastic climate variables to minimize deviations in the mean values
         between predicted and observed time-series of past and future time periods.
@@ -100,18 +134,18 @@ class CMethods2:
 
         :param obs: The reference data set of the control period
             (in most cases the observational data)
-        :type obs: xr.core.dataarray.DataArray
+        :type obs: list | np.ndarray | np.generic
         :param simh: The modeled data of the control period
-        :type simh: xr.core.dataarray.DataArray
+        :type simh: list | np.ndarray | np.generic
         :param simp: The modeled data of the scenario period (this is the data set
             on which the bias correction takes action)
-        :type simp: xr.core.dataarray.DataArray
+        :type simp: list | np.ndarray | np.generic
         :param kind: The kind of the correction, additive for non-stochastic and multiplicative
             for stochastic climate variables, defaults to ``+``
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
-        :return: The bias-corrected time series
-        :rtype: np.ndarray
+        :return: The bias-corrected data set
+        :rtype: list | np.ndarray | np.generic
 
         .. code-block:: python
             :linenos:
@@ -134,14 +168,15 @@ class CMethods2:
             ...     kind="+"
             ... )
         """
+        check_np_types(obs=obs, simh=simh, simp=simp)
         if kind in ADDITIVE:
             return np.array(simp) + (np.nanmean(obs) - np.nanmean(simh))  # Eq. 1
         if kind in MULTIPLICATIVE:
             adj_scaling_factor = get_adjusted_scaling_factor(
                 ensure_devidable(
-                    np.nanmean(obs), np.nanmean(simh), cls.MAX_SCALING_FACTOR
+                    np.nanmean(obs), np.nanmean(simh), self.MAX_SCALING_FACTOR
                 ),
-                kwargs.get("max_scaling_factor", cls.MAX_SCALING_FACTOR),
+                kwargs.get("max_scaling_factor", self.MAX_SCALING_FACTOR),
             )
             return np.array(simp) * adj_scaling_factor  # Eq. 2
         raise NotImplementedError(
@@ -149,16 +184,18 @@ class CMethods2:
         )
 
     # ? -----========= V A R I A N C E - S C A L I N G =========------
-    @classmethod
-    def variance_scaling(
-        cls,
-        obs,
-        simh,
-        simp,
+
+    def __variance_scaling(
+        self,
+        obs: NPData,
+        simh: NPData,
+        simp: NPData,
         kind: str = "+",
         **kwargs: Any,
-    ) -> np.ndarray:
+    ) -> NPData:
         r"""
+        **Do not call this function directly, please use :func:`cmethods.CMethhods.adjust`**
+
         The Variance Scaling bias correction technique can be applied only on non-stochastic
         climate variables to minimize deviations in the mean and variance
         between predicted and observed time-series of past and future time periods.
@@ -205,18 +242,18 @@ class CMethods2:
 
         :param obs: The reference data set of the control period
             (in most cases the observational data)
-        :type obs: xr.core.dataarray.DataArray
+        :type obs: list | np.ndarray | np.generic
         :param simh: The modeled data of the control period
-        :type simh: xr.core.dataarray.DataArray
+        :type simh: list | np.ndarray | np.generic
         :param simp: The modeled data of the scenario period (this is the data set
             on which the bias correction takes action)
-        :type simp: xr.core.dataarray.DataArray
+        :type simp: list | np.ndarray | np.generic
         :param kind: The kind of the correction, additive for non-stochastic climate variables
             no other kind is available so far, defaults to ``+``
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``add``)
         :return: The bias-corrected time series
-        :rtype: np.ndarray
+        :rtype: list | np.ndarray | np.generic
 
         .. code-block:: python
             :linenos:
@@ -238,18 +275,19 @@ class CMethods2:
             ...     simp=simp[variable],
             ... )
         """
+        check_np_types(obs=obs, simh=simp, simp=simp)
         if kind in ADDITIVE:
-            LS_simh = cls.linear_scaling(obs, simh, simh)  # Eq. 1
-            LS_simp = cls.linear_scaling(obs, simh, simp)  # Eq. 2
+            LS_simh = self.__linear_scaling(obs, simh, simh)  # Eq. 1
+            LS_simp = self.__linear_scaling(obs, simh, simp)  # Eq. 2
 
             VS_1_simh = LS_simh - np.nanmean(LS_simh)  # Eq. 3
             VS_1_simp = LS_simp - np.nanmean(LS_simp)  # Eq. 4
 
             adj_scaling_factor = get_adjusted_scaling_factor(
                 ensure_devidable(
-                    np.std(np.array(obs)), np.std(VS_1_simh), cls.MAX_SCALING_FACTOR
+                    np.std(np.array(obs)), np.std(VS_1_simh), self.MAX_SCALING_FACTOR
                 ),
-                kwargs.get("max_scaling_factor", cls.MAX_SCALING_FACTOR),
+                kwargs.get("max_scaling_factor", self.MAX_SCALING_FACTOR),
             )
 
             VS_2_simp = VS_1_simp * adj_scaling_factor  # Eq. 5
@@ -260,16 +298,17 @@ class CMethods2:
         )
 
     # ? -----========= D E L T A - M E T H O D =========------
-    @classmethod
-    def delta_method(
-        cls,
-        obs: xr.core.dataarray.DataArray,
-        simh: xr.core.dataarray.DataArray,
-        simp: xr.core.dataarray.DataArray,
+    def __delta_method(
+        self,
+        obs: NPData,
+        simh: NPData,
+        simp: NPData,
         kind: str = "+",
         **kwargs: Any,
-    ) -> np.ndarray:
+    ) -> NPData:
         r"""
+        **Do not call this function directly, please use :func:`cmethods.CMethhods.adjust`**
+
         The Delta Method bias correction technique can be applied on stochastic and
         non-stochastic climate variables to minimize deviations in the mean values
         between predicted and observed time-series of past and future time periods.
@@ -311,18 +350,18 @@ class CMethods2:
 
         :param obs: The reference data set of the control period
             (in most cases the observational data)
-        :type obs: xr.core.dataarray.DataArray
+        :type obs: list | np.ndarray | np.generic
         :param simh: The modeled data of the control period
-        :type simh: xr.core.dataarray.DataArray
+        :type simh: list | np.ndarray | np.generic
         :param simp: The modeled data of the scenario period (this is the data set
             on which the bias correction takes action)
-        :type simp: xr.core.dataarray.DataArray
+        :type simp: list | np.ndarray | np.generic
         :param kind: The kind of the correction, additive for non-stochastic and multiplicative
             for stochastic climate variables, defaults to ``+``
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
-        :return: The bias-corrected time series
-        :rtype: np.ndarray
+        :return: The bias-corrected data set
+        :rtype: list | np.ndarray | np.generic
 
         .. code-block:: python
             :linenos:
@@ -344,14 +383,15 @@ class CMethods2:
             ...     simp=simp[variable],
             ... )
         """
+        check_np_types(obs=obs, simh=simh, simp=simp)
         if kind in ADDITIVE:
             return np.array(obs) + (np.nanmean(simp) - np.nanmean(simh))  # Eq. 1
         if kind in MULTIPLICATIVE:
             adj_scaling_factor = get_adjusted_scaling_factor(
                 ensure_devidable(
-                    np.nanmean(simp), np.nanmean(simh), cls.MAX_SCALING_FACTOR
+                    np.nanmean(simp), np.nanmean(simh), self.MAX_SCALING_FACTOR
                 ),
-                kwargs.get("max_scaling_factor", cls.MAX_SCALING_FACTOR),
+                kwargs.get("max_scaling_factor", self.MAX_SCALING_FACTOR),
             )
             return np.array(obs) * adj_scaling_factor  # Eq. 2
         raise NotImplementedError(
@@ -359,17 +399,18 @@ class CMethods2:
         )
 
     # ? -----========= Q U A N T I L E - M A P P I N G =========------
-    @classmethod
-    def quantile_mapping(
-        cls,
-        obs,
-        simh,
-        simp,
+    def __quantile_mapping(
+        self,
+        obs: NPData,
+        simh: NPData,
+        simp: NPData,
         n_quantiles: int,
         kind: str = "+",
         **kwargs: Any,
-    ) -> np.ndarray:
+    ) -> NPData:
         r"""
+        **Do not call this function directly, please use :func:`cmethods.CMethhods.adjust`**
+
         The Quantile Mapping bias correction technique can be used to minimize distributional
         biases between modeled and observed time-series climate data. Its interval-independent
         behavior ensures that the whole time series is taken into account to redistribute
@@ -429,12 +470,12 @@ class CMethods2:
 
         :param obs: The reference data set of the control period
             (in most cases the observational data)
-        :type obs: xr.core.dataarray.DataArray
+        :type obs: list | np.ndarray | np.generic
         :param simh: The modeled data of the control period
-        :type simh: xr.core.dataarray.DataArray
+        :type simh: list | np.ndarray | np.generic
         :param simp: The modeled data of the scenario period (this is the data set
             on which the bias correction takes action)
-        :type simp: xr.core.dataarray.DataArray
+        :type simp: list | np.ndarray | np.generic
         :param n_quantiles: Number of quantiles to respect/use
         :type n_quantiles: int
         :param kind: The kind of the correction, additive for non-stochastic and multiplicative
@@ -445,8 +486,8 @@ class CMethods2:
         :param val_max: Upper boundary for interpolation (only if ``kind="*"``, default: ``None``)
         :type val_max: float, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
-        :return: The bias-corrected time series
-        :rtype: np.ndarray
+        :return: The bias-corrected data set
+        :rtype: list | np.ndarray | np.generic
 
         .. code-block:: python
             :linenos:
@@ -469,7 +510,7 @@ class CMethods2:
             ...     n_quantiles=250
             ... )
         """
-        check_types(obs=obs, simh=simh, simp=simp)
+        check_np_types(obs=obs, simh=simh, simp=simp)
         if not isinstance(n_quantiles, int):
             raise TypeError("'n_quantiles' must be type int")
 
@@ -508,13 +549,13 @@ class CMethods2:
     # @classmethod
     # def detrended_quantile_mapping(
     #     cls,
-    #     obs,
-    #     simh,
-    #     simp,
+    #     obs:XRData,
+    #     simh:XRData,
+    #     simp:XRData,
     #     n_quantiles: int,
     #     kind: str = "+",
     #     **kwargs: Any,
-    # ) -> np.ndarray:
+    # ) -> XRData:
     #     r"""
     #     The Detrended Quantile Mapping bias correction technique can be used to minimize distributional
     #     biases between modeled and observed time-series climate data like the regular Quantile Mapping.
@@ -549,12 +590,12 @@ class CMethods2:
 
     #     :param obs: The reference data set of the control period
     #         (in most cases the observational data)
-    #     :type obs: xr.core.dataarray.DataArray
+    #     :type obs: xr.core.dataarray.DataArray | xr.core.dataarray.Dataset
     #     :param simh: The modeled data of the control period
-    #     :type simh: xr.core.dataarray.DataArray
+    #     :type simh: xr.core.dataarray.DataArray | xr.core.dataarray.Dataset
     #     :param simp: The modeled data of the scenario period (this is the data set
     #         on which the bias correction takes action)
-    #     :type simp: xr.core.dataarray.DataArray
+    #     :type simp: xr.core.dataarray.DataArray | xr.core.dataarray.Dataset
     #     :param n_quantiles: Number of quantiles to respect/use
     #     :type n_quantiles: int
     #     :param kind: The kind of the correction, additive for non-stochastic and multiplicative
@@ -565,8 +606,8 @@ class CMethods2:
     #     :param val_max: Upper boundary for interpolation (only if ``kind="*"``, default: ``None``)
     #     :type val_max: float, optional
     #     :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
-    #     :return: The bias-corrected time series
-    #     :rtype: np.ndarray
+    #     :return: The bias-corrected data set
+    #     :rtype: xr.core.dataarray.DataArray | xr.core.dataarray.Dataset
 
     #     .. code-block:: python
     #         :linenos:
@@ -660,34 +701,33 @@ class CMethods2:
     #     return res
 
     # ? -----========= E M P I R I C A L - Q U A N T I L E - M A P P I N G =========------
-    @classmethod
-    def empirical_quantile_mapping(
-        cls,
-        obs,
-        simh,
-        simp,
+    def __empirical_quantile_mapping(
+        self,
+        obs: NPData,
+        simh: NPData,
+        simp: NPData,
         n_quantiles: int = 100,
         extrapolate: Optional[str] = None,
         **kwargs: Any,
-    ) -> xr.core.dataarray.DataArray:
+    ) -> NPData:
         """
         Method to adjust 1-dimensional climate data by empirical quantile mapping
 
         :param obs: The reference data set of the control period
             (in most cases the observational data)
-        :type obs: xr.core.dataarray.DataArray
+        :type obs: list | np.ndarray | np.generic
         :param simh: The modeled data of the control period
-        :type simh: xr.core.dataarray.DataArray
+        :type simh: list | np.ndarray | np.generic
         :param simp: The modeled data of the scenario period (this is the data set
             on which the bias correction takes action)
-        :type simp: xr.core.dataarray.DataArray
+        :type simp: list | np.ndarray | np.generic
         :param n_quantiles: Number of quantiles to respect/use, defaults to ``100``
         :type n_quantiles: int, optional
         :type kind: str, optional
         :param extrapolate: Bounded range or extrapolate, defaults to ``None``
         :type extrapolate: str | None
-        :return: The bias-corrected time series
-        :rtype: xr.core.dataarray.DataArray
+        :return: The bias-corrected data set
+        :rtype: list | np.ndarray | np.generic
         :raises NotImplementedError: This method is not implemented
         """
         raise NotImplementedError(
@@ -695,17 +735,19 @@ class CMethods2:
         )
 
     # ? -----========= Q U A N T I L E - D E L T A - M A P P I N G =========------
-    @classmethod
-    def quantile_delta_mapping(
-        cls,
-        obs,
-        simh,
-        simp,
+
+    def __quantile_delta_mapping(
+        self,
+        obs: NPData,
+        simh: NPData,
+        simp: NPData,
         n_quantiles: int,
         kind: str = "+",
         **kwargs: Any,
-    ) -> np.ndarray:
+    ) -> NPData:
         r"""
+        **Do not call this function directly, please use :func:`cmethods.CMethhods.adjust`**
+
         The Quantile Delta Mapping bias correction technique can be used to minimize distributional
         biases between modeled and observed time-series climate data. Its interval-independent
         behavior ensures that the whole time series is taken into account to redistribute
@@ -777,12 +819,12 @@ class CMethods2:
 
         :param obs: The reference data set of the control period
             (in most cases the observational data)
-        :type obs: xr.core.dataarray.DataArray
+        :type obs: list | np.ndarray | np.generic
         :param simh: The modeled data of the control period
-        :type simh: xr.core.dataarray.DataArray
+        :type simh: list | np.ndarray | np.generic
         :param simp: The modeled data of the scenario period (this is the data set
             on which the bias correction takes action)
-        :type simp: xr.core.dataarray.DataArray
+        :type simp: list | np.ndarray | np.generic
         :param n_quantiles: Number of quantiles to respect/use
         :type n_quantiles: int
         :param kind: The kind of the correction, additive for non-stochastic and multiplicative
@@ -790,7 +832,7 @@ class CMethods2:
         :type kind: str, optional
         :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
         :return: The bias-corrected time series
-        :rtype: np.ndarray
+        :rtype: list | np.ndarray | np.generic
 
         .. code-block:: python
             :linenos:
@@ -813,7 +855,7 @@ class CMethods2:
             ...     n_quantiles=250
             ... )
         """
-        check_types(obs=obs, simh=simh, simp=simp)
+        check_np_types(obs=obs, simh=simh, simp=simp)
 
         if not isinstance(n_quantiles, int):
             raise TypeError("'n_quantiles' must be type int")
@@ -837,7 +879,7 @@ class CMethods2:
             cdf_simh = get_cdf(simh, xbins)
             cdf_simp = get_cdf(simp, xbins)
 
-            # calculate exact cdf values of $F_{sim,p}[T_{sim,p}(t)]$
+            # calculate exact CDF values of $F_{sim,p}[T_{sim,p}(t)]$
             epsilon = np.interp(simp, xbins, cdf_simp)  # Eq. 1.1
             QDM1 = get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 1.2
             delta = simp - get_inverse_of_cdf(cdf_simh, epsilon, xbins)  # Eq. 1.3
@@ -863,22 +905,40 @@ class CMethods2:
             delta = ensure_devidable(  # Eq. 2.3
                 simp,
                 get_inverse_of_cdf(cdf_simh, epsilon, xbins),
-                max_scaling_factor=cls.MAX_SCALING_FACTOR,
+                max_scaling_factor=self.MAX_SCALING_FACTOR,
             )
             return QDM1 * delta  # Eq. 2.4
         raise NotImplementedError(
             f"{kind} not available for quantile_delta_mapping. Use '+' or '*' instead."
         )
 
-    @classmethod
-    def adjust(cls, method, obs, simh, simp, **kwargs):
+    def adjust(
+        self, method: str, obs: XRData, simh: XRData, simp: XRData, **kwargs
+    ) -> XRData:
+        """
+        Function to apply bias corrections on time series climage data. Please
+        use this to execute any available bias correction technique.
+
+        :param method: Technique to apply
+        :type method: str
+        :param obs: The reference/observational data set
+        :type obs: XRData
+        :param simh: The modeled data of the control period
+        :type simh: XRData
+        :param simp: The modeled data of the period to adjust
+        :type simp: XRData
+        :return: The bias corrected/adjusted data set
+        :rtype: XRData
+        """
+        check_xr_types(obs=obs, simh=simh, simp=simp)
+
         if kwargs.get("group", None) is not None:
             group = kwargs["group"]
             del kwargs["group"]
 
-            obs_g = list(obs.groupby(group))
-            simh_g = list(simh.groupby(group))
-            simp_g = list(simp.groupby(group))
+            obs_g: List[Tuple[int, XRData]] = list(obs.groupby(group))
+            simh_g: List[Tuple[int, XRData]] = list(simh.groupby(group))
+            simp_g: List[Tuple[int, XRData]] = list(simp.groupby(group))
 
             result = None
             for index in range(len(list(obs_g))):
@@ -886,18 +946,18 @@ class CMethods2:
                 simh_gds = simh_g[index][1]
                 simp_gds = simp_g[index][1]
 
-                monthly_result = cls.apply_ufunc(
+                monthly_result = self.__apply_ufunc(
                     method, obs_gds, simh_gds, simp_gds, **kwargs
                 )
                 if result is None:
                     result = monthly_result
                 else:
                     result = xr.concat([result, monthly_result], dim="time")
-            return result
-        return cls.apply_ufunc(method, obs, simh, simp, **kwargs)
 
-    @classmethod
-    def get_function(cls, method):
+            return result
+        return self.__apply_ufunc(method, obs, simh, simp, **kwargs)
+
+    def get_function(self, method: str) -> Callable:
         """
         Returns the bias correction function corresponding to the ``method`` name.
 
@@ -908,25 +968,28 @@ class CMethods2:
         :rtype: function
         """
         if method == "linear_scaling":
-            return cls.linear_scaling
+            return self.__linear_scaling
         if method == "variance_scaling":
-            return cls.variance_scaling
+            return self.__variance_scaling
         if method == "delta_method":
-            return cls.delta_method
+            return self.__delta_method
         if method == "quantile_mapping":
-            return cls.quantile_mapping
-        if method == "detrended_quantile_mapping":
-            return cls.detrended_quantile_mapping
+            return self.__quantile_mapping
+        # if method == "detrended_quantile_mapping":
+        #     return self.__detrended_quantile_mapping
         if method == "empirical_quantile_mapping":
-            return cls.empirical_quantile_mapping
+            return self.__empirical_quantile_mapping
         if method == "quantile_delta_mapping":
-            return cls.quantile_delta_mapping
+            return self.__quantile_delta_mapping
         raise UnknownMethodError(method, METHODS)
 
-    @classmethod
-    def apply_ufunc(cls, method, obs, simh, simp, **kwargs):
-        result = xr.apply_ufunc(
-            cls.get_function(method),
+    def __apply_ufunc(
+        self, method: str, obs: XRData, simh: XRData, simp: XRData, **kwargs: dict
+    ) -> XRData:
+        check_xr_types(obs=obs, simh=simh, simp=simp)
+
+        result: XRData = xr.apply_ufunc(
+            self.get_function(method),
             obs,
             simh,
             # Need to spoof a fake time axis since 'time' coord on full dataset is different

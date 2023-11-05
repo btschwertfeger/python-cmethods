@@ -4,6 +4,7 @@
 # GitHub: https://github.com/btschwertfeger
 #
 
+"""Module providing static information for the python-cmethods package"""
 
 from typing import List
 

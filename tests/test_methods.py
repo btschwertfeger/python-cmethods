@@ -120,7 +120,7 @@ class TestMethods(unittest.TestCase):
         """Tests the linear scaling method"""
 
         for kind in ("+", "*"):
-            ls_result = cm.linear_scaling(
+            ls_result = cm.__linear_scaling(
                 obs=self.data[kind]["obsh"][:, 0, 0],
                 simh=self.data[kind]["simh"][:, 0, 0],
                 simp=self.data[kind]["simp"][:, 0, 0],
@@ -138,7 +138,7 @@ class TestMethods(unittest.TestCase):
     def test_variance_scaling(self) -> None:
         """Tests the variance scaling method"""
         kind = "+"
-        vs_result = cm.variance_scaling(
+        vs_result = cm.__variance_scaling(
             obs=self.data[kind]["obsh"][:, 0, 0],
             simh=self.data[kind]["simh"][:, 0, 0],
             simp=self.data[kind]["simp"][:, 0, 0],
@@ -157,7 +157,7 @@ class TestMethods(unittest.TestCase):
         """Tests the delta method"""
 
         for kind in ("+", "*"):
-            dm_result = cm.delta_method(
+            dm_result = cm.__delta_method(
                 obs=self.data[kind]["obsh"][:, 0, 0],
                 simh=self.data[kind]["simh"][:, 0, 0],
                 simp=self.data[kind]["simp"][:, 0, 0],
@@ -176,7 +176,7 @@ class TestMethods(unittest.TestCase):
         """Tests the quantile mapping method"""
 
         for kind in ("+", "*"):
-            qm_result = cm.quantile_mapping(
+            qm_result = cm.__quantile_mapping(
                 obs=self.data[kind]["obsh"][:, 0, 0],
                 simh=self.data[kind]["simh"][:, 0, 0],
                 simp=self.data[kind]["simp"][:, 0, 0],
@@ -217,7 +217,7 @@ class TestMethods(unittest.TestCase):
         """Tests the quantile delta mapping method"""
 
         for kind in ("+", "*"):
-            qdm_result = cm.quantile_delta_mapping(
+            qdm_result = cm.__quantile_delta_mapping(
                 obs=self.data[kind]["obsh"][:, 0, 0],
                 simh=self.data[kind]["simh"][:, 0, 0],
                 simp=self.data[kind]["simp"][:, 0, 0],
@@ -358,7 +358,7 @@ class TestMethods(unittest.TestCase):
     def test_invalid_adjustment_type(self) -> None:
         kind = "+"
         with pytest.raises(NotImplementedError):
-            cm.linear_scaling(
+            cm.__linear_scaling(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],
@@ -366,7 +366,7 @@ class TestMethods(unittest.TestCase):
             )
 
         with pytest.raises(NotImplementedError):
-            cm.variance_scaling(
+            cm.__variance_scaling(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],
@@ -374,7 +374,7 @@ class TestMethods(unittest.TestCase):
             )
 
         with pytest.raises(NotImplementedError):
-            cm.delta_method(
+            cm.__delta_method(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],
@@ -382,7 +382,7 @@ class TestMethods(unittest.TestCase):
             )
 
         with pytest.raises(NotImplementedError):
-            cm.quantile_mapping(
+            cm.__quantile_mapping(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],
@@ -399,7 +399,7 @@ class TestMethods(unittest.TestCase):
             )
 
         with pytest.raises(NotImplementedError):
-            cm.quantile_delta_mapping(
+            cm.__quantile_delta_mapping(
                 self.data[kind]["obsh"],
                 self.data[kind]["simh"],
                 self.data[kind]["simp"],

@@ -11,7 +11,8 @@ from __future__ import annotations
 from typing import Union
 
 import numpy as np
-import xarray as xr
+
+from cmethods.types import NPData, XRData
 
 
 class UnknownMethodError(Exception):
@@ -25,22 +26,37 @@ class UnknownMethodError(Exception):
         )
 
 
-def check_types(
-    obs: Union[list, np.ndarray, np.generic, xr.core.dataarray.DataArray],
-    simh: Union[list, np.ndarray, np.generic, xr.core.dataarray.DataArray],
-    simp: Union[list, np.ndarray, np.generic, xr.core.dataarray.DataArray],
+def check_xr_types(obs: XRData, simh: XRData, simp: XRData) -> None:
+    """
+    Checks if the parameters are in the correct type. **only used internally**
+    """
+    phrase: str = (
+        "must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray"
+    )
+
+    if not isinstance(obs, XRData):
+        raise TypeError(f"'obs' {phrase}")
+    if not isinstance(simh, XRData):
+        raise TypeError(f"'simh' {phrase}")
+    if not isinstance(simp, XRData):
+        raise TypeError(f"'simp' {phrase}")
+
+
+def check_np_types(
+    obs: NPData,
+    simh: NPData,
+    simp: NPData,
 ) -> None:
     """
     Checks if the parameters are in the correct type. **only used internally**
     """
-    phrase: str = "must be type list, np.ndarray or xarray.core.dataarray.DataArray"
-    valid_types: tuple = (list, np.ndarray, np.generic, xr.core.dataarray.DataArray)
+    phrase: str = "must be type list, np.ndarray or np.generic"
 
-    if not isinstance(obs, valid_types):
+    if not isinstance(obs, NPData):
         raise TypeError(f"'obs' {phrase}")
-    if not isinstance(simh, valid_types):
+    if not isinstance(simh, NPData):
         raise TypeError(f"'simh' {phrase}")
-    if not isinstance(simp, valid_types):
+    if not isinstance(simp, NPData):
         raise TypeError(f"'simp' {phrase}")
 
 
