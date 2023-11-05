@@ -12,7 +12,7 @@ from typing import Union
 
 import numpy as np
 
-from cmethods.types import NPData, XRData
+from cmethods.types import NPData, NPData_t, XRData, XRData_t
 
 
 class UnknownMethodError(Exception):
@@ -34,11 +34,11 @@ def check_xr_types(obs: XRData, simh: XRData, simp: XRData) -> None:
         "must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray"
     )
 
-    if not isinstance(obs, XRData.__constraints__):  # pylint: disable=no-member
+    if not isinstance(obs, XRData_t):
         raise TypeError(f"'obs' {phrase}")
-    if not isinstance(simh, XRData.__constraints__):  # pylint: disable=no-member
+    if not isinstance(simh, XRData_t):
         raise TypeError(f"'simh' {phrase}")
-    if not isinstance(simp, XRData.__constraints__):  # pylint: disable=no-member
+    if not isinstance(simp, XRData_t):
         raise TypeError(f"'simp' {phrase}")
 
 
@@ -52,11 +52,11 @@ def check_np_types(
     """
     phrase: str = "must be type list, np.ndarray or np.generic"
 
-    if not isinstance(obs, NPData.__constraints__):  # pylint: disable=no-member
+    if not isinstance(obs, NPData_t):
         raise TypeError(f"'obs' {phrase}")
-    if not isinstance(simh, NPData.__constraints__):  # pylint: disable=no-member
+    if not isinstance(simh, NPData_t):
         raise TypeError(f"'simh' {phrase}")
-    if not isinstance(simp, NPData.__constraints__):  # pylint: disable=no-member
+    if not isinstance(simp, NPData_t):
         raise TypeError(f"'simp' {phrase}")
 
 
@@ -95,10 +95,10 @@ def ensure_devidable(
 
     if isinstance(numerator, np.ndarray):
         mask_inf = np.isinf(result)
-        result[mask_inf] = numerator[mask_inf] * max_scaling_factor
+        result[mask_inf] = numerator[mask_inf] * max_scaling_factor  # type: ignore[index]
 
         mask_nan = np.isnan(result)
-        result[mask_nan] = 0
+        result[mask_nan] = 0  # type: ignore[index]
     elif np.isinf(result):
         result = numerator * max_scaling_factor
     elif np.isnan(result):

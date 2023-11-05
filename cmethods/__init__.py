@@ -23,7 +23,7 @@ r"""
 
 from __future__ import annotations
 
-from typing import Any, Callable, List, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 import numpy as np
 import xarray as xr
@@ -932,19 +932,22 @@ class CMethods:
         """
         check_xr_types(obs=obs, simh=simh, simp=simp)
 
+        if "group" in kwargs and "n_quantiles" in kwargs:
+            raise ValueError("Cannot use group and quantiles at the same time")
+
         if kwargs.get("group", None) is not None:
-            group = kwargs["group"]
+            group: str = kwargs["group"]
             del kwargs["group"]
 
             obs_g: List[Tuple[int, XRData]] = list(obs.groupby(group))
             simh_g: List[Tuple[int, XRData]] = list(simh.groupby(group))
             simp_g: List[Tuple[int, XRData]] = list(simp.groupby(group))
 
-            result = None
+            result: Optional[XRData] = None
             for index in range(len(list(obs_g))):
-                obs_gds = obs_g[index][1]
-                simh_gds = simh_g[index][1]
-                simp_gds = simp_g[index][1]
+                obs_gds: XRData = obs_g[index][1]
+                simh_gds: XRData = simh_g[index][1]
+                simp_gds: XRData = simp_g[index][1]
 
                 monthly_result = self.__apply_ufunc(
                     method, obs_gds, simh_gds, simp_gds, **kwargs
@@ -952,7 +955,7 @@ class CMethods:
                 if result is None:
                     result = monthly_result
                 else:
-                    result = xr.concat([result, monthly_result], dim="time")
+                    result = xr.merge([result, monthly_result])
 
             return result
         return self.__apply_ufunc(method, obs, simh, simp, **kwargs)

@@ -13,5 +13,7 @@ from typing import TypeVar
 from numpy import generic, ndarray
 from xarray.core.dataarray import DataArray, Dataset
 
+XRData_t = (Dataset, DataArray)
+NPData_t = (list, ndarray, generic)
 XRData = TypeVar("XRData", Dataset, DataArray)
 NPData = TypeVar("NPData", list, ndarray, generic)

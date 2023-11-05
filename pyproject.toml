@@ -89,7 +89,9 @@ dev = [
   # linting
   "pylint",
   "flake8",
+  # typing
   "mypy",
+  "numpy-stubs",
 ]
 examples = ["matplotlib"]
 
