@@ -199,27 +199,27 @@ class TestMethods(unittest.TestCase):
                 squared=False,
             )
 
-    # def test_detrended_quantile_mapping(self) -> None: # FIXME
-    #     """Tests the detrendeed quantile mapping method"""
+    def test_detrended_quantile_mapping(self) -> None:
+        """Tests the detrended quantile mapping method"""
 
-    #     for kind in ("+", "*"):
-    #         dqm_result = self.cm.adjust(
-    #             method="detrended_quantile_mapping",
-    #             obs=self.data[kind]["obsh"][:, 0, 0],
-    #             simh=self.data[kind]["simh"][:, 0, 0],
-    #             simp=self.data[kind]["simp"][:, 0, 0],
-    #             n_quantiles=100,
-    #             kind=kind,
-    #             detrended=True,
-    #         )
-    #         assert isinstance(dqm_result, XRData_t)
-    #         assert mean_squared_error(
-    #             dqm_result, self.data[kind]["obsp"][:, 0, 0], squared=False
-    #         ) < mean_squared_error(
-    #             self.data[kind]["simp"][:, 0, 0],
-    #             self.data[kind]["obsp"][:, 0, 0],
-    #             squared=False,
-    #         )
+        for kind in ("+", "*"):
+            dqm_result = self.cm.adjust(
+                method="detrended_quantile_mapping",
+                obs=self.data[kind]["obsh"][:, 0, 0],
+                simh=self.data[kind]["simh"][:, 0, 0],
+                simp=self.data[kind]["simp"][:, 0, 0],
+                n_quantiles=100,
+                kind=kind,
+                group="time.month",
+            )
+            assert isinstance(dqm_result, XRData_t)
+            assert mean_squared_error(
+                dqm_result[kind], self.data[kind]["obsp"][:, 0, 0], squared=False
+            ) < mean_squared_error(
+                self.data[kind]["simp"][:, 0, 0],
+                self.data[kind]["obsp"][:, 0, 0],
+                squared=False,
+            )
 
     def test_quantile_delta_mapping(self) -> None:
         """Tests the quantile delta mapping method"""
@@ -282,12 +282,18 @@ class TestMethods(unittest.TestCase):
 
         for kind in ("+", "*"):
             for method in DISTRIBUTION_METHODS:
+                kwargs: dict = {}
+                if method == "detrended_quantile_mapping":
+                    kwargs = {"group": "time.month"}
+
                 result = self.cm.adjust(
                     method=method,
                     obs=self.data[kind]["obsh"],
                     simh=self.data[kind]["simh"],
                     simp=self.data[kind]["simp"],
                     n_quantiles=25,
+                    kind=kind,
+                    **kwargs,
                 )
                 assert isinstance(result, XRData_t)
                 for lat in range(len(self.data[kind]["obsh"].lat)):
@@ -390,14 +396,17 @@ class TestMethods(unittest.TestCase):
                 n_quantiles=10,
             )
 
-        # with pytest.raises(NotImplementedError): # FIXME
-        #     self.cm._CMethodsdetrended_quantile_mapping(  # type: ignore[attr-defined]
-        #         obs,
-        #         simh,
-        #         simp,
-        #         kind="/",
-        #         n_quantiles=10,
-        #     )
+        with pytest.raises(NotImplementedError):
+            self.cm._CMethods__detrended_quantile_mapping(  # type: ignore[attr-defined]
+                obs,
+                simh,
+                simp,
+                kind="/",
+                n_quantiles=10,
+                xbins=[1, 2, 3, 4],
+                cdf_simh=[1, 2, 3],
+                cdf_obs=[1, 2, 3],
+            )
 
         with pytest.raises(NotImplementedError):
             self.cm._CMethods__quantile_delta_mapping(  # type: ignore[attr-defined]

@@ -87,7 +87,7 @@ def test_get_available_methods() -> None:
         "variance_scaling",
         "delta_method",
         "quantile_mapping",
-        # "detrended_quantile_mapping", # FIXME
+        "detrended_quantile_mapping",
         "quantile_delta_mapping",
     ]
 
@@ -172,24 +172,6 @@ def test_quantile_mapping_type_check_n_quantiles_failing() -> None:
         )
 
 
-def test_detrended_quantile_mapping_type_check_n_quantiles_failing() -> None:
-    """n_quantiles must by type int"""
-    with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
-        cm._CMethods__detrended_quantile_mapping(  # type: ignore[attr-defined]
-            obs=[], simh=[], simp=[], n_quantiles="100"
-        )
-
-
-# def test_detrended_quantile_mapping_type_check_simp_failing() -> None:
-#     """simp must be type xarray.core.dataarray.DataArray"""
-#     with pytest.raises(
-#         TypeError, match="'simp' must be type xarray.core.dataarray.DataArray"
-#     ):
-#         cm._CMethods__detrended_quantile_mapping(  # type: ignore[attr-defined]
-#             obs=[], simh=[], simp=[], n_quantiles=100
-#         )
-
-
 def test_quantile_delta_mapping_type_check_n_quantiles_failing() -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
@@ -199,7 +181,7 @@ def test_quantile_delta_mapping_type_check_n_quantiles_failing() -> None:
 
 
 @pytest.mark.wip()
-def test_adjust_3d_type_checking_failing() -> None:
+def test_adjust_type_checking_failing() -> None:
     """
     Checks for all types that are expected to be passed to the adjust_3d method
     """
@@ -217,50 +199,28 @@ def test_adjust_3d_type_checking_failing() -> None:
             obs=[],
             simh=data,
             simp=data,
-            n_quantiles=100,
             group="time.month",
         )
     with pytest.raises(
-        TypeError, match="'simh' must be type xarray.core.dataarray.DataArray"
+        TypeError,
+        match="'simh' must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray",
     ):
         cm.adjust(
             method="linear_scaling",
             obs=data,
             simh=[],
             simp=data,
-            n_quantiles=100,
             group="time.month",
         )
 
     with pytest.raises(
-        TypeError, match="'simp' must be type xarray.core.dataarray.DataArray"
+        TypeError,
+        match="'simp' must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray",
     ):
         cm.adjust(
             method="linear_scaling",
             obs=data,
             simh=data,
             simp=[],
-            n_quantiles=100,
             group="time.month",
-        )
-
-    with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
-        cm.adjust(
-            method="linear_scaling",
-            obs=data,
-            simh=data,
-            simp=data,
-            n_quantiles="100",
-            group="time.month",
-        )
-
-    with pytest.raises(TypeError, match="'n_jobs' must be type int"):
-        cm.adjust(
-            method="linear_scaling",
-            obs=data,
-            simh=data,
-            simp=data,
-            n_quantiles=100,
-            group="time.month",
-            n_jobs="1",
         )

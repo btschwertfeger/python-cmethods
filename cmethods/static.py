@@ -11,7 +11,7 @@ from typing import List
 SCALING_METHODS: List[str] = ["linear_scaling", "variance_scaling", "delta_method"]
 DISTRIBUTION_METHODS: List[str] = [
     "quantile_mapping",
-    # "detrended_quantile_mapping", # FIXME
+    "detrended_quantile_mapping",
     "quantile_delta_mapping",
 ]
 

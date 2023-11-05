@@ -35,7 +35,13 @@ __link__ = "https://github.com/btschwertfeger"
 __github__ = "https://github.com/btschwertfeger/python-cmethods"
 
 
-from cmethods.static import ADDITIVE, METHODS, MULTIPLICATIVE
+from cmethods.static import (
+    ADDITIVE,
+    DISTRIBUTION_METHODS,
+    METHODS,
+    MULTIPLICATIVE,
+    SCALING_METHODS,
+)
 from cmethods.types import NPData, XRData
 from cmethods.utils import (
     UnknownMethodError,
@@ -84,7 +90,7 @@ class CMethods:
 
     # ? -----========= L I N E A R - S C A L I N G =========------
     def __linear_scaling(
-        self,
+        self: CMethods,
         obs: NPData,
         simh: NPData,
         simp: NPData,
@@ -92,7 +98,7 @@ class CMethods:
         **kwargs: Any,
     ) -> NPData:
         r"""
-        **Do not call this function directly, please use :func:`cmethods.CMethhods.adjust`**
+        **Do not call this function directly, please use :func:`cmethods.CMethods.adjust`**
 
         The Linear Scaling bias correction technique can be applied on stochastic and
         non-stochastic climate variables to minimize deviations in the mean values
@@ -186,7 +192,7 @@ class CMethods:
     # ? -----========= V A R I A N C E - S C A L I N G =========------
 
     def __variance_scaling(
-        self,
+        self: CMethods,
         obs: NPData,
         simh: NPData,
         simp: NPData,
@@ -194,7 +200,7 @@ class CMethods:
         **kwargs: Any,
     ) -> NPData:
         r"""
-        **Do not call this function directly, please use :func:`cmethods.CMethhods.adjust`**
+        **Do not call this function directly, please use :func:`cmethods.CMethods.adjust`**
 
         The Variance Scaling bias correction technique can be applied only on non-stochastic
         climate variables to minimize deviations in the mean and variance
@@ -299,7 +305,7 @@ class CMethods:
 
     # ? -----========= D E L T A - M E T H O D =========------
     def __delta_method(
-        self,
+        self: CMethods,
         obs: NPData,
         simh: NPData,
         simp: NPData,
@@ -307,7 +313,7 @@ class CMethods:
         **kwargs: Any,
     ) -> NPData:
         r"""
-        **Do not call this function directly, please use :func:`cmethods.CMethhods.adjust`**
+        **Do not call this function directly, please use :func:`cmethods.CMethods.adjust`**
 
         The Delta Method bias correction technique can be applied on stochastic and
         non-stochastic climate variables to minimize deviations in the mean values
@@ -400,7 +406,7 @@ class CMethods:
 
     # ? -----========= Q U A N T I L E - M A P P I N G =========------
     def __quantile_mapping(
-        self,
+        self: CMethods,
         obs: NPData,
         simh: NPData,
         simp: NPData,
@@ -409,26 +415,30 @@ class CMethods:
         **kwargs: Any,
     ) -> NPData:
         r"""
-        **Do not call this function directly, please use :func:`cmethods.CMethhods.adjust`**
+        **Do not call this function directly, please use :func:`cmethods.CMethods.adjust`**
 
-        The Quantile Mapping bias correction technique can be used to minimize distributional
-        biases between modeled and observed time-series climate data. Its interval-independent
-        behavior ensures that the whole time series is taken into account to redistribute
-        its values, based on the distributions of the modeled and observed/reference data of the
-        control period.
+        The Quantile Mapping bias correction technique can be used to minimize
+        distributional biases between modeled and observed time-series climate
+        data. Its interval-independent behavior ensures that the whole time
+        series is taken into account to redistribute its values, based on the
+        distributions of the modeled and observed/reference data of the control
+        period.
 
-        This method must be applied on a 1-dimensional data set i.e., there is only one
-        time-series passed for each of ``obs``, ``simh``, and ``simp``.
+        This method must be applied on a 1-dimensional data set i.e., there is
+        only one time-series passed for each of ``obs``, ``simh``, and ``simp``.
 
-        The Quantile Mapping technique implemented here is based on the equations of
-        Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock (2015) *"Bias Correction of GCM
-        Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles
-        and Extremes?"* (https://doi.org/10.1175/JCLI-D-14-00754.1).
+        The Quantile Mapping technique implemented here is based on the
+        equations of Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock
+        (2015) *"Bias Correction of GCM Precipitation by Quantile Mapping: How
+        Well Do Methods Preserve Changes in Quantiles and Extremes?"*
+        (https://doi.org/10.1175/JCLI-D-14-00754.1).
 
-        The regular Quantile Mapping is bounded to the value range of the modeled data
-        of the control period. To avoid this, the Detrended Quantile Mapping can be used.
+        The regular Quantile Mapping is bounded to the value range of the
+        modeled data of the control period. To avoid this, the Detrended
+        Quantile Mapping can be used.
 
-        In the following the equations of Alex J. Cannon (2015) are shown and explained:
+        In the following the equations of Alex J. Cannon (2015) are shown and
+        explained:
 
         **Additive**:
 
@@ -546,163 +556,161 @@ class CMethods:
             f"{kind} for quantile_mapping is not available. Use '+' or '*' instead."
         )
 
-    # @classmethod
-    # def detrended_quantile_mapping(
-    #     cls,
-    #     obs:XRData,
-    #     simh:XRData,
-    #     simp:XRData,
-    #     n_quantiles: int,
-    #     kind: str = "+",
-    #     **kwargs: Any,
-    # ) -> XRData:
-    #     r"""
-    #     The Detrended Quantile Mapping bias correction technique can be used to minimize distributional
-    #     biases between modeled and observed time-series climate data like the regular Quantile Mapping.
-    #     Detrending means, that the values of :math:`X_{sim,p}` are shifted to the value range of
-    #     :math:`X_{sim,h}` before the regular Quantile Mapping is applied.
-    #     After the Quantile Mapping was applied, the mean is shifted back. Since it does not make sens
-    #     to take the whole mean to rescale the data, the month-dependent long-term mean is used.
+    def __detrended_quantile_mapping(
+        self: CMethods,
+        obs: XRData,
+        simh: XRData,
+        simp: XRData,
+        xbins,
+        cdf_simh,
+        cdf_obs,
+        kind: str = "+",
+        **kwargs: Any,
+    ) -> XRData:
+        r"""
+        **Do not call this function directly, please use :func:`cmethods.CMethods.adjust`**
 
-    #     This method must be applied on a 1-dimensional data set i.e., there is only one
-    #     time-series passed for each of ``obs``, ``simh``, and ``simp``. Also this method requires
-    #     that the time series are groupable by ``time.month``.
+        The Detrended Quantile Mapping bias correction technique can be used to
+        minimize distributional biases between modeled and observed time-series
+        climate data like the regular Quantile Mapping. Detrending means, that
+        the values of :math:`X_{sim,p}` are shifted to the value range of
+        :math:`X_{sim,h}` before the regular Quantile Mapping is applied. After
+        the Quantile Mapping was applied, the mean is shifted back. Since it
+        does not make sens to take the whole mean to rescale the data, the
+        month-dependent long-term mean is used.
 
-    #     The Detrended Quantile Mapping technique implemented here is based on the equations of
-    #     Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock (2015) *"Bias Correction of GCM
-    #     Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles
-    #     and Extremes?"* (https://doi.org/10.1175/JCLI-D-14-00754.1).
+        This method must be applied on a 1-dimensional data set i.e., there is
+        only one time-series passed for each of ``obs``, ``simh``, and ``simp``.
+        Also this method requires that the time series are groupable by
+        ``time.month``.
 
-    #     In the following the equations of Alex J. Cannon (2015) are shown (without detrending; see QM
-    #     for explanations):
+        The Detrended Quantile Mapping technique implemented here is based on
+        the equations of Alex J. Cannon and Stephen R. Sobie and Trevor Q.
+        Murdock (2015) *"Bias Correction of GCM Precipitation by Quantile
+        Mapping: How Well Do Methods Preserve Changes in Quantiles and
+        Extremes?"* (https://doi.org/10.1175/JCLI-D-14-00754.1).
 
-    #     **Additive**:
+        In the following the equations of Alex J. Cannon (2015) are shown
+        (without detrending; see QM for explanations):
 
-    #         .. math::
+        **Additive**:
 
-    #             X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h} \left\{F_{sim,h}\left[X_{sim,p}(i)\right]\right\}
+            .. math::
 
-    #     **Multiplicative**:
+                X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h} \left\{F_{sim,h}\left[X_{sim,p}(i)\right]\right\}
 
-    #         .. math::
+        **Multiplicative**:
 
-    #             X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot \mu{X_{sim,p}(i)}}{\mu{X_{sim,p}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}(i)}}{\mu{X_{sim,h}}}
+            .. math::
 
-    #     :param obs: The reference data set of the control period
-    #         (in most cases the observational data)
-    #     :type obs: xr.core.dataarray.DataArray | xr.core.dataarray.Dataset
-    #     :param simh: The modeled data of the control period
-    #     :type simh: xr.core.dataarray.DataArray | xr.core.dataarray.Dataset
-    #     :param simp: The modeled data of the scenario period (this is the data set
-    #         on which the bias correction takes action)
-    #     :type simp: xr.core.dataarray.DataArray | xr.core.dataarray.Dataset
-    #     :param n_quantiles: Number of quantiles to respect/use
-    #     :type n_quantiles: int
-    #     :param kind: The kind of the correction, additive for non-stochastic and multiplicative
-    #         for stochastic climate variables, defaults to ``+``
-    #     :type kind: str, optional
-    #     :param val_min: Lower boundary for interpolation (only if ``kind="*"``, default: ``0.0``)
-    #     :type val_min: float, optional
-    #     :param val_max: Upper boundary for interpolation (only if ``kind="*"``, default: ``None``)
-    #     :type val_max: float, optional
-    #     :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
-    #     :return: The bias-corrected data set
-    #     :rtype: xr.core.dataarray.DataArray | xr.core.dataarray.Dataset
+                X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot \mu{X_{sim,p}(i)}}{\mu{X_{sim,p}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}(i)}}{\mu{X_{sim,h}}}
 
-    #     .. code-block:: python
-    #         :linenos:
-    #         :caption: Example: Quantile Mapping
+        :param obs: The reference data set of the control period
+            (in most cases the observational data)
+        :type obs: xr.core.dataarray.DataArray | xr.core.dataarray.Dataset
+        :param simh: The modeled data of the control period
+        :type simh: xr.core.dataarray.DataArray | xr.core.dataarray.Dataset
+        :param simp: The modeled data of the scenario period (this is the data set
+            on which the bias correction takes action)
+        :type simp: xr.core.dataarray.DataArray | xr.core.dataarray.Dataset
+        :param n_quantiles: Number of quantiles to respect/use
+        :type n_quantiles: int
+        :param kind: The kind of the correction, additive for non-stochastic and multiplicative
+            for stochastic climate variables, defaults to ``+``
+        :type kind: str, optional
+        :param val_min: Lower boundary for interpolation (only if ``kind="*"``, default: ``0.0``)
+        :type val_min: float, optional
+        :param val_max: Upper boundary for interpolation (only if ``kind="*"``, default: ``None``)
+        :type val_max: float, optional
+        :raises NotImplementedError: If the kind is not in (``+``, ``*``, ``add``, ``mult``)
+        :return: The bias-corrected data set
+        :rtype: xr.core.dataarray.DataArray | xr.core.dataarray.Dataset
 
-    #         >>> import xarray as xr
-    #         >>> from cmethods import CMethods as cm
+        .. code-block:: python
+            :linenos:
+            :caption: Example: Quantile Mapping
 
-    #         >>> # Note: The data sets must contain the dimension "time"
-    #         >>> #       for the respective variable.
-    #         >>> obsh = xr.open_dataset("path/to/reference_data-control_period.nc")
-    #         >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
-    #         >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
-    #         >>> variable = "tas" # temperatures
+            >>> import xarray as xr
+            >>> from cmethods import CMethods as cm
 
-    #         >>> qm_adjusted = cm.detrended_quantile_mapping(
-    #         ...     obs=obs[variable],
-    #         ...     simh=simh[variable],
-    #         ...     simp=simp[variable],
-    #         ...     n_quantiles=250
-    #         ... )
-    #     """
-    #     if kind not in MULTIPLICATIVE and kind not in ADDITIVE:
-    #         raise NotImplementedError(
-    #             f"{kind} for detrended_quantile_mapping is not available. Use '+' or '*' instead."
-    #         )
+            >>> # Note: The data sets must contain the dimension "time"
+            >>> #       for the respective variable.
+            >>> obsh = xr.open_dataset("path/to/reference_data-control_period.nc")
+            >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
+            >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
+            >>> variable = "tas" # temperatures
 
-    #     check_types(obs=obs, simh=simh, simp=simp)
-    #     if not isinstance(n_quantiles, int):
-    #         raise TypeError("'n_quantiles' must be type int")
-    #     if not isinstance(simp, xr.core.dataarray.DataArray):
-    #         raise TypeError("'simp' must be type xarray.core.dataarray.DataArray")
+            >>> qm_adjusted = cm.detrended_quantile_mapping(
+            ...     obs=obs[variable],
+            ...     simh=simh[variable],
+            ...     simp=simp[variable],
+            ...     n_quantiles=250
+            ... )
+        """
 
-    #     obs, simh = np.array(obs), np.array(simh)
+        if kind not in MULTIPLICATIVE and kind not in ADDITIVE:
+            raise NotImplementedError(
+                f"{kind} for detrended_quantile_mapping is not available. Use '+' or '*' instead."
+            )
+        check_np_types(obs=obs, simh=simh, simp=simp)
 
-    #     global_max = max(np.nanmax(obs), np.nanmax(simh))
-    #     global_min = min(np.nanmin(obs), np.nanmin(simh))
+        # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
+        m_simh_mean = np.nanmean(simh)
+        m_simp_mean = np.nanmean(simp)
 
-    #     if nan_or_equal(value1=global_max, value2=global_min):
-    #         return np.array(simp.values)
+        if kind in ADDITIVE:  # pylint: disable=no-else-return
+            epsilon = np.interp(
+                simp - m_simp_mean + m_simh_mean, xbins, cdf_simh
+            )  # Eq. 1
+            return (
+                get_inverse_of_cdf(cdf_obs, epsilon, xbins) + m_simp_mean - m_simh_mean
+            )  # Eq. 1
 
-    #     wide = abs(global_max - global_min) / n_quantiles
-    #     xbins = np.arange(global_min, global_max + wide, wide)
+        else:  # kind in MULTIPLICATIVE:
+            epsilon = np.interp(  # Eq. 2
+                ensure_devidable(
+                    (m_simh_mean * simp),
+                    m_simp_mean,
+                    max_scaling_factor=self.MAX_SCALING_FACTOR,
+                ),
+                xbins,
+                cdf_simh,
+                left=kwargs.get("val_min", 0.0),
+                right=kwargs.get("val_max", None),
+            )
+            return np.interp(epsilon, cdf_obs, xbins) * ensure_devidable(
+                m_simp_mean,
+                m_simh_mean,
+                max_scaling_factor=self.MAX_SCALING_FACTOR,
+            )  # Eq. 2
 
-    #     cdf_obs = get_cdf(obs, xbins)
-    #     cdf_simh = get_cdf(simh, xbins)
+    @classmethod
+    def __get_dqm_kwargs(
+        cls, obs: XRData, simh: XRData, simp: XRData, n_quantiles: int
+    ) -> dict | NPData:
+        if not isinstance(n_quantiles, int):
+            raise TypeError("'n_quantiles' must be type int")
+        kwargs: dict = {}
+        kwargs["global_max"] = max(np.nanmax(obs), np.nanmax(simh))
+        kwargs["global_min"] = min(np.nanmin(obs), np.nanmin(simh))
 
-    #     # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
-    #     res = np.zeros(len(simp.values))
-    #     for indices in simp.groupby("time.month").groups.values():
-    #         # detrended by long-term month
-    #         m_simh, m_simp = [], []
-    #         for index in indices:
-    #             m_simh.append(simh[index])
-    #             m_simp.append(simp[index])
+        if nan_or_equal(value1=kwargs["global_max"], value2=kwargs["global_min"]):
+            return simp
 
-    #         m_simh = np.array(m_simh)
-    #         m_simp = np.array(m_simp)
-    #         m_simh_mean = np.nanmean(m_simh)
-    #         m_simp_mean = np.nanmean(m_simp)
+        kwargs["wide"] = abs(kwargs["global_max"] - kwargs["global_min"]) / n_quantiles
+        kwargs["xbins"] = np.arange(
+            kwargs["global_min"],
+            kwargs["global_max"] + kwargs["wide"],
+            kwargs["wide"],
+        )
 
-    #         if kind in ADDITIVE:
-    #             epsilon = np.interp(
-    #                 m_simp - m_simp_mean + m_simh_mean, xbins, cdf_simh
-    #             )  # Eq. 1
-    #             X = (
-    #                 get_inverse_of_cdf(cdf_obs, epsilon, xbins)
-    #                 + m_simp_mean
-    #                 - m_simh_mean
-    #             )  # Eq. 1
-
-    #         else:  # kind in MULTIPLICATIVE:
-    #             epsilon = np.interp(  # Eq. 2
-    #                 ensure_devidable(
-    #                     (m_simh_mean * m_simp),
-    #                     m_simp_mean,
-    #                     max_scaling_factor=cls.MAX_SCALING_FACTOR,
-    #                 ),
-    #                 xbins,
-    #                 cdf_simh,
-    #                 left=kwargs.get("val_min", 0.0),
-    #                 right=kwargs.get("val_max", None),
-    #             )
-    #             X = np.interp(epsilon, cdf_obs, xbins) * ensure_devidable(
-    #                 m_simp_mean,
-    #                 m_simh_mean,
-    #                 max_scaling_factor=cls.MAX_SCALING_FACTOR,
-    #             )  # Eq. 2
-    #         for i, index in enumerate(indices):
-    #             res[index] = X[i]
-    #     return res
+        kwargs["cdf_obs"] = get_cdf(obs, kwargs["xbins"])
+        kwargs["cdf_simh"] = get_cdf(simh, kwargs["xbins"])
+        return kwargs
 
     # ? -----========= E M P I R I C A L - Q U A N T I L E - M A P P I N G =========------
     def __empirical_quantile_mapping(
-        self,
+        self: CMethods,
         obs: NPData,
         simh: NPData,
         simp: NPData,
@@ -737,7 +745,7 @@ class CMethods:
     # ? -----========= Q U A N T I L E - D E L T A - M A P P I N G =========------
 
     def __quantile_delta_mapping(
-        self,
+        self: CMethods,
         obs: NPData,
         simh: NPData,
         simp: NPData,
@@ -746,7 +754,7 @@ class CMethods:
         **kwargs: Any,
     ) -> NPData:
         r"""
-        **Do not call this function directly, please use :func:`cmethods.CMethhods.adjust`**
+        **Do not call this function directly, please use :func:`cmethods.CMethods.adjust`**
 
         The Quantile Delta Mapping bias correction technique can be used to minimize distributional
         biases between modeled and observed time-series climate data. Its interval-independent
@@ -913,7 +921,7 @@ class CMethods:
         )
 
     def adjust(
-        self, method: str, obs: XRData, simh: XRData, simp: XRData, **kwargs
+        self: CMethods, method: str, obs: XRData, simh: XRData, simp: XRData, **kwargs
     ) -> XRData:
         """
         Function to apply bias corrections on time series climage data. Please
@@ -932,10 +940,20 @@ class CMethods:
         """
         check_xr_types(obs=obs, simh=simh, simp=simp)
 
-        if "group" in kwargs and "n_quantiles" in kwargs:
-            raise ValueError("Cannot use group and quantiles at the same time")
-
         if kwargs.get("group", None) is not None:
+            if method == "detrended_quantile_mapping":
+                qdm_kwargs = self.__get_dqm_kwargs(
+                    obs=obs, simh=simh, simp=simp, n_quantiles=kwargs["n_quantiles"]
+                )
+                if not isinstance(qdm_kwargs, dict):
+                    return qdm_kwargs
+
+                kwargs |= qdm_kwargs
+            elif method not in SCALING_METHODS:
+                raise ValueError("Can't use group on distribution based methods")
+            elif "n_quantiles" in kwargs:
+                print("Warning: n_quantiles will be ignored")
+
             group: str = kwargs["group"]
             del kwargs["group"]
 
@@ -960,7 +978,7 @@ class CMethods:
             return result
         return self.__apply_ufunc(method, obs, simh, simp, **kwargs)
 
-    def get_function(self, method: str) -> Callable:
+    def get_function(self: CMethods, method: str) -> Callable:
         """
         Returns the bias correction function corresponding to the ``method`` name.
 
@@ -978,8 +996,8 @@ class CMethods:
             return self.__delta_method
         if method == "quantile_mapping":
             return self.__quantile_mapping
-        # if method == "detrended_quantile_mapping":
-        #     return self.__detrended_quantile_mapping
+        if method == "detrended_quantile_mapping":
+            return self.__detrended_quantile_mapping
         if method == "empirical_quantile_mapping":
             return self.__empirical_quantile_mapping
         if method == "quantile_delta_mapping":
@@ -987,7 +1005,12 @@ class CMethods:
         raise UnknownMethodError(method, METHODS)
 
     def __apply_ufunc(
-        self, method: str, obs: XRData, simh: XRData, simp: XRData, **kwargs: dict
+        self: CMethods,
+        method: str,
+        obs: XRData,
+        simh: XRData,
+        simp: XRData,
+        **kwargs: dict,
     ) -> XRData:
         check_xr_types(obs=obs, simh=simh, simp=simp)
 

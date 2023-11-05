@@ -91,7 +91,6 @@ dev = [
   "flake8",
   # typing
   "mypy",
-  "numpy-stubs",
 ]
 examples = ["matplotlib"]
 
