@@ -3,6 +3,7 @@
 # Copyright (C) 2023 Benjamin Thomas Schwertfeger
 # GitGub: https://github.com/btschwertfeger
 #
+# pylint: disable=no-member
 
 """
 Module to to test utility functions for the CMethods package
@@ -14,7 +15,20 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from cmethods import CMethods as cm
+from cmethods import CMethods
+from cmethods.static import MAX_SCALING_FACTOR
+from cmethods.utils import (
+    check_np_types,
+    check_xr_types,
+    ensure_devidable,
+    get_adjusted_scaling_factor,
+    get_cdf,
+    get_inverse_of_cdf,
+    get_pdf,
+    nan_or_equal,
+)
+
+cm: CMethods = CMethods()
 
 # --------------------------------------------------------------------------
 # test for nan values
@@ -25,7 +39,7 @@ def test_quantile_mapping_single_nan() -> None:
     obs[0] = np.nan
     expected = np.array([0.0, 1.9, 2.9, 3.9, 4.9, 5.9, 6.9, 7.9, 8.9, 9.0])
 
-    res = cm.__quantile_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
+    res = cm._CMethods__quantile_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
     assert np.allclose(res, expected)
 
 
@@ -36,7 +50,7 @@ def test_quantile_mapping_all_nan() -> None:
         list(np.arange(10)),
         list(np.arange(10)),
     )
-    res = cm.__quantile_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
+    res = cm._CMethods__quantile_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
     assert np.allclose(res, simp)
 
 
@@ -45,7 +59,9 @@ def test_quantile_delta_mapping_single_nan() -> None:
     obs[0] = np.nan
     expected = np.array([0.0, 1.9, 2.9, 3.9, 4.9, 5.9, 6.9, 7.9, 8.9, 9.0])
 
-    res = cm.__quantile_delta_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
+    res = cm._CMethods__quantile_delta_mapping(
+        obs=obs, simh=simh, simp=simp, n_quantiles=5
+    )
     assert np.allclose(res, expected)
 
 
@@ -56,7 +72,9 @@ def test_quantile_delta_mapping_all_nan() -> None:
         list(np.arange(10)),
         list(np.arange(10)),
     )
-    res = cm.__quantile_delta_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
+    res = cm._CMethods__quantile_delta_mapping(
+        obs=obs, simh=simh, simp=simp, n_quantiles=5
+    )
     assert np.allclose(res, simp)
 
 
@@ -76,25 +94,29 @@ def test_get_available_methods() -> None:
 
 
 def test_nan_or_equal() -> None:
-    assert cm.nan_or_equal(0, 0)
-    assert cm.nan_or_equal(np.NaN, np.NaN)
-    assert not cm.nan_or_equal(0, 1)
+    assert nan_or_equal(0, 0)
+    assert nan_or_equal(np.NaN, np.NaN)
+    assert not nan_or_equal(0, 1)
 
 
 def test_get_pdf() -> None:
-    assert (cm.get_pdf(np.arange(10), [0, 5, 11]) == np.array((5, 5))).all()
+    assert (get_pdf(np.arange(10), [0, 5, 11]) == np.array((5, 5))).all()
 
 
 def test_get_adjusted_scaling_factor() -> None:
-    assert cm.get_adjusted_scaling_factor(10, 5) == 5
-    assert cm.get_adjusted_scaling_factor(10, 11) == 10
-    assert cm.get_adjusted_scaling_factor(-10, -11) == -10
-    assert cm.get_adjusted_scaling_factor(-11, -10) == -10
+    assert get_adjusted_scaling_factor(10, 5) == 5
+    assert get_adjusted_scaling_factor(10, 11) == 10
+    assert get_adjusted_scaling_factor(-10, -11) == -10
+    assert get_adjusted_scaling_factor(-11, -10) == -10
 
 
 def test_ensure_devidable() -> None:
     assert np.array_equal(
-        cm.ensure_devidable(np.array((1, 2, 3, 4, 5, 0)), np.array((0, 1, 0, 2, 3, 0))),
+        ensure_devidable(
+            np.array((1, 2, 3, 4, 5, 0)),
+            np.array((0, 1, 0, 2, 3, 0)),
+            MAX_SCALING_FACTOR,
+        ),
         np.array((10, 2, 30, 2, 5 / 3, 0)),
     )
 
@@ -106,13 +128,24 @@ def test_ensure_devidable() -> None:
 # valid values.
 
 
-def test_type_check() -> None:
+def test_np_type_check() -> None:
     """
     Checks the correctness of the type checking function when the types are
     correct. No error should occur.
     """
 
-    cm.check_types(obs=[], simh=[], simp=[])
+    check_np_types(obs=[], simh=[], simp=[])
+
+
+def test_XR_type_check() -> None:
+    """
+    Checks the correctness of the type checking function when the types are
+    correct. No error should occur.
+
+    TODO:
+    """
+
+    check_xr_types(obs=[], simh=[], simp=[])
 
 
 def test_type_check_failing() -> None:
@@ -121,27 +154,31 @@ def test_type_check_failing() -> None:
     have the correct type.
     """
 
-    phrase: str = "must be type list, np.ndarray or xarray.core.dataarray.DataArray"
+    phrase: str = "must be type list, np.ndarray or np.generic"
     with pytest.raises(TypeError, match=f"'obs' {phrase}"):
-        cm.check_types(obs=1, simh=[], simp=[])
+        check_np_types(obs=1, simh=[], simp=[])
 
     with pytest.raises(TypeError, match=f"'simh' {phrase}"):
-        cm.check_types(obs=[], simh=1, simp=[])
+        check_np_types(obs=[], simh=1, simp=[])
 
     with pytest.raises(TypeError, match=f"'simp' {phrase}"):
-        cm.check_types(obs=[], simh=[], simp=1)
+        check_np_types(obs=[], simh=[], simp=1)
 
 
 def test_quantile_mapping_type_check_n_quantiles_failing() -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
-        cm.__quantile_delta_mapping(obs=[], simh=[], simp=[], n_quantiles="100")
+        cm._CMethods__quantile_delta_mapping(
+            obs=[], simh=[], simp=[], n_quantiles="100"
+        )
 
 
 def test_detrended_quantile_mapping_type_check_n_quantiles_failing() -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
-        cm.detrended_quantile_mapping(obs=[], simh=[], simp=[], n_quantiles="100")
+        cm._CMethods__detrended_quantile_mapping(
+            obs=[], simh=[], simp=[], n_quantiles="100"
+        )
 
 
 def test_detrended_quantile_mapping_type_check_simp_failing() -> None:
@@ -149,13 +186,17 @@ def test_detrended_quantile_mapping_type_check_simp_failing() -> None:
     with pytest.raises(
         TypeError, match="'simp' must be type xarray.core.dataarray.DataArray"
     ):
-        cm.detrended_quantile_mapping(obs=[], simh=[], simp=[], n_quantiles=100)
+        cm._CMethods__detrended_quantile_mapping(
+            obs=[], simh=[], simp=[], n_quantiles=100
+        )
 
 
 def test_quantile_delta_mapping_type_check_n_quantiles_failing() -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
-        cm.__quantile_delta_mapping(obs=[], simh=[], simp=[], n_quantiles="100")
+        cm._CMethods__quantile_delta_mapping(
+            obs=[], simh=[], simp=[], n_quantiles="100"
+        )
 
 
 def test_grouped_correction_worng_type_failing() -> None:
@@ -163,7 +204,7 @@ def test_grouped_correction_worng_type_failing() -> None:
     with pytest.raises(
         TypeError, match="'simp' must be type xarray.core.dataarray.DataArray"
     ):
-        cm.__linear_scaling(
+        cm._CMethods__linear_scaling(
             obs=[], simh=[], simp=[], n_quantiles=100, group="time.month"
         )
 
@@ -180,7 +221,7 @@ def test_adjust_3d_type_checking_failing() -> None:
     with pytest.raises(
         TypeError, match="'obs' must be type xarray.core.dataarray.DataArray"
     ):
-        cm.adjust_3d(
+        cm.adjust(
             method="linear_scaling",
             obs=[],
             simh=data,
@@ -191,7 +232,7 @@ def test_adjust_3d_type_checking_failing() -> None:
     with pytest.raises(
         TypeError, match="'simh' must be type xarray.core.dataarray.DataArray"
     ):
-        cm.adjust_3d(
+        cm.adjust(
             method="linear_scaling",
             obs=data,
             simh=[],
@@ -203,7 +244,7 @@ def test_adjust_3d_type_checking_failing() -> None:
     with pytest.raises(
         TypeError, match="'simp' must be type xarray.core.dataarray.DataArray"
     ):
-        cm.adjust_3d(
+        cm.adjust(
             method="linear_scaling",
             obs=data,
             simh=data,
@@ -213,7 +254,7 @@ def test_adjust_3d_type_checking_failing() -> None:
         )
 
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
-        cm.adjust_3d(
+        cm.adjust(
             method="linear_scaling",
             obs=data,
             simh=data,
@@ -223,7 +264,7 @@ def test_adjust_3d_type_checking_failing() -> None:
         )
 
     with pytest.raises(TypeError, match="'n_jobs' must be type int"):
-        cm.adjust_3d(
+        cm.adjust(
             method="linear_scaling",
             obs=data,
             simh=data,

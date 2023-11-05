@@ -34,11 +34,11 @@ def check_xr_types(obs: XRData, simh: XRData, simp: XRData) -> None:
         "must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray"
     )
 
-    if not isinstance(obs, XRData):
+    if not isinstance(obs, XRData.__constraints__):  # pylint: disable=no-member
         raise TypeError(f"'obs' {phrase}")
-    if not isinstance(simh, XRData):
+    if not isinstance(simh, XRData.__constraints__):  # pylint: disable=no-member
         raise TypeError(f"'simh' {phrase}")
-    if not isinstance(simp, XRData):
+    if not isinstance(simp, XRData.__constraints__):  # pylint: disable=no-member
         raise TypeError(f"'simp' {phrase}")
 
 
@@ -52,11 +52,11 @@ def check_np_types(
     """
     phrase: str = "must be type list, np.ndarray or np.generic"
 
-    if not isinstance(obs, NPData):
+    if not isinstance(obs, NPData.__constraints__):  # pylint: disable=no-member
         raise TypeError(f"'obs' {phrase}")
-    if not isinstance(simh, NPData):
+    if not isinstance(simh, NPData.__constraints__):  # pylint: disable=no-member
         raise TypeError(f"'simh' {phrase}")
-    if not isinstance(simp, NPData):
+    if not isinstance(simp, NPData.__constraints__):  # pylint: disable=no-member
         raise TypeError(f"'simp' {phrase}")
 
 

@@ -6,6 +6,7 @@
 VENV := venv
 GLOBAL_PYTHON := $(shell which python3)
 PYTHON := $(VENV)/bin/python3
+TESTS := tests
 
 .PHONY := build dev install test tests doc doctest pre-commit changelog clean
 
@@ -27,7 +28,7 @@ install:
 ##		Run the unit tests
 ##
 test:
-	$(PYTHON) -m pytest tests/
+	$(PYTHON) -m pytest $(TESTS)
 
 tests: test
 
