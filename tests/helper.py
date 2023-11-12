@@ -4,6 +4,8 @@
 # GitHub: https://github.com/btschwertfeger
 #
 
+"""Module providing utility functions for testing."""
+
 from __future__ import annotations
 
 import numpy as np

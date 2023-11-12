@@ -8,8 +8,6 @@
 
 from __future__ import annotations
 
-from typing import Union
-
 import numpy as np
 
 from cmethods.types import NPData, NPData_t, XRData, XRData_t
@@ -75,8 +73,8 @@ def nan_or_equal(value1: float, value2: float) -> bool:
 
 
 def ensure_devidable(
-    numerator: Union[float, np.ndarray],
-    denominator: Union[float, np.ndarray],
+    numerator: float | np.ndarray,
+    denominator: float | np.ndarray,
     max_scaling_factor: float,
 ) -> np.ndarray:
     """
@@ -107,15 +105,15 @@ def ensure_devidable(
     return result
 
 
-def get_pdf(x: Union[list, np.ndarray], xbins: Union[list, np.ndarray]) -> np.ndarray:
+def get_pdf(x: list | np.ndarray, xbins: list | np.ndarray) -> np.ndarray:
     r"""
     Compuites and returns the the probability density function :math:`P(x)`
     of ``x`` based on ``xbins``.
 
     :param x: The vector to get :math:`P(x)` from
-    :type x: Union[list, np.ndarray]
+    :type x: list | np.ndarray
     :param xbins: The boundaries/bins of :math:`P(x)`
-    :type xbins: Union[list, np.ndarray]
+    :type xbins: list | np.ndarray
     :return: The probability densitiy function of ``x``
     :rtype: np.ndarray
 
@@ -134,15 +132,15 @@ def get_pdf(x: Union[list, np.ndarray], xbins: Union[list, np.ndarray]) -> np.nd
     return pdf
 
 
-def get_cdf(x: Union[list, np.ndarray], xbins: Union[list, np.ndarray]) -> np.ndarray:
+def get_cdf(x: list | np.ndarray, xbins: list | np.ndarray) -> np.ndarray:
     r"""
     Computes and returns returns the cumulative distribution function :math:`F(x)`
     of ``x`` based on ``xbins``.
 
     :param x: Vector to get :math:`F(x)` from
-    :type x: Union[list, np.ndarray]
+    :type x: list | np.ndarray
     :param xbins: The boundaries/bins of :math:`F(x)`
-    :type xbins: Union[list, np.ndarray]
+    :type xbins: list | np.ndarray
     :return: The cumulative distribution function of ``x``
     :rtype: np.ndarray
 
@@ -163,9 +161,9 @@ def get_cdf(x: Union[list, np.ndarray], xbins: Union[list, np.ndarray]) -> np.nd
 
 
 def get_inverse_of_cdf(
-    base_cdf: Union[list, np.ndarray],
-    insert_cdf: Union[list, np.ndarray],
-    xbins: Union[list, np.ndarray],
+    base_cdf: list | np.ndarray,
+    insert_cdf: list | np.ndarray,
+    xbins: list | np.ndarray,
 ) -> np.ndarray:
     r"""
     Returns the inverse cumulative distribution function as:
@@ -173,11 +171,11 @@ def get_inverse_of_cdf(
     ``insert_cdf`` is represented by :math:`y`.
 
     :param base_cdf: The basis
-    :type base_cdf: Union[list, np.ndarray]
+    :type base_cdf: list | np.ndarray
     :param insert_cdf: The CDF that gets inserted
-    :type insert_cdf: Union[list, np.ndarray]
+    :type insert_cdf: list | np.ndarray
     :param xbins: Probability boundaries
-    :type xbins: Union[list, np.ndarray]
+    :type xbins: list | np.ndarray
     :return: The inverse CDF
     :rtype: np.ndarray
     """
@@ -185,7 +183,7 @@ def get_inverse_of_cdf(
 
 
 def get_adjusted_scaling_factor(
-    factor: Union[int, float], max_scaling_factor: Union[int, float]
+    factor: int | float, max_scaling_factor: int | float
 ) -> float:
     r"""
     Returns:
@@ -198,9 +196,9 @@ def get_adjusted_scaling_factor(
             - :math:`y` is ``max_scaling_factor``
 
     :param factor: The value to check for
-    :type factor: Union[int, float]
+    :type factor: int | float
     :param max_scaling_factor: The maximum/minimum allowed value
-    :type max_scaling_factor: Union[int, float]
+    :type max_scaling_factor: int | float
     :return: The correct value
     :rtype: float
     """

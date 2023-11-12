@@ -4,9 +4,9 @@
 # GitHub: https://github.com/btschwertfeger
 #
 
-from __future__ import annotations
+"""Module providing fixtures for testing."""
 
-from functools import cache
+from __future__ import annotations
 
 import pytest
 

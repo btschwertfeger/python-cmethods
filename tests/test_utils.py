@@ -11,10 +11,14 @@ Module to to test utility functions for the CMethods package
 Data types are ignored for simplicity.
 """
 
+import re
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 import xarray as xr
 
+from cmethods import CMethods
 from cmethods.utils import (
     check_np_types,
     check_xr_types,
@@ -28,7 +32,7 @@ from cmethods.utils import (
 # test for nan values
 
 
-def test_quantile_mapping_single_nan(cm) -> None:
+def test_quantile_mapping_single_nan(cm: CMethods) -> None:
     obs, simh, simp = list(np.arange(10)), list(np.arange(10)), list(np.arange(10))
     obs[0] = np.nan
     expected = np.array([0.0, 1.9, 2.9, 3.9, 4.9, 5.9, 6.9, 7.9, 8.9, 9.0])
@@ -38,7 +42,7 @@ def test_quantile_mapping_single_nan(cm) -> None:
 
 
 @pytest.mark.filterwarnings("ignore:All-NaN slice encountered")
-def test_quantile_mapping_all_nan(cm) -> None:
+def test_quantile_mapping_all_nan(cm: CMethods) -> None:
     obs, simh, simp = (
         list(np.full(10, np.nan)),
         list(np.arange(10)),
@@ -48,7 +52,7 @@ def test_quantile_mapping_all_nan(cm) -> None:
     assert np.allclose(res, simp)
 
 
-def test_quantile_delta_mapping_single_nan(cm) -> None:
+def test_quantile_delta_mapping_single_nan(cm: CMethods) -> None:
     obs, simh, simp = list(np.arange(10)), list(np.arange(10)), list(np.arange(10))
     obs[0] = np.nan
     expected = np.array([0.0, 1.9, 2.9, 3.9, 4.9, 5.9, 6.9, 7.9, 8.9, 9.0])
@@ -60,7 +64,7 @@ def test_quantile_delta_mapping_single_nan(cm) -> None:
 
 
 @pytest.mark.filterwarnings("ignore:All-NaN slice encountered")
-def test_quantile_delta_mapping_all_nan(cm) -> None:
+def test_quantile_delta_mapping_all_nan(cm: CMethods) -> None:
     obs, simh, simp = (
         list(np.full(10, np.nan)),
         list(np.arange(10)),
@@ -76,7 +80,7 @@ def test_quantile_delta_mapping_all_nan(cm) -> None:
 # test utils
 
 
-def test_get_available_methods(cm) -> None:
+def test_get_available_methods(cm: CMethods) -> None:
     assert cm.get_available_methods() == [
         "linear_scaling",
         "variance_scaling",
@@ -104,7 +108,7 @@ def test_get_adjusted_scaling_factor() -> None:
     assert get_adjusted_scaling_factor(-11, -10) == -10
 
 
-def test_ensure_devidable(cm) -> None:
+def test_ensure_devidable(cm: CMethods) -> None:
     assert np.array_equal(
         ensure_devidable(
             np.array((1, 2, 3, 4, 5, 0)),
@@ -135,8 +139,6 @@ def test_xr_type_check() -> None:
     """
     Checks the correctness of the type checking function when the types are
     correct. No error should occur.
-
-    TODO:
     """
     ds: xr.core.dataarray.Dataset = xr.core.dataarray.Dataset()
     check_xr_types(obs=ds, simh=ds, simp=ds)
@@ -159,7 +161,43 @@ def test_type_check_failing() -> None:
         check_np_types(obs=[], simh=[], simp=1)
 
 
-def test_quantile_mapping_type_check_n_quantiles_failing(cm) -> None:
+def test_quantile_mapping_type_check_n_quantiles_failing(cm: CMethods) -> None:
+    """n_quantiles must by type int"""
+    with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
+        cm._CMethods__quantile_mapping(  # type: ignore[attr-defined]
+            obs=[], simh=[], simp=[], n_quantiles="100"
+        )
+
+
+def test_detrended_quantile_mapping_type_check_n_quantiles_failing(
+    cm: CMethods, datasets: dict
+) -> None:
+    """n_quantiles must by type int"""
+    with pytest.raises(TypeError, match=re.escape("'n_quantiles' must be type int")):
+        cm.detrended_quantile_mapping(  # type: ignore[attr-defined]
+            obs=datasets["+"]["obsh"][:, 0, 0],
+            simh=datasets["+"]["simh"][:, 0, 0],
+            simp=datasets["+"]["simp"][:, 0, 0],
+            n_quantiles="100",
+        )
+
+
+def test_detrended_quantile_mapping_type_check_simp_failing(
+    cm: CMethods, datasets: dict
+) -> None:
+    """n_quantiles must by type int"""
+    with pytest.raises(
+        TypeError, match="'simp' must be type xarray.core.dataarray.DataArray"
+    ):
+        cm.detrended_quantile_mapping(  # type: ignore[attr-defined]
+            obs=datasets["+"]["obsh"][:, 0, 0],
+            simh=datasets["+"]["simh"][:, 0, 0],
+            simp=[],
+            n_quantiles=100,
+        )
+
+
+def test_quantile_delta_mapping_type_check_n_quantiles(cm: CMethods) -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
         cm._CMethods__quantile_delta_mapping(  # type: ignore[attr-defined]
@@ -167,7 +205,7 @@ def test_quantile_mapping_type_check_n_quantiles_failing(cm) -> None:
         )
 
 
-def test_quantile_delta_mapping_type_check_n_quantiles_failing(cm) -> None:
+def test_quantile_delta_mapping_type_check_n_quantiles_failing(cm: CMethods) -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
         cm._CMethods__quantile_delta_mapping(  # type: ignore[attr-defined]

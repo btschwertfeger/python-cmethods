@@ -4,11 +4,14 @@
 # GitHub: https://github.com/btschwertfeger
 #
 
+"""
+Module implementing the unit tests for all implemented bias correction
+techniques.
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-
-import pytest
 
 from cmethods.types import NPData_t, XRData_t
 
@@ -21,7 +24,6 @@ GROUP: str = "time.month"
 N_QUANTILES: int = 100
 
 
-@pytest.mark.wip()
 def test_linear_scaling_add_1d(cm: CMethods, datasets: dict) -> None:
     kind: str = "+"
     method: str = "linear_scaling"

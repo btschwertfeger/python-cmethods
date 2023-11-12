@@ -4,6 +4,8 @@
 # GitHub: https://github.com/btschwertfeger
 #
 
+"""Module implementing even more tests"""
+
 from __future__ import annotations
 
 import re
@@ -16,8 +18,9 @@ if TYPE_CHECKING:
 
 import numpy as np
 
+from cmethods.utils import UnknownMethodError
 
-@pytest.mark.wip()
+
 def test_not_implemented_errors(cm: CMethods, datasets: dict) -> None:
     with pytest.raises(
         NotImplementedError,
@@ -71,3 +74,33 @@ def test_not_implemented_errors(cm: CMethods, datasets: dict) -> None:
             kind="/",
             n_quantiles=100,
         )
+
+
+def test_adjust_failing_dqm(cm: CMethods, datasets: dict) -> None:
+    with pytest.raises(ValueError):
+        cm.adjust(
+            method="detrended_quantile_mapping",
+            obs=datasets["+"]["obsh"][:, 0, 0],
+            simh=datasets["+"]["simh"][:, 0, 0],
+            simp=datasets["+"]["simp"][:, 0, 0],
+            kind="/",
+            n_quantiles=100,
+        )
+
+
+def test_adjust_failing_no_group_for_distribution(cm: CMethods, datasets: dict) -> None:
+    with pytest.raises(ValueError):
+        cm.adjust(
+            method="quantile_mapping",
+            obs=datasets["+"]["obsh"][:, 0, 0],
+            simh=datasets["+"]["simh"][:, 0, 0],
+            simp=datasets["+"]["simp"][:, 0, 0],
+            kind="/",
+            n_quantiles=100,
+            group="time.month",
+        )
+
+
+def test_get_function_unknown_method(cm: CMethods) -> None:
+    with pytest.raises(UnknownMethodError):
+        cm._CMethods__get_function("not-existing")
