@@ -7,46 +7,51 @@ VENV := venv
 GLOBAL_PYTHON := $(shell which python3)
 PYTHON := $(VENV)/bin/python3
 TESTS := tests
+PYTEST_OPTS := -vv
 
 .PHONY := build dev install test tests doc doctest pre-commit changelog clean
 
-##		Builds the python-kraken-sdk
+## build		Builds the python-kraken-sdk
 ##
 build:
 	$(PYTHON) -m pip wheel -w dist --no-deps .
 
-##		Installs the package in edit mode
+## dev		Installs the package in edit mode
 ##
 dev:
 	$(PYTHON) -m pip install -e ".[dev]"
 
-##		Install the package
+## install		Install the package
 ##
 install:
 	$(PYTHON) -m pip install .
 
-##		Run the unit tests
+## test		Run the unit tests
 ##
 test:
-	$(PYTHON) -m pytest $(TESTS)
-
+	$(PYTHON) -m pytest $(PYTEST_OPTS) $(TESTS)
 tests: test
 
-##		Build the documentation
+## wip  	Run tests marked as wip
+##
+wip:
+	$(PYTHON) -m pytest $(PYTEST_OPTS)  -m "wip" $(TESTS)
+
+## doc		Build the documentation
 ##
 doc:
 	cd docs && make html
 
-##		Run the documentation tests
+## doctest		Run the documentation tests
 ##
 doctest:
 	cd docs && make doctest
 
-##		Pre-Commit
+## pre-commit		Pre-Commit
 pre-commit:
 	@pre-commit run -a
 
-## 		Create the changelog
+## changelog		Create the changelog
 ##
 changelog:
 	docker run -it --rm \
@@ -58,7 +63,7 @@ changelog:
 		--breaking-labels Breaking \
 		--enhancement-labels Feature
 
-##		Clean the workspace
+## clean		Clean the workspace
 ##
 clean:
 	rm -rf .pytest_cache \
