@@ -10,11 +10,11 @@ Introduction
 About
 -----
 
-This Python module and the provided data structures are designed
-to help minimize discrepancies between modeled and observed climate data of different
-time periods. Data from past periods are used to adjust variables
-from current and future time series so that their distributional
-properties approximate possible actual values.
+This Python module and the provided data structures are designed to help
+minimize discrepancies between modeled and observed climate data of different
+time periods. Data from past periods are used to adjust variables from current
+and future time series so that their distributional properties approximate
+possible actual values.
 
 .. figure:: ../_static/images/biasCdiagram.png
     :width: 600
@@ -24,12 +24,12 @@ properties approximate possible actual values.
     Fig 1: Schematic representation of a bias adjustment procedure
 
 
-In this way, for example, modeled data, which on average represent values
-that are too cold, can be bias-corrected by applying an adjustment procedure.
-The following figure shows the observed, the modeled, and the bias-corrected values.
+In this way, for example, modeled data, which on average represent values that
+are too cold, can be bias-corrected by applying an adjustment procedure. The
+following figure shows the observed, the modeled, and the bias-corrected values.
 It is directly visible that the delta adjusted time series
-(:math:`T^{*DM}_{sim,p}`) are much more similar to the observed data (:math:`T_{obs,p}`)
-than the raw modeled data (:math:`T_{sim,p}`).
+(:math:`T^{*DM}_{sim,p}`) are much more similar to the observed data
+(:math:`T_{obs,p}`) than the raw modeled data (:math:`T_{sim,p}`).
 
 .. figure:: ../_static/images/dm-doy-plot.png
     :width: 600
@@ -42,33 +42,39 @@ than the raw modeled data (:math:`T_{sim,p}`).
 Available Methods
 -----------------
 
-The following bias correction techniques are available:
-    Scaling-based techniques:
-        * Linear Scaling :func:`cmethods.CMethods.linear_scaling`
-        * Variance Scaling :func:`cmethods.CMethods.variance_scaling`
-        * Delta (change) Method :func:`cmethods.CMethods.delta_method`
+python-cmethods provides the following bias correction techniques:
 
-    Distribution-based techniques:
-        * Quantile Mapping :func:`cmethods.CMethods.quantile_mapping`
-        * Detrended Quantile Mapping :func:`cmethods.CMethods.detrended_quantile_mapping`
-        * Quantile Delta Mapping :func:`cmethods.CMethods.quantile_delta_mapping`
+- Linear Scaling
+- Variance Scaling
+- Delta Method
+- Quantile Mapping
+- Detrended Quantile Mapping
+- Quantile Delta Mapping
 
-All of these methods are intended to be applied on 1-dimensional time-series climate data.
-This module also provides the function :func:`cmethods.CMethods.adjust_3d` that enables
-the application of the desired bias correction method on 3-dimensional data sets.
+Please refer to the official documentation for more information about these
+methods as well as sample scripts:
+https://python-cmethods.readthedocs.io/en/stable/
 
-Except for the variance scaling, all methods can be applied on stochastic and non-stochastic
-climate variables. Variance scaling can only be applied on non-stochastic climate variables.
+- Except for the variance scaling, all methods can be applied on stochastic and
+  non-stochastic climate variables. Variance scaling can only be applied on
+  non-stochastic climate variables.
 
-- Non-stochastic climate variables are those that can be predicted with relative certainty based
-  on factors such as location, elevation, and season. Examples of non-stochastic climate variables
-  include air temperature, air pressure, and solar radiation.
+  - Non-stochastic climate variables are those that can be predicted with relative
+    certainty based on factors such as location, elevation, and season. Examples
+    of non-stochastic climate variables include air temperature, air pressure, and
+    solar radiation.
 
-- Stochastic climate variables, on the other hand, are those that exhibit a high degree of
-  variability and unpredictability, making them difficult to forecast accurately.
-  Precipitation is an example of a stochastic climate variable because it can vary greatly in timing,
-  intensity, and location due to complex atmospheric and meteorological processes.
+  - Stochastic climate variables, on the other hand, are those that exhibit a high
+    degree of variability and unpredictability, making them difficult to forecast
+    accurately. Precipitation is an example of a stochastic climate variable
+    because it can vary greatly in timing, intensity, and location due to complex
+    atmospheric and meteorological processes.
 
+- Except for the detrended quantile mapping (DQM) technique, all methods can be
+  applied to 1- and 3-dimensional data sets. The implementation of DQM to
+  3-dimensional data is still in progress.
+
+- For any questions -- please open an issue at https://github.com/btschwertfeger/python-cmethods/issues
 Examples can be found in the `python-cmethods`_ repository and of course
 within this documentation.
 
