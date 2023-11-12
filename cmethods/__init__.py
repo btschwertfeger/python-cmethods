@@ -119,7 +119,7 @@ class CMethods:
             )
             return np.array(simp) * adj_scaling_factor  # Eq. 2
         raise NotImplementedError(
-            f"{kind} not available for linear_scaling. Use '+' or '*' instead."
+            f"{kind=} not available for linear_scaling. Use '+' or '*' instead."
         )
 
     # ? -----========= V A R I A N C E - S C A L I N G =========------
@@ -156,7 +156,7 @@ class CMethods:
             return VS_2_simp + np.nanmean(LS_simp)  # Eq. 6
 
         raise NotImplementedError(
-            f"{kind} not available for variance_scaling. Use '+' instead."
+            f"{kind=} not available for variance_scaling. Use '+' instead."
         )
 
     # ? -----========= D E L T A - M E T H O D =========------
@@ -185,7 +185,7 @@ class CMethods:
             )
             return np.array(obs) * adj_scaling_factor  # Eq. 2
         raise NotImplementedError(
-            f"{kind} not available for delta_method. Use '+' or '*' instead."
+            f"{kind=} not available for delta_method. Use '+' or '*' instead."
         )
 
     # ? -----========= Q U A N T I L E - M A P P I N G =========------
@@ -236,7 +236,7 @@ class CMethods:
             return get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 2
 
         raise NotImplementedError(
-            f"{kind} for quantile_mapping is not available. Use '+' or '*' instead."
+            f"{kind=} for quantile_mapping is not available. Use '+' or '*' instead."
         )
 
     # ? -----========= D E T R E N D E D - Q U A N T I L E - M A P P I N G =========------
@@ -260,7 +260,7 @@ class CMethods:
 
         if kind not in MULTIPLICATIVE and kind not in ADDITIVE:
             raise NotImplementedError(
-                f"{kind} for detrended_quantile_mapping is not available. Use '+' or '*' instead."
+                f"{kind=} for detrended_quantile_mapping is not available. Use '+' or '*' instead."
             )
 
         if not isinstance(n_quantiles, int):
@@ -326,21 +326,21 @@ class CMethods:
         return res
 
     # ? -----========= E M P I R I C A L - Q U A N T I L E - M A P P I N G =========------
-    def __empirical_quantile_mapping(
-        self: CMethods,
-        obs: NPData,
-        simh: NPData,
-        simp: NPData,
-        n_quantiles: int = 100,
-        extrapolate: Optional[str] = None,
-        **kwargs: Any,
-    ) -> NPData:
-        """
-        Method to adjust 1-dimensional climate data by empirical quantile mapping
-        """
-        raise NotImplementedError(
-            "Not implemented; please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py "
-        )
+    # def __empirical_quantile_mapping(
+    #     self: CMethods,
+    #     obs: NPData,
+    #     simh: NPData,
+    #     simp: NPData,
+    #     n_quantiles: int = 100,
+    #     extrapolate: Optional[str] = None,
+    #     **kwargs: Any,
+    # ) -> NPData:
+    #     """
+    #     Method to adjust 1-dimensional climate data by empirical quantile mapping
+    #     """
+    #     raise NotImplementedError(
+    #         "Not implemented; please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py "
+    #     )
 
     # ? -----========= Q U A N T I L E - D E L T A - M A P P I N G =========------
 
@@ -412,7 +412,7 @@ class CMethods:
             )
             return QDM1 * delta  # Eq. 2.4
         raise NotImplementedError(
-            f"{kind} not available for quantile_delta_mapping. Use '+' or '*' instead."
+            f"{kind=} not available for quantile_delta_mapping. Use '+' or '*' instead."
         )
 
     def adjust(
@@ -481,7 +481,7 @@ class CMethods:
 
         return result
 
-    def get_function(self: CMethods, method: str) -> Callable:
+    def __get_function(self: CMethods, method: str) -> Callable:
         """
         Returns the bias correction function corresponding to the ``method`` name.
 
@@ -499,10 +499,6 @@ class CMethods:
             return self.__delta_method
         if method == "quantile_mapping":
             return self.__quantile_mapping
-        if method == "detrended_quantile_mapping":
-            return self.detrended_quantile_mapping
-        if method == "empirical_quantile_mapping":
-            return self.__empirical_quantile_mapping
         if method == "quantile_delta_mapping":
             return self.__quantile_delta_mapping
         raise UnknownMethodError(method, METHODS)
@@ -518,7 +514,7 @@ class CMethods:
         check_xr_types(obs=obs, simh=simh, simp=simp)
 
         result: XRData = xr.apply_ufunc(
-            self.get_function(method),
+            self.__get_function(method),
             obs,
             simh,
             # Need to spoof a fake time axis since 'time' coord on full dataset is different

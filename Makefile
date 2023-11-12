@@ -46,7 +46,7 @@ tests: test
 ##
 .PHONY := wip
 wip:
-	$(PYTHON) -m pytest $(PYTEST_OPTS)  -m "wip" $(TESTS)
+	$(PYTHON) -m pytest $(PYTEST_OPTS) -m "wip" $(TESTS)
 
 ## doc		Build the documentation
 ##
