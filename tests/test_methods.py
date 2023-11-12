@@ -21,6 +21,7 @@ GROUP: str = "time.month"
 N_QUANTILES: int = 100
 
 
+@pytest.mark.wip()
 def test_linear_scaling_add_1d(cm: CMethods, datasets: dict) -> None:
     kind: str = "+"
     method: str = "linear_scaling"
@@ -34,7 +35,7 @@ def test_linear_scaling_add_1d(cm: CMethods, datasets: dict) -> None:
         method=method, obs=obsh, simh=simh, simp=simp, kind=kind
     )
     assert isinstance(result, XRData_t)
-    assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
     # grouped
     result = cm.adjust(
@@ -58,7 +59,7 @@ def test_linear_scaling_add_3d(cm: CMethods, datasets: dict) -> None:
     )
 
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
     # grouped
     result: XRData_t = cm.adjust(
@@ -82,7 +83,7 @@ def test_linear_scaling_mult_1d(cm: CMethods, datasets: dict) -> None:
         method=method, obs=obsh, simh=simh, simp=simp, kind=kind
     )
     assert isinstance(result, XRData_t)
-    assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
     # grouped
     result = cm.adjust(
@@ -106,7 +107,7 @@ def test_linear_scaling_mult_3d(cm: CMethods, datasets: dict) -> None:
     )
 
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
     # grouped
     result: XRData_t = cm.adjust(
@@ -135,7 +136,7 @@ def test_variance_scaling_add_1d(cm: CMethods, datasets: dict) -> None:
         method=method, obs=obsh, simh=simh, simp=simp, kind=kind
     )
     assert isinstance(result, XRData_t)
-    assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
     # grouped
     result = cm.adjust(
@@ -159,7 +160,7 @@ def test_variance_scaling_add_3d(cm: CMethods, datasets: dict) -> None:
     )
 
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
     # grouped
     result: XRData_t = cm.adjust(
@@ -183,7 +184,7 @@ def test_delta_method_add_1d(cm: CMethods, datasets: dict) -> None:
         method=method, obs=obsh, simh=simh, simp=simp, kind=kind
     )
     assert isinstance(result, XRData_t)
-    assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
     # grouped
     result = cm.adjust(
@@ -207,7 +208,7 @@ def test_delta_method_add_3d(cm: CMethods, datasets: dict) -> None:
     )
 
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
     # grouped
     result: XRData_t = cm.adjust(
@@ -231,7 +232,7 @@ def test_delta_method_mult_1d(cm: CMethods, datasets: dict) -> None:
         method=method, obs=obsh, simh=simh, simp=simp, kind=kind
     )
     assert isinstance(result, XRData_t)
-    assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
     # grouped
     result = cm.adjust(
@@ -255,7 +256,7 @@ def test_delta_method_mult_3d(cm: CMethods, datasets: dict) -> None:
     )
 
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
     # grouped
     result: XRData_t = cm.adjust(
@@ -284,7 +285,7 @@ def test_quantile_mapping_add_1d(cm: CMethods, datasets: dict) -> None:
     )
 
     assert isinstance(result, XRData_t)
-    assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
 
 def test_quantile_mapping_add_3d(cm: CMethods, datasets: dict) -> None:
@@ -305,7 +306,7 @@ def test_quantile_mapping_add_3d(cm: CMethods, datasets: dict) -> None:
     )
 
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
 
 def test_quantile_mapping_mult_1d(cm: CMethods, datasets: dict) -> None:
@@ -326,7 +327,7 @@ def test_quantile_mapping_mult_1d(cm: CMethods, datasets: dict) -> None:
     )
 
     assert isinstance(result, XRData_t)
-    assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
 
 def test_quantile_mapping_mult_3d(cm: CMethods, datasets: dict) -> None:
@@ -347,10 +348,9 @@ def test_quantile_mapping_mult_3d(cm: CMethods, datasets: dict) -> None:
     )
 
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
 
-@pytest.mark.wip()
 def test_detrended_quantile_mapping_add_1d(cm: CMethods, datasets: dict) -> None:
     kind: str = "+"
     obsh: XRData_t = datasets[kind]["obsh"][:, 0, 0]
@@ -366,7 +366,6 @@ def test_detrended_quantile_mapping_add_1d(cm: CMethods, datasets: dict) -> None
     assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
 
 
-@pytest.mark.wip()
 def test_detrended_quantile_mapping_mult_1d(cm: CMethods, datasets: dict) -> None:
     kind: str = "*"
     obsh: XRData_t = datasets[kind]["obsh"][:, 0, 0]
@@ -400,7 +399,7 @@ def test_quantile_delta_mapping_add_1d(cm: CMethods, datasets: dict) -> None:
     )
 
     assert isinstance(result, XRData_t)
-    assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
 
 def test_quantile_delta_mapping_add_3d(cm: CMethods, datasets: dict) -> None:
@@ -421,7 +420,7 @@ def test_quantile_delta_mapping_add_3d(cm: CMethods, datasets: dict) -> None:
     )
 
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
 
 def test_quantile_delta_mapping_mult_1d(cm: CMethods, datasets: dict) -> None:
@@ -442,7 +441,7 @@ def test_quantile_delta_mapping_mult_1d(cm: CMethods, datasets: dict) -> None:
     )
 
     assert isinstance(result, XRData_t)
-    assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
 
 def test_quantile_delta_mapping_mult_3d(cm: CMethods, datasets: dict) -> None:
@@ -463,4 +462,4 @@ def test_quantile_delta_mapping_mult_3d(cm: CMethods, datasets: dict) -> None:
     )
 
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)

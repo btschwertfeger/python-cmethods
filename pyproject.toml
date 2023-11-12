@@ -12,7 +12,7 @@ description = "Collection of bias correction procedures for 1- and 3-dimensional
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.11"
-dependencies = ["xarray>=2022.11.0", "netCDF4>=1.6.1", "numpy", "tqdm"]
+dependencies = ["xarray>=2022.11.0", "netCDF4>=1.6.1", "numpy"]
 keywords = [
   "climate-science",
   "bias",

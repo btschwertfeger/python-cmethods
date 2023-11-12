@@ -3,7 +3,7 @@
 <div align="center">
 
 [![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/btschwertfeger/Bias-Adjustment-Python)
-[![Generic badge](https://img.shields.io/badge/python-3.8_|_3.9_|_3.10_|_3.11-blue.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/python-3.11-blue.svg)](https://shields.io/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Downloads](https://pepy.tech/badge/python-cmethods)](https://pepy.tech/project/python-cmethods)
 
@@ -18,11 +18,16 @@
 
 </div>
 
-This Python module serves as a collection of different scale- and distribution-based bias correction techniques for climatic research
+This Python module serves as a collection of different scale- and
+distribution-based bias correction techniques for climatic research
 
 The documentation is available at: [https://python-cmethods.readthedocs.io/en/stable/](https://python-cmethods.readthedocs.io/en/stable/)
 
-> ⚠️ For the application of bias corrections on _lage data sets_ it is recommended to use the command-line tool [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX) since bias corrections are complex statistical transformation which are very slow in Python compared to the C++ implementation.
+> ⚠️ For the application of bias corrections on _lage data sets_ it is
+> recommended to use the command-line tool
+> [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX) since bias
+> corrections are complex statistical transformation which can be very slow in
+> Python compared to the C++ implementation.
 
 ---
 
@@ -41,7 +46,10 @@ The documentation is available at: [https://python-cmethods.readthedocs.io/en/st
 
 ## 1. About
 
-These programs and data structures are developed with the aim of reducing discrepancies between modeled and observed climate data. Historical data is utilized to calibrate variables from current and future time series to achieve distributional properties that closely resemble the possible actual values.
+These programs and data structures are developed with the aim of reducing
+discrepancies between modeled and observed climate data. Historical data is
+utilized to calibrate variables from current and future time series to achieve
+distributional properties that closely resemble the possible actual values.
 
 <figure>
   <img
@@ -51,7 +59,12 @@ These programs and data structures are developed with the aim of reducing discre
   <figcaption>Figure 1: Schematic representation of a bias adjustment procedure</figcaption>
 </figure>
 
-For instance, modeled data typically indicate values that are colder than the actual values. To address this issue, an adjustment procedure is employed. The figure below illustrates the observed, modeled, and adjusted values, revealing that the delta adjusted time series ($T^{*DM}_{sim,p}$) are significantly more similar to the observed data ($T{obs,p}$) than the raw modeled data ($T_{sim,p}$).
+For instance, modeled data typically indicate values that are colder than the
+actual values. To address this issue, an adjustment procedure is employed. The
+figure below illustrates the observed, modeled, and adjusted values, revealing
+that the delta adjusted time series ($T^{*DM}_{sim,p}$) are significantly more
+similar to the observed data ($T{obs,p}$) than the raw modeled data
+($T_{sim,p}$).
 
 <figure>
   <img
@@ -65,32 +78,41 @@ For instance, modeled data typically indicate values that are colder than the ac
 
 <a name="methods"></a>
 
-## 2. Available methods
+## 2. Available Methods
 
-All methods except the `adjust_3d` function requires that the input data sets only contain one dimension.
+python-cmethods provides the following bias correction techniques:
 
-| Function name            | Description                                                                                                                                                  |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `linear_scaling`         | Linear Scaling (additive and multiplicative)                                                                                                                 |
-| `variance_scaling`       | Variance Scaling (additive)                                                                                                                                  |
-| `delta_method`           | Delta (Change) Method (additive and multiplicative)                                                                                                          |
-| `quantile_mapping`       | Quantile Mapping (additive and multiplicative) and Detrended Quantile Mapping (additive and multiplicative; to use DQM, set parameter `detrended` to `True`) |
-| `quantile_delta_mapping` | Quantile Delta Mapping (additive and multiplicative)                                                                                                         |
-| `adjust_3d`              | requires a method name and the respective parameters to adjust all time series of a 3-dimensional data set                                                   |
+- Linear Scaling
+- Variance Scaling
+- Delta Method
+- Quantile Mapping
+- Detrended Quantile Mapping
+- Quantile Delta Mapping
 
-Except for the variance scaling, all methods can be applied on stochastic and non-stochastic
-climate variables. Variance scaling can only be applied on non-stochastic climate variables.
+Please refer to the official documentation for more information about these
+methods as well as sample scripts:
+https://python-cmethods.readthedocs.io/en/stable/
 
-- Non-stochastic climate variables are those that can be predicted with relative certainty based
-  on factors such as location, elevation, and season. Examples of non-stochastic climate variables
-  include air temperature, air pressure, and solar radiation.
+- Except for the variance scaling, all methods can be applied on stochastic and
+  non-stochastic climate variables. Variance scaling can only be applied on
+  non-stochastic climate variables.
 
-- Stochastic climate variables, on the other hand, are those that exhibit a high degree of
-  variability and unpredictability, making them difficult to forecast accurately.
-  Precipitation is an example of a stochastic climate variable because it can vary greatly in timing,
-  intensity, and location due to complex atmospheric and meteorological processes.
+  - Non-stochastic climate variables are those that can be predicted with relative
+    certainty based on factors such as location, elevation, and season. Examples
+    of non-stochastic climate variables include air temperature, air pressure, and
+    solar radiation.
 
----
+  - Stochastic climate variables, on the other hand, are those that exhibit a high
+    degree of variability and unpredictability, making them difficult to forecast
+    accurately. Precipitation is an example of a stochastic climate variable
+    because it can vary greatly in timing, intensity, and location due to complex
+    atmospheric and meteorological processes.
+
+- Except for the detrended quantile mapping (DQM) technique, all methods can be
+  applied to 1- and 3-dimensional data sets. The implementation of DQM to
+  3-dimensional data is still in progress.
+
+- For any questions -- please open an issue at https://github.com/btschwertfeger/python-cmethods/issues
 
 <a name="installation"></a>
 
@@ -108,27 +130,34 @@ python3 -m pip install python-cmethods
 
 ```python
 import xarray as xr
-from cmethods import CMethods as cm
+from cmethods import CMethods
 
-obsh = xr.open_dataset('input_data/observations.nc')
-simh = xr.open_dataset('input_data/control.nc')
-simp = xr.open_dataset('input_data/scenario.nc')
+obsh = xr.open_dataset("input_data/observations.nc")
+simh = xr.open_dataset("input_data/control.nc")
+simp = xr.open_dataset("input_data/scenario.nc")
 
-ls_result = cm.linear_scaling(
-    obs = obsh['tas'][:,0,0],
-    simh = simh['tas'][:,0,0],
-    simp = simp['tas'][:,0,0],
-    kind = '+'
+cm = CMethods()
+
+# adjust only one grid cell
+ls_result = cm.adjust(
+    method="linear_scaling",
+    obs=obsh["tas"][:,0,0],
+    simh=simh["tas"][:,0,0],
+    simp=simp["tas"][:,0,0],
+    kind="+",
+    group="time.month"
 )
 
-qdm_result = cm.adjust_3d( # 3d = 2 spatial and 1 time dimension
-    method = 'quantile_delta_mapping',
-    obs = obsh['tas'],
-    simh = simh['tas'],
-    simp = simp['tas'],
-    n_quaniles = 1000,
-    kind = '+'
+# adjust all grid cells
+qdm_result = cm.adjust(
+    method="quantile_delta_mapping",
+    obs=obsh["tas"],
+    simh=simh["tas"],
+    simp=simp["tas"],
+    n_quantiles=1000,
+    kind="+"
 )
+
 # to calculate the relative rather than the absolute change,
 # '*' can be used instead of '+' (this is preferred when adjusting
 # stochastic variables like precipitation)
@@ -136,8 +165,12 @@ qdm_result = cm.adjust_3d( # 3d = 2 spatial and 1 time dimension
 
 Notes:
 
-- When using the `adjust_3d` method you have to specify the method by name.
-- For the multiplicative techniques a maximum scaling factor of 10 is defined. This can be changed by the attribute `max_scaling_factor`.
+- For the multiplicative techniques a maximum scaling factor of 10 is defined.
+  This can be changed by adjusting the the `CMethods.MAX_SCALING_FACTOR`
+  attribute.
+- Except for detrended quantile mapping, all implemented technqieus can be
+  applied to 1-and 3-dimensional data sets by executing the `CMethods.adjust`
+  function.
 
 ## Examples (see repository on [GitHub](https://github.com/btschwertfeger/python-cmethods))
 
@@ -161,6 +194,7 @@ Help:
     --scen input_data/scenario.nc     \
     --kind "+"                        \
     --variable "tas"                  \
+    --quantiles 10                    \
     --method quantile_mapping
 ```
 
@@ -180,7 +214,8 @@ Help:
 Notes:
 
 - Data sets must have the same spatial resolutions.
-- This script is far away from perfect - so please look at it, as a starting point. (:
+- This script is far away from perfect - so please see it, as a starting point.
+  (:
 
 ---
 
@@ -188,12 +223,25 @@ Notes:
 
 ## 5. Notes
 
-- Computation in Python takes some time, so this is only for demonstration. When adjusting large datasets, its best to use the command-line tool [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX).
-- Formulas and references can be found in the implementations of the corresponding functions, on the bottom of the README.md and in the [documentation](https://python-kraken-sdk.readthedocs.io/en/stable/).
+- Computation in Python takes some time, so this is only for demonstration. When
+  adjusting large datasets, its best to use the command-line tool
+  [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX).
+- Formulas and references can be found in the implementations of the
+  corresponding functions, on the bottom of the README.md and in the
+  [documentation](https://python-kraken-sdk.readthedocs.io/en/stable/).
 
-### Space for improvements:
+### Space for improvements
 
-- Since the scaling methods implemented so far scale by default over the mean values of the respective months, unrealistic long-term mean values may occur at the month transitions. This can be prevented either by selecting `group='time.dayofyear'`. Alternatively, it is possible not to scale using long-term mean values, but using a 31-day interval, which takes the 31 surrounding values over all years as the basis for calculating the mean values. This is not yet implemented, because even the computation for this takes so much time, that it is not worth implementing it in python - but this is available in [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX).
+- Since the scaling methods implemented so far scale by default over the mean
+  values of the respective months, unrealistic long-term mean values may occur
+  at the month transitions. This can be prevented either by selecting
+  `group='time.dayofyear'`. Alternatively, it is possible not to scale using
+  long-term mean values, but using a 31-day interval, which takes the 31
+  surrounding values over all years as the basis for calculating the mean
+  values. This is not yet implemented, because even the computation for this
+  takes so much time, that it is not worth implementing it in python - but this
+  is available in
+  [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX).
 
 ---
 
