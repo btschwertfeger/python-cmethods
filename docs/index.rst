@@ -13,5 +13,6 @@ Welcome to python-cmethods's documentation!
    src/introduction.rst
    src/getting_started.rst
    src/cmethods.rst
+   src/methods.rst
    src/issues.rst
    src/license.rst

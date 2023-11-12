@@ -17,7 +17,6 @@ project = "python-cmethods"
 copyright = "2023, Benjamin Thomas Schwertfeger"  # pylint: disable=redefined-builtin
 author = "Benjamin Thomas Schwertfeger"
 
-
 # to import the package
 sys.path.insert(0, os.path.abspath(".."))
 

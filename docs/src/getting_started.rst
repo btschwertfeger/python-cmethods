@@ -25,33 +25,34 @@ method specific documentation.
     import xarray as xr
     from cmethods import CMethods as cm
 
-    obsh = xr.open_dataset('input_data/observations.nc')
-    simh = xr.open_dataset('input_data/control.nc')
-    simp = xr.open_dataset('input_data/scenario.nc')
+    obsh = xr.open_dataset("input_data/observations.nc")
+    simh = xr.open_dataset("input_data/control.nc")
+    simp = xr.open_dataset("input_data/scenario.nc")
 
-    ls_result = cm.linear_scaling(
-        obs = obsh['tas'][:,0,0],
-        simh = simh['tas'][:,0,0],
-        simp = simp['tas'][:,0,0],
-        kind = '+'
+    ls_result=cm.adjust(
+        mathod="linear_scaling",
+        obs=obsh["tas"][:,0,0],
+        simh=simh["tas"][:,0,0],
+        simp=simp["tas"][:,0,0],
+        kind="+"
     )
 
 .. code-block:: python
     :linenos:
-    :caption: Apply the Quantile Delta Mapping bias correction technique on 1-dimensional data
+    :caption: Apply the Quantile Delta Mapping bias correction technique on 3-dimensional data
 
     import xarray as xr
     from cmethods import CMethods as cm
 
-    obsh = xr.open_dataset('input_data/observations.nc')
-    simh = xr.open_dataset('input_data/control.nc')
-    simp = xr.open_dataset('input_data/scenario.nc')
+    obsh = xr.open_dataset("input_data/observations.nc")
+    simh = xr.open_dataset("input_data/control.nc")
+    simp = xr.open_dataset("input_data/scenario.nc")
 
-    qdm_result = cm.adjust_3d( # 3d = 2 spatial and 1 time dimension
-        method = 'quantile_delta_mapping',
-        obs = obsh['tas'],
-        simh = simh['tas'],
-        simp = simp['tas'],
-        n_quaniles = 1000,
-        kind = '+'
+    qdm_result=cm.adjust(
+        method="quantile_delta_mapping",
+        obs=obsh["tas"],
+        simh=simh["tas"],
+        simp=simp["tas"],
+        n_quaniles=1000,
+        kind="+"
     )

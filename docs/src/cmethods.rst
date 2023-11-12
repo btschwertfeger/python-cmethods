@@ -5,14 +5,12 @@ Classes and Functions
 .. currentmodule:: cmethods
 
 .. autoclass:: CMethods
-   :members: linear_scaling, variance_scaling, delta_method, quantile_mapping, detrended_quantile_mapping, quantile_delta_mapping, adjust_3d
+   :members: adjust
 
 
-Some helpful additional methods
--------------------------------
+Some additional methods
+-----------------------
 
-.. automethod:: CMethods.get_pdf
-.. automethod:: CMethods.get_cdf
-.. automethod:: CMethods.get_inverse_of_cdf
-.. automethod:: CMethods.get_adjusted_scaling_factor
-.. automethod:: CMethods.get_available_methods
+.. automethod:: cmethods.utils.get_pdf
+.. automethod:: cmethods.utils.get_cdf
+.. automethod:: cmethods.utils.get_inverse_of_cdf
