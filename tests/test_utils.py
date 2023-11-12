@@ -15,25 +15,20 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from cmethods import CMethods
 from cmethods.utils import (
     check_np_types,
     check_xr_types,
     ensure_devidable,
     get_adjusted_scaling_factor,
-    get_cdf,
-    get_inverse_of_cdf,
     get_pdf,
     nan_or_equal,
 )
-
-cm: CMethods = CMethods()
 
 # --------------------------------------------------------------------------
 # test for nan values
 
 
-def test_quantile_mapping_single_nan() -> None:
+def test_quantile_mapping_single_nan(cm) -> None:
     obs, simh, simp = list(np.arange(10)), list(np.arange(10)), list(np.arange(10))
     obs[0] = np.nan
     expected = np.array([0.0, 1.9, 2.9, 3.9, 4.9, 5.9, 6.9, 7.9, 8.9, 9.0])
@@ -43,7 +38,7 @@ def test_quantile_mapping_single_nan() -> None:
 
 
 @pytest.mark.filterwarnings("ignore:All-NaN slice encountered")
-def test_quantile_mapping_all_nan() -> None:
+def test_quantile_mapping_all_nan(cm) -> None:
     obs, simh, simp = (
         list(np.full(10, np.nan)),
         list(np.arange(10)),
@@ -53,7 +48,7 @@ def test_quantile_mapping_all_nan() -> None:
     assert np.allclose(res, simp)
 
 
-def test_quantile_delta_mapping_single_nan() -> None:
+def test_quantile_delta_mapping_single_nan(cm) -> None:
     obs, simh, simp = list(np.arange(10)), list(np.arange(10)), list(np.arange(10))
     obs[0] = np.nan
     expected = np.array([0.0, 1.9, 2.9, 3.9, 4.9, 5.9, 6.9, 7.9, 8.9, 9.0])
@@ -65,7 +60,7 @@ def test_quantile_delta_mapping_single_nan() -> None:
 
 
 @pytest.mark.filterwarnings("ignore:All-NaN slice encountered")
-def test_quantile_delta_mapping_all_nan() -> None:
+def test_quantile_delta_mapping_all_nan(cm) -> None:
     obs, simh, simp = (
         list(np.full(10, np.nan)),
         list(np.arange(10)),
@@ -81,7 +76,7 @@ def test_quantile_delta_mapping_all_nan() -> None:
 # test utils
 
 
-def test_get_available_methods() -> None:
+def test_get_available_methods(cm) -> None:
     assert cm.get_available_methods() == [
         "linear_scaling",
         "variance_scaling",
@@ -109,7 +104,7 @@ def test_get_adjusted_scaling_factor() -> None:
     assert get_adjusted_scaling_factor(-11, -10) == -10
 
 
-def test_ensure_devidable() -> None:
+def test_ensure_devidable(cm) -> None:
     assert np.array_equal(
         ensure_devidable(
             np.array((1, 2, 3, 4, 5, 0)),
@@ -164,7 +159,7 @@ def test_type_check_failing() -> None:
         check_np_types(obs=[], simh=[], simp=1)
 
 
-def test_quantile_mapping_type_check_n_quantiles_failing() -> None:
+def test_quantile_mapping_type_check_n_quantiles_failing(cm) -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
         cm._CMethods__quantile_delta_mapping(  # type: ignore[attr-defined]
@@ -172,7 +167,7 @@ def test_quantile_mapping_type_check_n_quantiles_failing() -> None:
         )
 
 
-def test_quantile_delta_mapping_type_check_n_quantiles_failing() -> None:
+def test_quantile_delta_mapping_type_check_n_quantiles_failing(cm) -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
         cm._CMethods__quantile_delta_mapping(  # type: ignore[attr-defined]
@@ -180,8 +175,7 @@ def test_quantile_delta_mapping_type_check_n_quantiles_failing() -> None:
         )
 
 
-@pytest.mark.wip()
-def test_adjust_type_checking_failing() -> None:
+def test_adjust_type_checking_failing(cm) -> None:
     """
     Checks for all types that are expected to be passed to the adjust_3d method
     """

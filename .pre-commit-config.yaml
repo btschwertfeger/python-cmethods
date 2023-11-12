@@ -19,6 +19,7 @@ repos:
       - id: mixed-line-ending
       - id: name-tests-test
         args: ["--pytest-test-first"]
+        exclude: tests/helper.py
       - id: end-of-file-fixer
       - id: pretty-format-json
       - id: detect-private-key
