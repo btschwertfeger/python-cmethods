@@ -13,6 +13,7 @@ import click
 from xarray import open_dataset
 
 from cmethods import CMethods as cm
+from cmethods.static import DISTRIBUTION_METHODS, METHODS, SCALING_METHODS
 
 
 def save_to_netcdf(ds, **kwargs) -> None:
@@ -87,9 +88,9 @@ def main(**kwargs) -> None:
     """
     The Main program that uses the passed arguments to perform the bias correction procedure.
     """
-    if kwargs["method"] not in cm.get_available_methods():
+    if kwargs["method"] not in METHODS:
         raise ValueError(
-            f"Unknown method {kwargs['method']}. Available methods: {cm.get_available_methods()}"
+            f"Unknown method {kwargs['method']}. Available methods: {METHODS}"
         )
 
     ds_obs = open_dataset(kwargs["ref"])[kwargs["variable"]]
@@ -102,7 +103,7 @@ def main(**kwargs) -> None:
     end_date: str = ds_simp["time"][-1].dt.strftime("%Y%m%d").values.ravel()[0]
 
     descr1 = ""
-    if kwargs["method"] in cm.DISTRIBUTION_METHODS:
+    if kwargs["method"] in DISTRIBUTION_METHODS:
         descr1 = f"_quantiles-{kwargs['quantiles']}"
         kwargs["group"] = None
     else:
@@ -110,37 +111,22 @@ def main(**kwargs) -> None:
 
     kwargs.update({"start_date": start_date, "end_date": end_date, "descr1": descr1})
 
+    xkwargs = {
+        "obs": ds_obs,
+        "simh": ds_simh,
+        "simp": ds_simp,
+        "method": kwargs["method"],
+        "kind": kwargs["kind"],
+    }
+
+    if kwargs["method"] in SCALING_METHODS:
+        xkwargs["group"] = kwargs["group"]
+    if kwargs["method"] in DISTRIBUTION_METHODS:
+        xkwargs["n_quantiles"] = kwargs["quantiles"]
+
     print("**Starting correction**")
 
-    n_dims = len(ds_obs.dims)
-    if 1 == n_dims:
-        result = ds_simp.copy(deep=True)
-        result.values = cm.get_function(kwargs["m"])(
-            obs=ds_obs,
-            simh=ds_simh,
-            simp=ds_simp,
-            kind=kwargs["kind"],
-            n_quantiles=kwargs["quantiles"],
-            group=kwargs["group"],
-            **kwargs,
-        )
-        result = result.to_dataset(name=kwargs["variable"])
-
-    elif 3 == n_dims:
-        result = cm.adjust_3d(
-            method=kwargs["method"],
-            obs=ds_obs,
-            simh=ds_simh,
-            simp=ds_simp,
-            n_quantiles=kwargs["quantiles"],
-            kind=kwargs["kind"],
-            group=kwargs["group"],
-            n_jobs=kwargs["processes"],
-        )
-    else:
-        raise ValueError(
-            "Cannot correct this data! Idk how to handle more than 3 dimensions!"
-        )
+    result = cm().adjust(**xkwargs)
 
     print("**Computation done - saving the result now**")
 
