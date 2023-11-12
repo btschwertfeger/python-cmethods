@@ -449,7 +449,7 @@ class CMethods:
 
         # No grouped correction | distribution-based technique
         if kwargs.get("group", None) is None:
-            return self.__apply_ufunc(method, obs, simh, simp, **kwargs)
+            return self.__apply_ufunc(method, obs, simh, simp, **kwargs).to_dataset()
 
         if method not in SCALING_METHODS:
             raise ValueError(
