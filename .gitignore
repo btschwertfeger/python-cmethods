@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 # C extensions
 *.so
-*.zip
 
 # Distribution / packaging
 .Python
@@ -135,6 +134,12 @@ del*.py
 *.csv
 *.log
 *.zip
+*.nc
+
+!examples/input_data/*.nc
+!tests/fixture/*.nc
+!examples/input_data/*.zip
+!tests/fixture/*.zip
 .vscode/
 
 *.egg-info/

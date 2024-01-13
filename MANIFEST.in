@@ -1,1 +1,7 @@
 include README.md LICENSE
+
+graft cmethods
+
+prune tests
+prune docs
+prune examples

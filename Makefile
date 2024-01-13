@@ -5,70 +5,69 @@
 #
 
 VENV := venv
-GLOBAL_PYTHON := $(shell which python3)
 PYTHON := $(VENV)/bin/python3
 TESTS := tests
 PYTEST_OPTS := -vv
 
-
-.PHONY := help
+.PHONY: help
 help:
 	@grep "^##" Makefile | sed -e "s/##//"
 
-## build		Builds the python-kraken-sdk
+## build		Builds python-cmethods
 ##
-.PHONY := build
+.PHONY: build
 build:
 	$(PYTHON) -m pip wheel -w dist --no-deps .
 
 ## dev		Installs the package in edit mode
 ##
-.PHONY := dev
+.PHONY: dev
 dev:
+	@git lfs install
 	$(PYTHON) -m pip install -e ".[dev]"
 
 ## install		Install the package
 ##
-.PHONY := install
+.PHONY: install
 install:
 	$(PYTHON) -m pip install .
 
 ## test		Run the unit tests
 ##
-.PHONY := test
+.PHONY: test
 test:
 	$(PYTHON) -m pytest $(PYTEST_OPTS) $(TESTS)
 
-.PHONY := tests
+.PHONY: tests
 tests: test
 
 ## wip  	Run tests marked as wip
 ##
-.PHONY := wip
+.PHONY: wip
 wip:
 	$(PYTHON) -m pytest $(PYTEST_OPTS) -m "wip" $(TESTS)
 
 ## doc		Build the documentation
 ##
-.PHONY := doc
+.PHONY: doc
 doc:
 	cd docs && make html
 
 ## doctest		Run the documentation tests
 ##
-.PHONY := doctest
+.PHONY: doctest
 doctest:
 	cd docs && make doctest
 
 ## pre-commit		Pre-Commit
 ##
-.PHONY := pre-commit
+.PHONY: pre-commit
 pre-commit:
 	@pre-commit run -a
 
 ## changelog		Create the changelog
 ##
-.PHONY := changelog
+.PHONY: changelog
 changelog:
 	docker run -it --rm \
 		-v "$(PWD)":/usr/local/src/your-app/ \
@@ -81,7 +80,7 @@ changelog:
 
 ## clean		Clean the workspace
 ##
-.PHONY := clean
+.PHONY: clean
 clean:
 	rm -rf .pytest_cache \
 		build/ dist/ python_cmethods.egg-info \

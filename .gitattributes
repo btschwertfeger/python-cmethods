@@ -1,0 +1,5 @@
+examples/input_data/*.zip filter=lfs diff=lfs merge=lfs -text
+# examples/input_data/*.nc filter=lfs diff=lfs merge=lfs -text
+
+tests/fixture/*.zip filter=lfs diff=lfs merge=lfs -text
+# tests/fixture/*.nc filter=lfs diff=lfs merge=lfs -text

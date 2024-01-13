@@ -57,4 +57,5 @@ repos:
     rev: v3.0.1
     hooks:
       - id: prettier
+        exclude: '*.nc|*.zip'
 exclude: (\.ipynb$)

@@ -8,7 +8,7 @@ dynamic = ["version"]
 authors = [
   { name = "Benjamin Thomas Schwertfeger", email = "contact@b-schwertfeger.de" },
 ]
-description = "Collection of bias correction procedures for 1- and 3-dimensional climate data"
+description = "Collection of bias correction procedures for single and multidimensional climate data"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.11"
@@ -69,18 +69,18 @@ exclude_lines = ["coverage: disable", "if TYPE_CHECKING:"]
 skip_empty = true
 
 [project.optional-dependencies]
-jupyter = ["venv-kernel", "jupyterlab"]
+jupyter = ["venv-kernel"]
 dev = [
   # testing
   "pytest",
   "pytest-cov",
+  "zarr",
+  "dask[distributed]",
   "scikit-learn",
   "scipy",
   # building
   "setuptools_scm",
-  # examples
-  "click",
-  # ducumentation
+  # documentation
   "sphinx",
   "sphinx-rtd-theme",
   # linting
@@ -89,17 +89,17 @@ dev = [
   # typing
   "mypy",
 ]
-examples = ["matplotlib"]
+examples = ["click", "matplotlib"]
 
 # ------------------------------------------------------------------------------
 # Pylint
 [tool.pylint.main]
 # Analyse import fallback blocks. This can be used to support both Python 2 and 3
 # compatible code, which means that the block might have code that exists only in
-# one or another interpreter, leading to false positives when analysed.
+# one or another interpreter, leading to false positives when analyzed.
 # analyse-fallback-blocks =
 
-# Clear in-memory caches upon conclusion of linting. Useful if running pylint in
+# Clear in-memory caches upon conclusion of linting. Useful if running PyLint in
 # a server-like mode.
 # clear-cache-post-run =
 
@@ -154,7 +154,7 @@ ignore-patterns = ["^\\.#"]
 # pygtk.require().
 # init-hook =
 
-# Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
+# Use multiple processes to speed up PyLint. Specifying 0 will auto-detect the
 # number of processors available to use, and will cap the count on Windows to
 # avoid hangs.
 jobs = 1
@@ -172,7 +172,7 @@ limit-inference-results = 100
 persistent = true
 
 # Minimum Python version to use for version dependent checks. Will default to the
-# version used to run pylint.
+# version used to run PyLint.
 py-version = "3.10"
 
 # Discover python modules and packages in the file system subtree.
@@ -184,7 +184,7 @@ py-version = "3.10"
 # source root.
 # source-roots =
 
-# When enabled, pylint would attempt to guess common misconfiguration and emit
+# When enabled, PyLint would attempt to guess common misconfiguration and emit
 # user-friendly hints instead of false-positive error messages.
 suggestion-mode = true
 
@@ -399,7 +399,7 @@ overgeneral-exceptions = ["builtin.BaseException", "builtin.Exception"]
 ignore-long-lines = "^\\s*(# )?<?https?://\\S+>?$"
 
 # Number of spaces of indent required inside a hanging or continued line.
-indent-after-paren = 4
+indent-after-parent = 4
 
 # String used as indentation unit. This is usually "    " (4 spaces) or "\t" (1
 # tab).

@@ -23,7 +23,7 @@ distribution-based bias correction techniques for climatic research
 
 The documentation is available at: [https://python-cmethods.readthedocs.io/en/stable/](https://python-cmethods.readthedocs.io/en/stable/)
 
-> ⚠️ For the application of bias corrections on _lage data sets_ it is
+> ⚠️ For the application of bias corrections on _large data sets_ it is
 > recommended to use the command-line tool
 > [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX) since bias
 > corrections are complex statistical transformation which can be very slow in
