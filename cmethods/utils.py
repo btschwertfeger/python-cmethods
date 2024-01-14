@@ -33,7 +33,7 @@ def check_adjust_called(
 ) -> None:
     """
     Displays a user warning in case a correction function was not called via
-    `cmethods.adjust`.
+    `CMethods.adjust`.
 
     :param adjust_called: If the function was called via adjust
     :type adjust_called: Optional[bool]
@@ -42,7 +42,7 @@ def check_adjust_called(
     """
     if not adjust_called:
         warnings.warn(
-            message=f"Do not call {function_name} directly, use `cmethods.adjust` instead!",
+            message=f"Do not call {function_name} directly, use `CMethods.adjust` instead!",
             category=UserWarning,
         )
 

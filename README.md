@@ -112,6 +112,9 @@ https://python-cmethods.readthedocs.io/en/stable/
   applied to 1- and 3-dimensional data sets. The implementation of DQM to
   3-dimensional data is still in progress.
 
+- Except for DQM, all methods can be applied using `CMethods.adjust`. Chunked
+  data for computing e.g. in a dask cluster is possible as well.
+
 - For any questions -- please open an issue at https://github.com/btschwertfeger/python-cmethods/issues
 
 <a name="installation"></a>
