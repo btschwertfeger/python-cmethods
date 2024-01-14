@@ -163,12 +163,15 @@ qdm_result = cm.adjust(
 # stochastic variables like precipitation)
 ```
 
+It is also possible to adjust chunked data sets. Feel free to have a look into
+`tests/test_zarr_dask_compatibility.py` to get a starting point.
+
 Notes:
 
 - For the multiplicative techniques a maximum scaling factor of 10 is defined.
   This can be changed by adjusting the the `CMethods.MAX_SCALING_FACTOR`
   attribute.
-- Except for detrended quantile mapping, all implemented technqieus can be
+- Except for detrended quantile mapping, all implemented techniques can be
   applied to 1-and 3-dimensional data sets by executing the `CMethods.adjust`
   function.
 
