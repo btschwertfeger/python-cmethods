@@ -53,7 +53,7 @@ distributional properties that closely resemble the possible actual values.
 
 <figure>
   <img
-  src="docs/_static/images/biasCdiagram.png?raw=true"
+  src="doc/_static/images/biasCdiagram.png?raw=true"
   alt="Schematic representation of a bias adjustment procedure"
   style="background-color: white; border-radius: 7px">
   <figcaption>Figure 1: Schematic representation of a bias adjustment procedure</figcaption>
@@ -68,7 +68,7 @@ similar to the observed data ($T{obs,p}$) than the raw modeled data
 
 <figure>
   <img
-  src="docs/_static/images/dm-doy-plot.png?raw=true"
+  src="doc/_static/images/dm-doy-plot.png?raw=true"
   alt="Temperature per day of year in modeled, observed and bias-adjusted climate data"
   style="background-color: white; border-radius: 7px">
   <figcaption>Figure 2: Temperature per day of year in observed, modeled, and bias-adjusted climate data</figcaption>
