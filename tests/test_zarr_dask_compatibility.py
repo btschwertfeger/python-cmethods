@@ -4,16 +4,15 @@
 # GitHub: https://github.com/btschwertfeger
 #
 
+from typing import Any
+
+import pytest
 import xarray as xr
 
-from cmethods.types import XRData_t
-import pytest
-
 from cmethods import CMethods
+from cmethods.types import XRData_t
 
 from .helper import is_3d_rmse_better
-
-from typing import Any
 
 GROUP: str = "time.month"
 N_QUANTILES: int = 100

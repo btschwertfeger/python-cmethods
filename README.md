@@ -141,11 +141,11 @@ cm = CMethods()
 # adjust only one grid cell
 ls_result = cm.adjust(
     method="linear_scaling",
-    obs=obsh["tas"][:,0,0],
-    simh=simh["tas"][:,0,0],
-    simp=simp["tas"][:,0,0],
+    obs=obsh["tas"][:, 0, 0],
+    simh=simh["tas"][:, 0, 0],
+    simp=simp["tas"][:, 0, 0],
     kind="+",
-    group="time.month"
+    group="time.month",
 )
 
 # adjust all grid cells
@@ -155,7 +155,7 @@ qdm_result = cm.adjust(
     simh=simh["tas"],
     simp=simp["tas"],
     n_quantiles=1000,
-    kind="+"
+    kind="+",
 )
 
 # to calculate the relative rather than the absolute change,

@@ -8,16 +8,17 @@
 
 from __future__ import annotations
 
+import os
+from functools import cache
+from typing import Any
+
 import pytest
+import xarray as xr
 from dask.distributed import LocalCluster
 
 from cmethods import CMethods
 
 from .helper import get_datasets
-from functools import cache
-import os
-import xarray as xr
-from typing import Any
 
 FIXTURE_DIR: str = os.path.join(os.path.dirname(__file__), "fixture")
 

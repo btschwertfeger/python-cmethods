@@ -18,8 +18,9 @@ from cmethods.types import NPData_t, XRData_t
 if TYPE_CHECKING:
     from cmethods import CMethods
 
-from .helper import is_1d_rmse_better, is_3d_rmse_better
 import pytest
+
+from .helper import is_1d_rmse_better, is_3d_rmse_better
 
 GROUP: str = "time.month"
 N_QUANTILES: int = 100

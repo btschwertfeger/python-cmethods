@@ -45,6 +45,7 @@ from cmethods.static import (
 from cmethods.types import NPData, XRData
 from cmethods.utils import (
     UnknownMethodError,
+    check_adjust_called,
     check_np_types,
     check_xr_types,
     ensure_devidable,
@@ -52,7 +53,6 @@ from cmethods.utils import (
     get_cdf,
     get_inverse_of_cdf,
     nan_or_equal,
-    check_adjust_called,
 )
 
 

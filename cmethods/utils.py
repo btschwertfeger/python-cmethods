@@ -8,11 +8,12 @@
 
 from __future__ import annotations
 
-import numpy as np
-from typing import Optional
-from cmethods.types import NPData, NPData_t, XRData, XRData_t
-
 import warnings
+from typing import Optional
+
+import numpy as np
+
+from cmethods.types import NPData, NPData_t, XRData, XRData_t
 
 
 class UnknownMethodError(Exception):

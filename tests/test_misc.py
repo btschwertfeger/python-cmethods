@@ -16,10 +16,11 @@ import pytest
 if TYPE_CHECKING:
     from cmethods import CMethods
 
+import logging
+
 import numpy as np
 
 from cmethods.utils import UnknownMethodError
-import logging
 
 
 def test_not_implemented_errors(

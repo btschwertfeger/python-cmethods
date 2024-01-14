@@ -29,12 +29,12 @@ method specific documentation.
     simh = xr.open_dataset("input_data/control.nc")
     simp = xr.open_dataset("input_data/scenario.nc")
 
-    ls_result=cm.adjust(
+    ls_result = cm.adjust(
         mathod="linear_scaling",
-        obs=obsh["tas"][:,0,0],
-        simh=simh["tas"][:,0,0],
-        simp=simp["tas"][:,0,0],
-        kind="+"
+        obs=obsh["tas"][:, 0, 0],
+        simh=simh["tas"][:, 0, 0],
+        simp=simp["tas"][:, 0, 0],
+        kind="+",
     )
 
 .. code-block:: python
@@ -48,11 +48,11 @@ method specific documentation.
     simh = xr.open_dataset("input_data/control.nc")
     simp = xr.open_dataset("input_data/scenario.nc")
 
-    qdm_result=cm.adjust(
+    qdm_result = cm.adjust(
         method="quantile_delta_mapping",
         obs=obsh["tas"],
         simh=simh["tas"],
         simp=simp["tas"],
         n_quaniles=1000,
-        kind="+"
+        kind="+",
     )
