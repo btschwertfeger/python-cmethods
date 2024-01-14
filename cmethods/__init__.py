@@ -52,6 +52,7 @@ from cmethods.utils import (
     get_cdf,
     get_inverse_of_cdf,
     nan_or_equal,
+    check_adjust_called,
 )
 
 
@@ -94,7 +95,7 @@ class CMethods:
     MAX_SCALING_FACTOR: int | float = 10
 
     # ? -----========= L I N E A R - S C A L I N G =========------
-    def __linear_scaling(
+    def linear_scaling(
         self: CMethods,
         obs: NPData,
         simh: NPData,
@@ -107,7 +108,12 @@ class CMethods:
 
         See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#linear-scaling
         """
+        check_adjust_called(
+            function_name="linear_scaling",
+            adjust_called=kwargs.get("adjust_called", None),
+        )
         check_np_types(obs=obs, simh=simh, simp=simp)
+
         if kind in ADDITIVE:
             return np.array(simp) + (np.nanmean(obs) - np.nanmean(simh))  # Eq. 1
         if kind in MULTIPLICATIVE:
@@ -124,7 +130,7 @@ class CMethods:
 
     # ? -----========= V A R I A N C E - S C A L I N G =========------
 
-    def __variance_scaling(
+    def variance_scaling(
         self: CMethods,
         obs: NPData,
         simh: NPData,
@@ -137,10 +143,15 @@ class CMethods:
 
         See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#variance-scaling
         """
+        check_adjust_called(
+            function_name="variance_scaling",
+            adjust_called=kwargs.get("adjust_called", None),
+        )
         check_np_types(obs=obs, simh=simp, simp=simp)
+
         if kind in ADDITIVE:
-            LS_simh = self.__linear_scaling(obs, simh, simh)  # Eq. 1
-            LS_simp = self.__linear_scaling(obs, simh, simp)  # Eq. 2
+            LS_simh = self.linear_scaling(obs, simh, simh, adjust_called=True)  # Eq. 1
+            LS_simp = self.linear_scaling(obs, simh, simp, adjust_called=True)  # Eq. 2
 
             VS_1_simh = LS_simh - np.nanmean(LS_simh)  # Eq. 3
             VS_1_simp = LS_simp - np.nanmean(LS_simp)  # Eq. 4
@@ -160,7 +171,7 @@ class CMethods:
         )
 
     # ? -----========= D E L T A - M E T H O D =========------
-    def __delta_method(
+    def delta_method(
         self: CMethods,
         obs: NPData,
         simh: NPData,
@@ -172,6 +183,10 @@ class CMethods:
         **Do not call this function directly, please use :func:`cmethods.CMethods.adjust`**
         See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#delta-method
         """
+        check_adjust_called(
+            function_name="delta_method",
+            adjust_called=kwargs.get("adjust_called", None),
+        )
         check_np_types(obs=obs, simh=simh, simp=simp)
 
         if kind in ADDITIVE:
@@ -189,7 +204,7 @@ class CMethods:
         )
 
     # ? -----========= Q U A N T I L E - M A P P I N G =========------
-    def __quantile_mapping(
+    def quantile_mapping(
         self: CMethods,
         obs: NPData,
         simh: NPData,
@@ -202,6 +217,10 @@ class CMethods:
         **Do not call this function directly, please use :func:`cmethods.CMethods.adjust`**
         See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#quantile-mapping
         """
+        check_adjust_called(
+            function_name="quantile_mapping",
+            adjust_called=kwargs.get("adjust_called", None),
+        )
         check_np_types(obs=obs, simh=simh, simp=simp)
 
         if not isinstance(n_quantiles, int):
@@ -344,7 +363,7 @@ class CMethods:
 
     # ? -----========= Q U A N T I L E - D E L T A - M A P P I N G =========------
 
-    def __quantile_delta_mapping(
+    def quantile_delta_mapping(
         self: CMethods,
         obs: NPData,
         simh: NPData,
@@ -358,6 +377,10 @@ class CMethods:
 
         See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#quantile-delta-mapping
         """
+        check_adjust_called(
+            function_name="quantile_delta_mapping",
+            adjust_called=kwargs.get("adjust_called", None),
+        )
         check_np_types(obs=obs, simh=simh, simp=simp)
 
         if not isinstance(n_quantiles, int):
@@ -439,6 +462,7 @@ class CMethods:
         :return: The bias corrected/adjusted data set
         :rtype: XRData
         """
+        kwargs["adjust_called"] = True
         check_xr_types(obs=obs, simh=simh, simp=simp)
 
         if method == "detrended_quantile_mapping":
@@ -492,15 +516,15 @@ class CMethods:
         :rtype: function
         """
         if method == "linear_scaling":
-            return self.__linear_scaling
+            return self.linear_scaling
         if method == "variance_scaling":
-            return self.__variance_scaling
+            return self.variance_scaling
         if method == "delta_method":
-            return self.__delta_method
+            return self.delta_method
         if method == "quantile_mapping":
-            return self.__quantile_mapping
+            return self.quantile_mapping
         if method == "quantile_delta_mapping":
-            return self.__quantile_delta_mapping
+            return self.quantile_delta_mapping
         raise UnknownMethodError(method, METHODS)
 
     def __apply_ufunc(

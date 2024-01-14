@@ -9,8 +9,10 @@
 from __future__ import annotations
 
 import numpy as np
-
+from typing import Optional
 from cmethods.types import NPData, NPData_t, XRData, XRData_t
+
+import warnings
 
 
 class UnknownMethodError(Exception):
@@ -21,6 +23,26 @@ class UnknownMethodError(Exception):
     def __init__(self: UnknownMethodError, method: str, available_methods: list):
         super().__init__(
             f'Unknown method "{method}"! Available methods: {available_methods}'
+        )
+
+
+def check_adjust_called(
+    function_name: str,
+    adjust_called: Optional[bool] = None,
+) -> None:
+    """
+    Displays a user warning in case a correction function was not called via
+    `cmethods.adjust`.
+
+    :param adjust_called: If the function was called via adjust
+    :type adjust_called: Optional[bool]
+    :param function_name: The function that was called
+    :type function_name: str
+    """
+    if not adjust_called:
+        warnings.warn(
+            message=f"Do not call {function_name} directly, use `cmethods.adjust` instead!",
+            category=UserWarning,
         )
 
 

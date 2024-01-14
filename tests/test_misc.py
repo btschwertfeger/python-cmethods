@@ -9,7 +9,7 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
@@ -19,32 +19,39 @@ if TYPE_CHECKING:
 import numpy as np
 
 from cmethods.utils import UnknownMethodError
+import logging
 
 
-def test_not_implemented_errors(cm: CMethods, datasets: dict) -> None:
+def test_not_implemented_errors(
+    cm: CMethods,
+    datasets: dict,
+    caplog: Any,
+) -> None:
+    caplog.set_level(logging.INFO)
+
     with pytest.raises(
         NotImplementedError,
         match=re.escape(r"kind='/' not available for linear_scaling."),
-    ):
-        cm._CMethods__linear_scaling(obs=[], simh=[], simp=[], kind="/")
+    ), pytest.warns(UserWarning, match="Do not call linear_scaling"):
+        cm.linear_scaling(obs=[], simh=[], simp=[], kind="/")
 
     with pytest.raises(
         NotImplementedError,
         match=re.escape(r"kind='/' not available for variance_scaling."),
-    ):
-        cm._CMethods__variance_scaling(obs=[], simh=[], simp=[], kind="/")
+    ), pytest.warns(UserWarning, match="Do not call variance_scaling"):
+        cm.variance_scaling(obs=[], simh=[], simp=[], kind="/")
 
     with pytest.raises(
         NotImplementedError,
         match=re.escape(r"kind='/' not available for delta_method. "),
-    ):
-        cm._CMethods__delta_method(obs=[], simh=[], simp=[], kind="/")
+    ), pytest.warns(UserWarning, match="Do not call delta_method"):
+        cm.delta_method(obs=[], simh=[], simp=[], kind="/")
 
     with pytest.raises(
         NotImplementedError,
         match=re.escape(r"kind='/' for quantile_mapping is not available."),
-    ):
-        cm._CMethods__quantile_mapping(
+    ), pytest.warns(UserWarning, match="Do not call quantile_mapping"):
+        cm.quantile_mapping(
             obs=np.array(datasets["+"]["obsh"][:, 0, 0]),
             simh=np.array(datasets["+"]["simh"][:, 0, 0]),
             simp=np.array(datasets["+"]["simp"][:, 0, 0]),
@@ -66,8 +73,8 @@ def test_not_implemented_errors(cm: CMethods, datasets: dict) -> None:
     with pytest.raises(
         NotImplementedError,
         match=re.escape(r"kind='/' not available for quantile_delta_mapping."),
-    ):
-        cm._CMethods__quantile_delta_mapping(
+    ), pytest.warns(UserWarning, match="Do not call quantile_delta_mapping"):
+        cm.quantile_delta_mapping(
             obs=np.array(datasets["+"]["obsh"][:, 0, 0]),
             simh=np.array(datasets["+"]["simh"][:, 0, 0]),
             simp=np.array(datasets["+"]["simp"][:, 0, 0]),

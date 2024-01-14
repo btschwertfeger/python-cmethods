@@ -31,7 +31,6 @@ def is_3d_rmse_better(result, obsp, simp) -> bool:
     rmse_values_new = np.sqrt(
         mean_squared_error(result_reshaped, obsp_reshaped, multioutput="raw_values")
     )
-
     # Convert the flattened array back to the original grid shape
     rmse_values_old_ds = xr.DataArray(
         rmse_values_old.reshape(obsp.lat.size, obsp.lon.size),
