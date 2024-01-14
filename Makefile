@@ -82,7 +82,7 @@ changelog:
 ##
 .PHONY: clean
 clean:
-	rm -rf .pytest_cache \
+	rm -rf .pytest_cache .cache \
 		build/ dist/ python_cmethods.egg-info \
 		docs/_build \
 		examples/.ipynb_checkpoints .ipynb_checkpoints \
