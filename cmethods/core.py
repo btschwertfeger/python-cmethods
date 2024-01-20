@@ -11,7 +11,7 @@ correction techniques.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Callable, Dict, Optional
 
 import xarray as xr
 
@@ -130,16 +130,12 @@ def adjust(
     group: str = kwargs["group"]
     del kwargs["group"]
 
-    obs_g: List[Tuple[int, XRData]] = list(obs.groupby(group))
-    simh_g: List[Tuple[int, XRData]] = list(simh.groupby(group))
-    simp_g: List[Tuple[int, XRData]] = list(simp.groupby(group))
-
     result: Optional[XRData] = None
-    for index in range(len(list(obs_g))):
-        obs_gds: XRData = obs_g[index][1]
-        simh_gds: XRData = simh_g[index][1]
-        simp_gds: XRData = simp_g[index][1]
-
+    for (_, obs_gds), (_, simh_gds), (_, simp_gds) in zip(
+        obs.groupby(group),
+        simh.groupby(group),
+        simp.groupby(group),
+    ):
         monthly_result = apply_ufunc(
             method,
             obs_gds,

@@ -171,7 +171,7 @@ def test_3d_distribution(
     assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
 
-def test_detrended_quantile_mapping_add_1d(datasets: dict) -> None:
+def test_1d_detrended_quantile_mapping_add(datasets: dict) -> None:
     kind: str = "+"
     obsh: XRData_t = datasets[kind]["obsh"][:, 0, 0]
     obsp: XRData_t = datasets[kind]["obsp"][:, 0, 0]
@@ -190,7 +190,7 @@ def test_detrended_quantile_mapping_add_1d(datasets: dict) -> None:
     assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
 
 
-def test_detrended_quantile_mapping_mult_1d(datasets: dict) -> None:
+def test_1d_detrended_quantile_mapping_mult(datasets: dict) -> None:
     kind: str = "*"
     obsh: XRData_t = datasets[kind]["obsh"][:, 0, 0]
     obsp: XRData_t = datasets[kind]["obsp"][:, 0, 0]
