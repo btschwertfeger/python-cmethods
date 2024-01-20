@@ -24,7 +24,7 @@ def save_to_netcdf(ds, **kwargs) -> None:
     :type ds: xarray.core.dataarray.Dataset
     """
     ds.to_netcdf(
-        f"{kwargs['method']}_result_var-{kwargs['variable']}{kwargs['descr1']}_kind-{kwargs['kind']}_group-{kwargs['group']}_{kwargs['start_date']}_{kwargs['end_date']}.nc"
+        f"{kwargs['method']}_result_var-{kwargs['variable']}{kwargs['descr1']}_kind-{kwargs['kind']}_group-{kwargs['group']}_{kwargs['start_date']}_{kwargs['end_date']}.nc",
     )
 
 
@@ -51,10 +51,18 @@ def save_to_netcdf(ds, **kwargs) -> None:
     help="The modeled data set to adjust (scenario period)",
 )
 @click.option(
-    "-m", "--method", required=True, type=str, help="The bias correction method"
+    "-m",
+    "--method",
+    required=True,
+    type=str,
+    help="The bias correction method",
 )
 @click.option(
-    "-v", "--variable", required=True, type=str, help="The variable to adjust"
+    "-v",
+    "--variable",
+    required=True,
+    type=str,
+    help="The variable to adjust",
 )
 @click.option(
     "-k",
@@ -90,7 +98,7 @@ def main(**kwargs) -> None:
     """
     if kwargs["method"] not in METHODS:
         raise ValueError(
-            f"Unknown method {kwargs['method']}. Available methods: {METHODS}"
+            f"Unknown method {kwargs['method']}. Available methods: {METHODS}",
         )
 
     ds_obs = open_dataset(kwargs["ref"])[kwargs["variable"]]

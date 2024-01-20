@@ -65,6 +65,17 @@ doctest:
 pre-commit:
 	@pre-commit run -a
 
+## ruff 	Run ruff without fix
+.PHONY: ruff
+ruff:
+	ruff check --preview .
+
+## ruff-fix 	Run ruff with fix
+##
+.PHONY: ruff-fix
+ruff-fix:
+	ruff check --fix --preview .
+
 ## changelog		Create the changelog
 ##
 .PHONY: changelog

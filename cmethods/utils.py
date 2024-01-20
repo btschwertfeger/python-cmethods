@@ -9,11 +9,14 @@
 from __future__ import annotations
 
 import warnings
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 
-from cmethods.types import NPData, NPData_t, XRData, XRData_t
+from cmethods.types import NPData_t, XRData_t
+
+if TYPE_CHECKING:
+    from cmethods.types import NPData, XRData
 
 
 class UnknownMethodError(Exception):
@@ -23,13 +26,13 @@ class UnknownMethodError(Exception):
 
     def __init__(self: UnknownMethodError, method: str, available_methods: list):
         super().__init__(
-            f'Unknown method "{method}"! Available methods: {available_methods}'
+            f'Unknown method "{method}"! Available methods: {available_methods}',
         )
 
 
 def check_adjust_called(
     function_name: str,
-    adjust_called: Optional[bool] = None,
+    adjust_called: Optional[bool] = None,  # noqa: FBT001
 ) -> None:
     """
     Displays a user warning in case a correction function was not called via
@@ -44,6 +47,7 @@ def check_adjust_called(
         warnings.warn(
             message=f"Do not call {function_name} directly, use `CMethods.adjust` instead!",
             category=UserWarning,
+            stacklevel=1,
         )
 
 
@@ -212,8 +216,8 @@ def get_inverse_of_cdf(
 
 
 def get_adjusted_scaling_factor(
-    factor: Union[int, float],
-    max_scaling_factor: Union[int, float],
+    factor: float,
+    max_scaling_factor: float,
 ) -> float:
     r"""
     Returns:
@@ -242,12 +246,12 @@ def get_adjusted_scaling_factor(
 __all__ = [
     "UnknownMethodError",
     "check_adjust_called",
-    "check_xr_types",
     "check_np_types",
-    "nan_or_equal",
+    "check_xr_types",
     "ensure_devidable",
-    "get_pdf",
+    "get_adjusted_scaling_factor",
     "get_cdf",
     "get_inverse_of_cdf",
-    "get_adjusted_scaling_factor",
+    "get_pdf",
+    "nan_or_equal",
 ]

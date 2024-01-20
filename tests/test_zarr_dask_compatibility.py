@@ -19,7 +19,7 @@ N_QUANTILES: int = 100
 
 
 @pytest.mark.parametrize(
-    "method,kind",
+    ("method", "kind"),
     [
         ("linear_scaling", "+"),
         ("variance_scaling", "+"),
@@ -32,9 +32,9 @@ def test_3d_scaling_zarr(
     datasets_from_zarr: xr.Dataset,
     method: str,
     kind: str,
-    dask_cluster: Any,
+    dask_cluster: Any,  # noqa: ARG001
 ) -> None:
-    variable: str = "tas" if kind == "+" else "pr"
+    variable: str = "tas" if kind == "+" else "pr"  # noqa: PLR2004
     obsh: xr.DataArray = datasets_from_zarr[kind]["obsh"][variable]
     obsp: xr.DataArray = datasets_from_zarr[kind]["obsp"][variable]
     simh: xr.DataArray = datasets_from_zarr[kind]["simh"][variable]
@@ -52,14 +52,19 @@ def test_3d_scaling_zarr(
 
     # grouped
     result = adjust(
-        method=method, obs=obsh, simh=simh, simp=simp, kind=kind, group=GROUP
+        method=method,
+        obs=obsh,
+        simh=simh,
+        simp=simp,
+        kind=kind,
+        group=GROUP,
     )
     assert isinstance(result, XRData_t)
     assert is_3d_rmse_better(result=result[variable], obsp=obsp, simp=simp)
 
 
 @pytest.mark.parametrize(
-    "method,kind",
+    ("method", "kind"),
     [
         ("quantile_mapping", "+"),
         ("quantile_delta_mapping", "+"),
@@ -71,9 +76,9 @@ def test_3d_distribution_zarr(
     datasets_from_zarr: dict,
     method: str,
     kind: str,
-    dask_cluster: Any,
+    dask_cluster: Any,  # noqa: ARG001
 ) -> None:
-    variable: str = "tas" if kind == "+" else "pr"
+    variable: str = "tas" if kind == "+" else "pr"  # noqa: PLR2004
     obsh: XRData_t = datasets_from_zarr[kind]["obsh"][variable]
     obsp: XRData_t = datasets_from_zarr[kind]["obsp"][variable]
     simh: XRData_t = datasets_from_zarr[kind]["simh"][variable]

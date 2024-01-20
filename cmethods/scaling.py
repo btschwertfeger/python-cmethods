@@ -12,18 +12,20 @@ intended to used directly - but as part of the adjustment procedure triggered by
 
 from __future__ import annotations
 
-from typing import Any, Final
+from typing import TYPE_CHECKING, Any, Final
 
 import numpy as np
 
 from cmethods.static import ADDITIVE, MAX_SCALING_FACTOR, MULTIPLICATIVE
-from cmethods.types import NPData
 from cmethods.utils import (
     check_adjust_called,
     check_np_types,
     ensure_devidable,
     get_adjusted_scaling_factor,
 )
+
+if TYPE_CHECKING:
+    from cmethods.types import NPData
 
 
 # ? -----========= L I N E A R - S C A L I N G =========------
@@ -62,7 +64,7 @@ def linear_scaling(
         )
         return np.array(simp) * adj_scaling_factor  # Eq. 2
     raise NotImplementedError(
-        f"{kind=} not available for linear_scaling. Use '+' or '*' instead."
+        f"{kind=} not available for linear_scaling. Use '+' or '*' instead.",
     )
 
 
@@ -94,7 +96,8 @@ def variance_scaling(
         VS_1_simh = LS_simh - np.nanmean(LS_simh)  # Eq. 3
         VS_1_simp = LS_simp - np.nanmean(LS_simp)  # Eq. 4
         max_scaling_factor: Final[float] = kwargs.get(
-            "max_scaling_factor", MAX_SCALING_FACTOR
+            "max_scaling_factor",
+            MAX_SCALING_FACTOR,
         )
         adj_scaling_factor: Final[float] = get_adjusted_scaling_factor(
             ensure_devidable(
@@ -109,7 +112,7 @@ def variance_scaling(
         return VS_2_simp + np.nanmean(LS_simp)  # Eq. 6
 
     raise NotImplementedError(
-        f"{kind=} not available for variance_scaling. Use '+' instead."
+        f"{kind=} not available for variance_scaling. Use '+' instead.",
     )
 
 
@@ -135,7 +138,8 @@ def delta_method(
         return np.array(obs) + (np.nanmean(simp) - np.nanmean(simh))  # Eq. 1
     if kind in MULTIPLICATIVE:
         max_scaling_factor: Final[float] = kwargs.get(
-            "max_scaling_factor", MAX_SCALING_FACTOR
+            "max_scaling_factor",
+            MAX_SCALING_FACTOR,
         )
         adj_scaling_factor = get_adjusted_scaling_factor(
             ensure_devidable(
@@ -147,5 +151,5 @@ def delta_method(
         )
         return np.array(obs) * adj_scaling_factor  # Eq. 2
     raise NotImplementedError(
-        f"{kind=} not available for delta_method. Use '+' or '*' instead."
+        f"{kind=} not available for delta_method. Use '+' or '*' instead.",
     )

@@ -17,7 +17,7 @@ from sklearn.metrics import mean_squared_error
 
 def is_1d_rmse_better(result, obsp, simp) -> bool:
     return np.sqrt(mean_squared_error(result, obsp)) < np.sqrt(
-        mean_squared_error(simp, obsp)
+        mean_squared_error(simp, obsp),
     )
 
 
@@ -28,10 +28,10 @@ def is_3d_rmse_better(result, obsp, simp) -> bool:
 
     # Compute RMSE
     rmse_values_old = np.sqrt(
-        mean_squared_error(simp_reshaped, obsp_reshaped, multioutput="raw_values")
+        mean_squared_error(simp_reshaped, obsp_reshaped, multioutput="raw_values"),
     )
     rmse_values_new = np.sqrt(
-        mean_squared_error(result_reshaped, obsp_reshaped, multioutput="raw_values")
+        mean_squared_error(result_reshaped, obsp_reshaped, multioutput="raw_values"),
     )
     # Convert the flattened array back to the original grid shape
     rmse_values_old_ds = xr.DataArray(
@@ -49,10 +49,16 @@ def is_3d_rmse_better(result, obsp, simp) -> bool:
 
 def get_datasets(kind: str) -> tuple[xr.Dataset, xr.Dataset, xr.Dataset, xr.Dataset]:
     historical_time = xr.cftime_range(
-        "1971-01-01", "2000-12-31", freq="D", calendar="noleap"
+        "1971-01-01",
+        "2000-12-31",
+        freq="D",
+        calendar="noleap",
     )
     future_time = xr.cftime_range(
-        "2001-01-01", "2030-12-31", freq="D", calendar="noleap"
+        "2001-01-01",
+        "2030-12-31",
+        freq="D",
+        calendar="noleap",
     )
     latitudes = np.arange(23, 27, 1)
 
@@ -93,14 +99,14 @@ def get_datasets(kind: str) -> tuple[xr.Dataset, xr.Dataset, xr.Dataset, xr.Data
             .to_dataset(name=kind)
         )
 
-    if kind == "+":
+    if kind == "+":  # noqa: PLR2004
         some_data = [get_hist_temp_for_lat(val) for val in latitudes]
         data = np.array(
             [
                 np.array(some_data),
                 np.array(some_data) + 0.5,
                 np.array(some_data) + 1,
-            ]
+            ],
         )
         obsh = get_dataset(data, historical_time, kind=kind)
         obsp = get_dataset(data + 1, historical_time, kind=kind)
@@ -110,7 +116,7 @@ def get_datasets(kind: str) -> tuple[xr.Dataset, xr.Dataset, xr.Dataset, xr.Data
     else:  # precipitation
         some_data = [get_fake_hist_precipitation_data() for _ in latitudes]
         data = np.array(
-            [some_data, np.array(some_data) + np.random.rand(), np.array(some_data)]
+            [some_data, np.array(some_data) + np.random.rand(), np.array(some_data)],
         )
         obsh = get_dataset(data, historical_time, kind=kind)
         obsp = get_dataset(data * 1.02, historical_time, kind=kind)

@@ -5,7 +5,6 @@
 #
 # This file is only used by sphinx for liking the package to the documentation.
 
-import setuptools_scm  # pylint: disable=unused-import
 from setuptools import setup
 
 setup()

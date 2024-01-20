@@ -91,10 +91,222 @@ dev = [
   # linting
   "pylint",
   "flake8",
+  "ruff==0.1.13",
   # typing
   "mypy",
 ]
+
 examples = ["click", "matplotlib"]
+
+
+# ========= T Y P I N G ========================================================
+#
+[tool.mypy]
+python_version = "3.11"
+
+# junit_xml = "mypy.xml"
+files = ["cmethods/**/*.py"]
+exclude = ["tests/**/*.py"]
+
+cache_dir = ".cache/mypy"
+sqlite_cache = true
+cache_fine_grained = true
+
+# Disallow dynamic typing
+disallow_any_unimported = false
+disallow_any_expr = false
+disallow_any_decorated = false
+disallow_any_explicit = false
+disallow_any_generics = false
+disallow_subclassing_any = false
+
+# # Untyped definitions and calls
+check_untyped_defs = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = false
+
+# None and Optional handling
+implicit_optional = true
+strict_optional = false
+
+# Configuring warnings
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unused_configs = true
+warn_no_return = true
+warn_return_any = true
+warn_unreachable = true
+
+# Suppressing errors
+ignore_errors = false
+
+# Configuring error messages
+show_error_context = true
+show_column_numbers = true
+hide_error_codes = false
+pretty = true
+color_output = true
+show_absolute_path = true
+ignore_missing_imports = true
+
+# Miscellaneous strictness flags
+allow_untyped_globals = false
+allow_redefinition = false
+local_partial_types = false
+# disable_error_code = xxx,xxx
+implicit_reexport = true
+strict_concatenate = false
+strict_equality = true
+strict = true
+
+# ========= L I N T I N G ======================================================
+#
+[tool.ruff]
+# https://beta.ruff.rs/docs/rules/
+# https://beta.ruff.rs/docs/settings/
+# src = ["cmethods"]
+
+select = [
+  "A",     # flake8-builtins
+  "AIR",   # Airflow
+  "ASYNC", # flake8-async
+  "B",     # flake8-bugbear
+  "BLE",   # blind-except
+  "C4",    # flake8-comprehensions
+  "COM",   # flake8-commas
+  "E",     # pycodestyle
+  "F",     # pyflakes
+  "FA",    # flake8-future-annotations
+  "FLY",   # flynt
+  "G",     # flake8-logging-format
+  "I",     # isort
+  "ICN",   # flake8-import-conventions
+  "INT",   # flake8-gettext
+  "ISC",   # flake8-implicit-string-concat
+  "LOG",   # flake8-logging
+  "N",     # PEP8 naming
+  "PERF",  # Perflint # maybe
+  "PGH",   # pygrep-hooks
+  "PIE",   # flake8-pie
+  "PL",    # PyLint
+  "PT",    # flake8-pytest-style
+  "PYI",   # flake8-pyi
+  "Q",     # flake8-quotes
+  "RET",   # flake8-return
+  "RSE",   # flake8-raise
+  "RUF",   # Ruff-specific rules
+  "S",     # flake8-bandit
+  "SIM",   # flake8-simplify
+  "SLF",   # flake8-self
+  "SLOT",  # flake8-slots
+  "T20",   # flake8-print
+  "TCH",   # flake8-type-checking
+  "TID",   # flake8-tidy-imports
+  "ARG",   # flake8-unused-arguments
+  "CPY",   # flake8-copyright
+  "FBT",   # boolean trap
+  "PTH",   # flake8-use-pathlib
+  "FURB",  # refurb
+  # "ERA", # eradicate # commented-out code
+  # "FIX", # flake8-fixme
+  # "TD",  # flake8-todos
+  # "TRY", # tryceratops # specify exception messages in class; not important
+]
+fixable = [
+  "I",
+  "C4",
+  "Q",
+  "PT",
+  "ICN",
+  "COM",
+  "RSE",
+  "PT",
+  "FA",
+  "FA100",
+  "PLR6201",
+]
+
+ignore = [
+  # "B019",    # use of lru_cache or cache
+  # "PLR2004", # magic value in comparison
+  # "E203",    # Whitespace before ':' # false positive on list slices
+  # "PLR6301", # Method `…` could be a function or static method # false positive for no-self-use
+]
+
+respect-gitignore = true
+exclude = []
+
+line-length = 130
+cache-dir = ".cache/ruff"
+task-tags = ["todo", "TODO"]
+
+[tool.ruff.per-file-ignores]
+"doc/*.py" = [
+  "CPY001",  # Missing copyright notice at top of file
+  "PTH118",  # `os.path.join()` should be replaced by `Path` with `/` operator,
+  "PTH123",  # `open()` should be replaced by `Path.open()`
+  "PTH100",  # `os.path.abspath()` should be replaced by `Path.resolve()`
+  "FURB101", # `open` and `read` should be replaced by `Path("links.rst").read_text(encoding="utf-8")`
+  "A001",    # Variable `copyright` is shadowing a Python builtin
+]
+
+"tests/*.py" = [
+  "E501",   # line to long
+  "F841",   # unused variable
+  "N802",   # PEP8 naming
+  "S101",   # assert use
+  "S110",   # try-except-pass without logging
+  "S311",   # pseudo-random-generator
+  "SLF001", # private member access
+  "TID252", # ban relative imports
+  "PTH118", # `os.path.join()` should be replaced by `Path` with `/` operator,
+  "PTH120", # `os.path.dirname()` should be replaced by `Path.parent`
+]
+"examples/biasadjust.py" = [
+  "T201", # `print` found
+]
+
+[tool.ruff.flake8-copyright]
+author = "Benjamin Thomas Schwertfeger"
+notice-rgx = "(?i)Copyright \\(C\\) \\d{4}"
+min-file-size = 1024
+
+[tool.ruff.flake8-quotes]
+docstring-quotes = "double"
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.flake8-bandit]
+check-typed-exception = true
+
+[tool.ruff.flake8-type-checking]
+strict = true
+
+[tool.ruff.pep8-naming]
+ignore-names = [
+  "i",
+  "j",
+  "k",
+  "_",
+  "X",
+  "LS_simh",
+  "LS_simp",
+  "VS_1_simh",
+  "VS_1_simp",
+  "VS_2_simp",
+  "QDM1",
+]
+
+[tool.ruff.pylint]
+max-args = 8
+max-branches = 15
+max-locals = 25
+max-returns = 6
+max-statements = 50
+allow-magic-value-types = ["int"]
 
 # ------------------------------------------------------------------------------
 # Pylint

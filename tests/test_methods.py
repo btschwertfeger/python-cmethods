@@ -24,7 +24,7 @@ N_QUANTILES: int = 100
 
 
 @pytest.mark.parametrize(
-    "method,kind",
+    ("method", "kind"),
     [
         ("linear_scaling", "+"),
         ("variance_scaling", "+"),
@@ -50,14 +50,19 @@ def test_1d_scaling(
 
     # grouped
     result = adjust(
-        method=method, obs=obsh, simh=simh, simp=simp, kind=kind, group=GROUP
+        method=method,
+        obs=obsh,
+        simh=simh,
+        simp=simp,
+        kind=kind,
+        group=GROUP,
     )
     assert isinstance(result, XRData_t)
     assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
 
 @pytest.mark.parametrize(
-    "method,kind",
+    ("method", "kind"),
     [
         ("linear_scaling", "+"),
         ("variance_scaling", "+"),
@@ -90,7 +95,12 @@ def test_3d_scaling(
 
     # grouped
     result: XRData_t = adjust(
-        method=method, obs=obsh, simh=simh, simp=simp, kind=kind, group=GROUP
+        method=method,
+        obs=obsh,
+        simh=simh,
+        simp=simp,
+        kind=kind,
+        group=GROUP,
     )
 
     assert isinstance(result, XRData_t)
@@ -98,7 +108,7 @@ def test_3d_scaling(
 
 
 @pytest.mark.parametrize(
-    "method,kind",
+    ("method", "kind"),
     [
         ("quantile_mapping", "+"),
         ("quantile_delta_mapping", "+"),
@@ -130,7 +140,7 @@ def test_1d_distribution(
 
 
 @pytest.mark.parametrize(
-    "method,kind",
+    ("method", "kind"),
     [
         ("quantile_mapping", "+"),
         ("quantile_delta_mapping", "+"),
@@ -170,7 +180,11 @@ def test_detrended_quantile_mapping_add_1d(datasets: dict) -> None:
 
     # not group
     result: XRData_t = detrended_quantile_mapping(
-        obs=obsh, simh=simh, simp=simp, kind=kind, n_quantiles=N_QUANTILES
+        obs=obsh,
+        simh=simh,
+        simp=simp,
+        kind=kind,
+        n_quantiles=N_QUANTILES,
     )
     assert isinstance(result, NPData_t)
     assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
@@ -185,7 +199,11 @@ def test_detrended_quantile_mapping_mult_1d(datasets: dict) -> None:
 
     # not group
     result: XRData_t = detrended_quantile_mapping(
-        obs=obsh, simh=simh, simp=simp, kind=kind, n_quantiles=N_QUANTILES
+        obs=obsh,
+        simh=simh,
+        simp=simp,
+        kind=kind,
+        n_quantiles=N_QUANTILES,
     )
     assert isinstance(result, NPData_t)
     assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)

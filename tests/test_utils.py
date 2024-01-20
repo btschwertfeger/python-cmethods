@@ -22,6 +22,7 @@ from cmethods.distribution import (
     quantile_delta_mapping,
     quantile_mapping,
 )
+from cmethods.static import MAX_SCALING_FACTOR
 from cmethods.utils import (
     check_np_types,
     check_xr_types,
@@ -100,8 +101,6 @@ def test_get_adjusted_scaling_factor() -> None:
 
 
 def test_ensure_devidable() -> None:
-    from cmethods.static import MAX_SCALING_FACTOR
-
     assert np.array_equal(
         ensure_devidable(
             np.array((1, 2, 3, 4, 5, 0)),
@@ -177,7 +176,8 @@ def test_detrended_quantile_mapping_type_check_n_quantiles_failing(
 def test_detrended_quantile_mapping_type_check_simp_failing(datasets: dict) -> None:
     """n_quantiles must by type int"""
     with pytest.raises(
-        TypeError, match="'simp' must be type xarray.core.dataarray.DataArray"
+        TypeError,
+        match="'simp' must be type xarray.core.dataarray.DataArray",
     ):
         detrended_quantile_mapping(  # type: ignore[attr-defined]
             obs=datasets["+"]["obsh"][:, 0, 0],
@@ -192,7 +192,10 @@ def test_quantile_delta_mapping_type_check_n_quantiles() -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
         quantile_delta_mapping(  # type: ignore[attr-defined]
-            obs=[], simh=[], simp=[], n_quantiles="100"
+            obs=[],
+            simh=[],
+            simp=[],
+            n_quantiles="100",
         )
 
 
@@ -201,7 +204,10 @@ def test_quantile_delta_mapping_type_check_n_quantiles_failing() -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
         quantile_delta_mapping(  # type: ignore[attr-defined]
-            obs=[], simh=[], simp=[], n_quantiles="100"
+            obs=[],
+            simh=[],
+            simp=[],
+            n_quantiles="100",
         )
 
 
@@ -211,7 +217,8 @@ def test_adjust_type_checking_failing() -> None:
     """
     # Create the DataArray
     data: xr.core.dataarray.DataArray = xr.DataArray(
-        [10, 20, 30, 40, 50], dims=["time"]
+        [10, 20, 30, 40, 50],
+        dims=["time"],
     )
     with pytest.raises(
         TypeError,

@@ -78,7 +78,7 @@ def quantile_mapping(
         return get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 2
 
     raise NotImplementedError(
-        f"{kind=} for quantile_mapping is not available. Use '+' or '*' instead."
+        f"{kind=} for quantile_mapping is not available. Use '+' or '*' instead.",
     )
 
 
@@ -103,7 +103,7 @@ def detrended_quantile_mapping(
 
     if kind not in MULTIPLICATIVE and kind not in ADDITIVE:
         raise NotImplementedError(
-            f"{kind=} for detrended_quantile_mapping is not available. Use '+' or '*' instead."
+            f"{kind=} for detrended_quantile_mapping is not available. Use '+' or '*' instead.",
         )
 
     if not isinstance(n_quantiles, int):
@@ -128,7 +128,8 @@ def detrended_quantile_mapping(
     # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
     res = np.zeros(len(simp.values))
     max_scaling_factor: Final[float] = kwargs.get(
-        "max_scaling_factor", MAX_SCALING_FACTOR
+        "max_scaling_factor",
+        MAX_SCALING_FACTOR,
     )
     for indices in simp.groupby("time.month").groups.values():
         # detrended by long-term month
@@ -144,7 +145,9 @@ def detrended_quantile_mapping(
 
         if kind in ADDITIVE:
             epsilon = np.interp(
-                m_simp - m_simp_mean + m_simh_mean, xbins, cdf_simh
+                m_simp - m_simp_mean + m_simh_mean,
+                xbins,
+                cdf_simh,
             )  # Eq. 1
             X = (
                 get_inverse_of_cdf(cdf_obs, epsilon, xbins) + m_simp_mean - m_simh_mean
@@ -186,7 +189,8 @@ def detrended_quantile_mapping(
 #     Method to adjust 1-dimensional climate data by empirical quantile mapping
 #     """
 #     raise NotImplementedError(
-#         "Not implemented; please have a look at: https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py "
+#         "Not implemented; please have a look at:
+# https://svn.oss.deltares.nl/repos/openearthtools/trunk/python/applications/hydrotools/hydrotools/statistics/bias_correction.py "
 #     )
 
 # ? -----========= Q U A N T I L E - D E L T A - M A P P I N G =========------
@@ -266,7 +270,7 @@ def quantile_delta_mapping(
         )
         return QDM1 * delta  # Eq. 2.4
     raise NotImplementedError(
-        f"{kind=} not available for quantile_delta_mapping. Use '+' or '*' instead."
+        f"{kind=} not available for quantile_delta_mapping. Use '+' or '*' instead.",
     )
 
 

@@ -8,17 +8,12 @@
 
 from __future__ import annotations
 
-import re
-from typing import TYPE_CHECKING, Any
-
-import pytest
-
-if TYPE_CHECKING:
-    from cmethods import CMethods
-
 import logging
+import re
+from typing import Any
 
 import numpy as np
+import pytest
 
 from cmethods import adjust
 from cmethods.distribution import (
@@ -90,7 +85,11 @@ def test_not_implemented_errors(
 
 
 def test_adjust_failing_dqm(datasets: dict) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match="This function is not available for detrended quantile mapping. "
+        "Please use cmethods.CMethods.detrended_quantile_mapping",
+    ):
         adjust(
             method="detrended_quantile_mapping",
             obs=datasets["+"]["obsh"][:, 0, 0],
@@ -103,7 +102,8 @@ def test_adjust_failing_dqm(datasets: dict) -> None:
 
 def test_adjust_failing_no_group_for_distribution(datasets: dict) -> None:
     with pytest.raises(
-        ValueError, match="Can't use group for distribution based methods."
+        ValueError,
+        match="Can't use group for distribution based methods.",
     ):
         adjust(
             method="quantile_mapping",
