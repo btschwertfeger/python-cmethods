@@ -24,7 +24,7 @@ r"""
 
 from __future__ import annotations
 
-from typing import Any, Callable, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import numpy as np
 import xarray as xr
@@ -440,7 +440,12 @@ class CMethods:
         )
 
     def adjust(
-        self: CMethods, method: str, obs: XRData, simh: XRData, simp: XRData, **kwargs
+        self: CMethods,
+        method: str,
+        obs: XRData,
+        simh: XRData,
+        simp: XRData,
+        **kwargs,
     ) -> XRData:
         """
         Function to apply a bias correction technique on 1-and multidimensional
