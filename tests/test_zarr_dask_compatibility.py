@@ -9,7 +9,7 @@ from typing import Any
 import pytest
 import xarray as xr
 
-from cmethods import CMethods
+from cmethods import adjust
 from cmethods.types import XRData_t
 
 from .helper import is_3d_rmse_better
@@ -29,7 +29,6 @@ N_QUANTILES: int = 100
     ],
 )
 def test_3d_scaling_zarr(
-    cm: CMethods,
     datasets_from_zarr: xr.Dataset,
     method: str,
     kind: str,
@@ -41,14 +40,18 @@ def test_3d_scaling_zarr(
     simh: xr.DataArray = datasets_from_zarr[kind]["simh"][variable]
     simp: xr.DataArray = datasets_from_zarr[kind]["simp"][variable]
 
-    result: XRData_t = cm.adjust(
-        method=method, obs=obsh, simh=simh, simp=simp, kind=kind
+    result: XRData_t = adjust(
+        method=method,
+        obs=obsh,
+        simh=simh,
+        simp=simp,
+        kind=kind,
     )
     assert isinstance(result, XRData_t)
     assert is_3d_rmse_better(result=result[variable], obsp=obsp, simp=simp)
 
     # grouped
-    result = cm.adjust(
+    result = adjust(
         method=method, obs=obsh, simh=simh, simp=simp, kind=kind, group=GROUP
     )
     assert isinstance(result, XRData_t)
@@ -65,7 +68,6 @@ def test_3d_scaling_zarr(
     ],
 )
 def test_3d_distribution_zarr(
-    cm: CMethods,
     datasets_from_zarr: dict,
     method: str,
     kind: str,
@@ -77,7 +79,7 @@ def test_3d_distribution_zarr(
     simh: XRData_t = datasets_from_zarr[kind]["simh"][variable]
     simp: XRData_t = datasets_from_zarr[kind]["simp"][variable]
 
-    result: XRData_t = cm.adjust(
+    result: XRData_t = adjust(
         method=method,
         obs=obsh,
         simh=simh,

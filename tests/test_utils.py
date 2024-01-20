@@ -16,7 +16,12 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from cmethods import CMethods
+from cmethods import adjust
+from cmethods.distribution import (
+    detrended_quantile_mapping,
+    quantile_delta_mapping,
+    quantile_mapping,
+)
 from cmethods.utils import (
     check_np_types,
     check_xr_types,
@@ -30,62 +35,51 @@ from cmethods.utils import (
 # --------------------------------------------------------------------------
 # test for nan values
 @pytest.mark.filterwarnings("ignore:Do not call quantile_mapping directly")
-def test_quantile_mapping_single_nan(cm: CMethods) -> None:
+def test_quantile_mapping_single_nan() -> None:
     obs, simh, simp = list(np.arange(10)), list(np.arange(10)), list(np.arange(10))
     obs[0] = np.nan
     expected = np.array([0.0, 1.9, 2.9, 3.9, 4.9, 5.9, 6.9, 7.9, 8.9, 9.0])
 
-    res = cm.quantile_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
+    res = quantile_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
     assert np.allclose(res, expected)
 
 
 @pytest.mark.filterwarnings("ignore:All-NaN slice encountered")
 @pytest.mark.filterwarnings("ignore:Do not call quantile_mapping directly")
-def test_quantile_mapping_all_nan(cm: CMethods) -> None:
+def test_quantile_mapping_all_nan() -> None:
     obs, simh, simp = (
         list(np.full(10, np.nan)),
         list(np.arange(10)),
         list(np.arange(10)),
     )
-    res = cm.quantile_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
+    res = quantile_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
     assert np.allclose(res, simp)
 
 
 @pytest.mark.filterwarnings("ignore:Do not call quantile_delta_mapping directly")
-def test_quantile_delta_mapping_single_nan(cm: CMethods) -> None:
+def test_quantile_delta_mapping_single_nan() -> None:
     obs, simh, simp = list(np.arange(10)), list(np.arange(10)), list(np.arange(10))
     obs[0] = np.nan
     expected = np.array([0.0, 1.9, 2.9, 3.9, 4.9, 5.9, 6.9, 7.9, 8.9, 9.0])
 
-    res = cm.quantile_delta_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
+    res = quantile_delta_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
     assert np.allclose(res, expected)
 
 
 @pytest.mark.filterwarnings("ignore:All-NaN slice encountered")
 @pytest.mark.filterwarnings("ignore:Do not call quantile_delta_mapping directly")
-def test_quantile_delta_mapping_all_nan(cm: CMethods) -> None:
+def test_quantile_delta_mapping_all_nan() -> None:
     obs, simh, simp = (
         list(np.full(10, np.nan)),
         list(np.arange(10)),
         list(np.arange(10)),
     )
-    res = cm.quantile_delta_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
+    res = quantile_delta_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
     assert np.allclose(res, simp)
 
 
 # --------------------------------------------------------------------------
 # test utils
-
-
-def test_get_available_methods(cm: CMethods) -> None:
-    assert cm.get_available_methods() == [
-        "linear_scaling",
-        "variance_scaling",
-        "delta_method",
-        "quantile_mapping",
-        "detrended_quantile_mapping",
-        "quantile_delta_mapping",
-    ]
 
 
 def test_nan_or_equal() -> None:
@@ -105,12 +99,14 @@ def test_get_adjusted_scaling_factor() -> None:
     assert get_adjusted_scaling_factor(-11, -10) == -10
 
 
-def test_ensure_devidable(cm: CMethods) -> None:
+def test_ensure_devidable() -> None:
+    from cmethods.static import MAX_SCALING_FACTOR
+
     assert np.array_equal(
         ensure_devidable(
             np.array((1, 2, 3, 4, 5, 0)),
             np.array((0, 1, 0, 2, 3, 0)),
-            cm.MAX_SCALING_FACTOR,
+            MAX_SCALING_FACTOR,
         ),
         np.array((10, 2, 30, 2, 5 / 3, 0)),
     )
@@ -159,18 +155,18 @@ def test_type_check_failing() -> None:
 
 
 @pytest.mark.filterwarnings("ignore:Do not call quantile_mapping directly")
-def test_quantile_mapping_type_check_n_quantiles_failing(cm: CMethods) -> None:
+def test_quantile_mapping_type_check_n_quantiles_failing() -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
-        cm.quantile_mapping(obs=[], simh=[], simp=[], n_quantiles="100")
+        quantile_mapping(obs=[], simh=[], simp=[], n_quantiles="100")
 
 
 def test_detrended_quantile_mapping_type_check_n_quantiles_failing(
-    cm: CMethods, datasets: dict
+    datasets: dict,
 ) -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match=re.escape("'n_quantiles' must be type int")):
-        cm.detrended_quantile_mapping(  # type: ignore[attr-defined]
+        detrended_quantile_mapping(  # type: ignore[attr-defined]
             obs=datasets["+"]["obsh"][:, 0, 0],
             simh=datasets["+"]["simh"][:, 0, 0],
             simp=datasets["+"]["simp"][:, 0, 0],
@@ -178,14 +174,12 @@ def test_detrended_quantile_mapping_type_check_n_quantiles_failing(
         )
 
 
-def test_detrended_quantile_mapping_type_check_simp_failing(
-    cm: CMethods, datasets: dict
-) -> None:
+def test_detrended_quantile_mapping_type_check_simp_failing(datasets: dict) -> None:
     """n_quantiles must by type int"""
     with pytest.raises(
         TypeError, match="'simp' must be type xarray.core.dataarray.DataArray"
     ):
-        cm.detrended_quantile_mapping(  # type: ignore[attr-defined]
+        detrended_quantile_mapping(  # type: ignore[attr-defined]
             obs=datasets["+"]["obsh"][:, 0, 0],
             simh=datasets["+"]["simh"][:, 0, 0],
             simp=[],
@@ -194,24 +188,24 @@ def test_detrended_quantile_mapping_type_check_simp_failing(
 
 
 @pytest.mark.filterwarnings("ignore:Do not call quantile_delta_mapping directly")
-def test_quantile_delta_mapping_type_check_n_quantiles(cm: CMethods) -> None:
+def test_quantile_delta_mapping_type_check_n_quantiles() -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
-        cm.quantile_delta_mapping(  # type: ignore[attr-defined]
+        quantile_delta_mapping(  # type: ignore[attr-defined]
             obs=[], simh=[], simp=[], n_quantiles="100"
         )
 
 
 @pytest.mark.filterwarnings("ignore:Do not call quantile_delta_mapping directly")
-def test_quantile_delta_mapping_type_check_n_quantiles_failing(cm: CMethods) -> None:
+def test_quantile_delta_mapping_type_check_n_quantiles_failing() -> None:
     """n_quantiles must by type int"""
     with pytest.raises(TypeError, match="'n_quantiles' must be type int"):
-        cm.quantile_delta_mapping(  # type: ignore[attr-defined]
+        quantile_delta_mapping(  # type: ignore[attr-defined]
             obs=[], simh=[], simp=[], n_quantiles="100"
         )
 
 
-def test_adjust_type_checking_failing(cm) -> None:
+def test_adjust_type_checking_failing() -> None:
     """
     Checks for all types that are expected to be passed to the adjust_3d method
     """
@@ -224,7 +218,7 @@ def test_adjust_type_checking_failing(cm) -> None:
         match="'obs' must be type xarray.core.dataarray.Dataset"
         " or xarray.core.dataarray.DataArray",
     ):
-        cm.adjust(
+        adjust(
             method="linear_scaling",
             obs=[],
             simh=data,
@@ -235,7 +229,7 @@ def test_adjust_type_checking_failing(cm) -> None:
         TypeError,
         match="'simh' must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray",
     ):
-        cm.adjust(
+        adjust(
             method="linear_scaling",
             obs=data,
             simh=[],
@@ -247,7 +241,7 @@ def test_adjust_type_checking_failing(cm) -> None:
         TypeError,
         match="'simp' must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray",
     ):
-        cm.adjust(
+        adjust(
             method="linear_scaling",
             obs=data,
             simh=data,

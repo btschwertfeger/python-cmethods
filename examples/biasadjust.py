@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (C) 2023 Benjamin Thomas Schwertfeger
-# Github: https://github.com/btschwertfeger
+# GitHub: https://github.com/btschwertfeger
 #
 # Note: This is just an example on how to use the python-cmethods module.
 #       This is in no way an optimal solution and exists only for demonstration
@@ -12,7 +12,7 @@ import sys
 import click
 from xarray import open_dataset
 
-from cmethods import CMethods as cm
+from cmethods import adjust
 from cmethods.static import DISTRIBUTION_METHODS, METHODS, SCALING_METHODS
 
 
@@ -126,7 +126,7 @@ def main(**kwargs) -> None:
 
     print("**Starting correction**")
 
-    result = cm().adjust(**xkwargs)
+    result = adjust(**xkwargs)
 
     print("**Computation done - saving the result now**")
 

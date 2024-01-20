@@ -16,8 +16,6 @@ import pytest
 import xarray as xr
 from dask.distributed import LocalCluster
 
-from cmethods import CMethods
-
 from .helper import get_datasets
 
 FIXTURE_DIR: str = os.path.join(os.path.dirname(__file__), "fixture")
@@ -85,11 +83,6 @@ def datasets() -> dict:
             "simp": simp_mult["*"],
         },
     }
-
-
-@pytest.fixture()
-def cm() -> CMethods:
-    return CMethods()
 
 
 @lru_cache(maxsize=None)

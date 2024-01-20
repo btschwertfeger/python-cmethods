@@ -3,7 +3,7 @@
 <div align="center">
 
 [![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/btschwertfeger/Bias-Adjustment-Python)
-[![Generic badge](https://img.shields.io/badge/python-3.11-blue.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/python-3.8_|_3.9_|_3.10_|_3.11|_3.12-blue.svg)](https://shields.io/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Downloads](https://pepy.tech/badge/python-cmethods)](https://pepy.tech/project/python-cmethods)
 
@@ -113,7 +113,7 @@ https://python-cmethods.readthedocs.io/en/stable/
   applied to 1- and 3-dimensional data sets. The implementation of DQM to
   3-dimensional data is still in progress.
 
-- Except for DQM, all methods can be applied using `CMethods.adjust`. Chunked
+- Except for DQM, all methods can be applied using `cmethods.adjust`. Chunked
   data for computing e.g. in a dask cluster is possible as well.
 
 - For any questions -- please open an issue at https://github.com/btschwertfeger/python-cmethods/issues
@@ -134,16 +134,14 @@ python3 -m pip install python-cmethods
 
 ```python
 import xarray as xr
-from cmethods import CMethods
+from cmethods import adjust
 
 obsh = xr.open_dataset("input_data/observations.nc")
 simh = xr.open_dataset("input_data/control.nc")
 simp = xr.open_dataset("input_data/scenario.nc")
 
-cm = CMethods()
-
 # adjust only one grid cell
-ls_result = cm.adjust(
+ls_result = adjust(
     method="linear_scaling",
     obs=obsh["tas"][:, 0, 0],
     simh=simh["tas"][:, 0, 0],
@@ -153,7 +151,7 @@ ls_result = cm.adjust(
 )
 
 # adjust all grid cells
-qdm_result = cm.adjust(
+qdm_result = adjust(
     method="quantile_delta_mapping",
     obs=obsh["tas"],
     simh=simh["tas"],
@@ -173,11 +171,10 @@ It is also possible to adjust chunked data sets. Feel free to have a look into
 Notes:
 
 - For the multiplicative techniques a maximum scaling factor of 10 is defined.
-  This can be changed by adjusting the the `CMethods.MAX_SCALING_FACTOR`
-  attribute.
+  This can be changed by passing the optional parameter `max_scaling_factor`.
 - Except for detrended quantile mapping, all implemented techniques can be
-  applied to 1-and 3-dimensional data sets by executing the `CMethods.adjust`
-  function.
+  applied to single and multdimensional data sets by executing the
+  `cmethods.adjust` function.
 
 ## Examples (see repository on [GitHub](https://github.com/btschwertfeger/python-cmethods))
 

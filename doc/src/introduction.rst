@@ -71,12 +71,12 @@ https://python-cmethods.readthedocs.io/en/stable/
     atmospheric and meteorological processes.
 
 - Except for the detrended quantile mapping (DQM) technique, all methods can be
-  applied to 1- and 3-dimensional data sets. The implementation of DQM to
+  applied to single and multidimensional data sets. The implementation of DQM to
   3-dimensional data is still in progress.
 
-- For any questions -- please open an issue at https://github.com/btschwertfeger/python-cmethods/issues
-Examples can be found in the `python-cmethods`_ repository and of course
-within this documentation.
+- For any questions -- please open an issue at
+  https://github.com/btschwertfeger/python-cmethods/issues. Examples can be found
+  in the `python-cmethods`_ repository and of course within this documentation.
 
 References
 ----------

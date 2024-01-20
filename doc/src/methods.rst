@@ -49,7 +49,7 @@ for both additive and multiplicative Linear Scaling are shown:
     :caption: Example: Linear Scaling
 
     >>> import xarray as xr
-    >>> from cmethods import CMethods
+    >>> from cmethods import adjust
 
     >>> # Note: The data sets must contain the dimension "time"
     >>> #       for the respective variable.
@@ -57,8 +57,7 @@ for both additive and multiplicative Linear Scaling are shown:
     >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
     >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
     >>> variable = "tas" # temperatures
-    >>> cm = CMethods()
-    >>> result = cm.adjust(
+    >>> result = adjust(
     ...     method="linear_scaling",
     ...     obs=obs[variable],
     ...     simh=simh[variable],
@@ -120,7 +119,7 @@ of the standard deviation in the following step.
     :caption: Example: Variance Scaling
 
     >>> import xarray as xr
-    >>> from cmethods import CMethods
+    >>> from cmethods import adjust
 
     >>> # Note: The data sets must contain the dimension "time"
     >>> #       for the respective variable.
@@ -128,8 +127,7 @@ of the standard deviation in the following step.
     >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
     >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
     >>> variable = "tas" # temperatures
-    >>> cm = CMethods()
-    >>> result = cm().adjust(
+    >>> result = adjust(
     ...     method="variance_scaling",
     ...     obs=obs[variable],
     ...     simh=simh[variable],
@@ -186,7 +184,7 @@ for both additive and multiplicative Delta Method are shown:
     :caption: Example: Delta Method
 
     >>> import xarray as xr
-    >>> from cmethods import CMethods
+    >>> from cmethods import adjust
 
     >>> # Note: The data sets must contain the dimension "time"
     >>> #       for the respective variable.
@@ -194,8 +192,7 @@ for both additive and multiplicative Delta Method are shown:
     >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
     >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
     >>> variable = "tas" # temperatures
-    >>> cm = CMethods()
-    >>> result = cm.adjust(
+    >>> result = adjust(
     ...     method="delta_method",
     ...     obs=obs[variable],
     ...     simh=simh[variable],
@@ -268,7 +265,7 @@ In the following the equations of Alex J. Cannon (2015) are shown and explained:
     :caption: Example: Quantile Mapping
 
     >>> import xarray as xr
-    >>> from cmethods import CMethods
+    >>> from cmethods import adjust
 
     >>> # Note: The data sets must contain the dimension "time"
     >>> #       for the respective variable.
@@ -276,8 +273,7 @@ In the following the equations of Alex J. Cannon (2015) are shown and explained:
     >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
     >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
     >>> variable = "tas" # temperatures
-    >>> cm = CMethods()
-    >>> qm_adjusted = cm.adjust(
+    >>> qm_adjusted = adjust(
     ...     method="quantile_mapping",
     ...     obs=obs[variable],
     ...     simh=simh[variable],
@@ -328,7 +324,7 @@ for explanations):
     :caption: Example: Quantile Mapping
 
     >>> import xarray as xr
-    >>> from cmethods import CMethods
+    >>> from cmethods.distribution import detrended_quantile_mapping
 
     >>> # Note: The data sets must contain the dimension "time"
     >>> #       for the respective variable.
@@ -336,8 +332,7 @@ for explanations):
     >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
     >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
     >>> variable = "tas" # temperatures
-    >>> cm = CMethods()
-    >>> qm_adjusted = cm._CMethods__detrended_quantile_mapping(
+    >>> qm_adjusted = detrended_quantile_mapping(
     ...     obs=obs[variable],
     ...     simh=simh[variable],
     ...     simp=simp[variable],
@@ -423,7 +418,7 @@ variant are shown.
     :caption: Example: Quantile Delta Mapping
 
     >>> import xarray as xr
-    >>> from cmethods import CMethods
+    >>> from cmethods import adjust
 
     >>> # Note: The data sets must contain the dimension "time"
     >>> #       for the respective variable.
@@ -431,8 +426,7 @@ variant are shown.
     >>> simh = xr.open_dataset("path/to/modeled_data-control_period.nc")
     >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
     >>> variable = "tas" # temperatures
-    >>> cm = CMethods()
-    >>> qdm_adjusted = cm.adjust(
+    >>> qdm_adjusted = adjust(
     ...     method="quantile_delta_mapping",
     ...     obs=obs[variable],
     ...     simh=simh[variable],

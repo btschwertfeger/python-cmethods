@@ -20,11 +20,16 @@ import logging
 
 import numpy as np
 
-from cmethods.utils import UnknownMethodError
+from cmethods import adjust
+from cmethods.distribution import (
+    detrended_quantile_mapping,
+    quantile_delta_mapping,
+    quantile_mapping,
+)
+from cmethods.scaling import delta_method, linear_scaling, variance_scaling
 
 
 def test_not_implemented_errors(
-    cm: CMethods,
     datasets: dict,
     caplog: Any,
 ) -> None:
@@ -34,25 +39,25 @@ def test_not_implemented_errors(
         NotImplementedError,
         match=re.escape(r"kind='/' not available for linear_scaling."),
     ), pytest.warns(UserWarning, match="Do not call linear_scaling"):
-        cm.linear_scaling(obs=[], simh=[], simp=[], kind="/")
+        linear_scaling(obs=[], simh=[], simp=[], kind="/")
 
     with pytest.raises(
         NotImplementedError,
         match=re.escape(r"kind='/' not available for variance_scaling."),
     ), pytest.warns(UserWarning, match="Do not call variance_scaling"):
-        cm.variance_scaling(obs=[], simh=[], simp=[], kind="/")
+        variance_scaling(obs=[], simh=[], simp=[], kind="/")
 
     with pytest.raises(
         NotImplementedError,
         match=re.escape(r"kind='/' not available for delta_method. "),
     ), pytest.warns(UserWarning, match="Do not call delta_method"):
-        cm.delta_method(obs=[], simh=[], simp=[], kind="/")
+        delta_method(obs=[], simh=[], simp=[], kind="/")
 
     with pytest.raises(
         NotImplementedError,
         match=re.escape(r"kind='/' for quantile_mapping is not available."),
     ), pytest.warns(UserWarning, match="Do not call quantile_mapping"):
-        cm.quantile_mapping(
+        quantile_mapping(
             obs=np.array(datasets["+"]["obsh"][:, 0, 0]),
             simh=np.array(datasets["+"]["simh"][:, 0, 0]),
             simp=np.array(datasets["+"]["simp"][:, 0, 0]),
@@ -63,7 +68,7 @@ def test_not_implemented_errors(
         NotImplementedError,
         match=re.escape(r"kind='/' for detrended_quantile_mapping is not available."),
     ):
-        cm.detrended_quantile_mapping(
+        detrended_quantile_mapping(
             obs=np.array(datasets["+"]["obsh"][:, 0, 0]),
             simh=np.array(datasets["+"]["simh"][:, 0, 0]),
             simp=np.array(datasets["+"]["simp"][:, 0, 0]),
@@ -75,7 +80,7 @@ def test_not_implemented_errors(
         NotImplementedError,
         match=re.escape(r"kind='/' not available for quantile_delta_mapping."),
     ), pytest.warns(UserWarning, match="Do not call quantile_delta_mapping"):
-        cm.quantile_delta_mapping(
+        quantile_delta_mapping(
             obs=np.array(datasets["+"]["obsh"][:, 0, 0]),
             simh=np.array(datasets["+"]["simh"][:, 0, 0]),
             simp=np.array(datasets["+"]["simp"][:, 0, 0]),
@@ -84,9 +89,9 @@ def test_not_implemented_errors(
         )
 
 
-def test_adjust_failing_dqm(cm: CMethods, datasets: dict) -> None:
+def test_adjust_failing_dqm(datasets: dict) -> None:
     with pytest.raises(ValueError):
-        cm.adjust(
+        adjust(
             method="detrended_quantile_mapping",
             obs=datasets["+"]["obsh"][:, 0, 0],
             simh=datasets["+"]["simh"][:, 0, 0],
@@ -96,9 +101,11 @@ def test_adjust_failing_dqm(cm: CMethods, datasets: dict) -> None:
         )
 
 
-def test_adjust_failing_no_group_for_distribution(cm: CMethods, datasets: dict) -> None:
-    with pytest.raises(ValueError):
-        cm.adjust(
+def test_adjust_failing_no_group_for_distribution(datasets: dict) -> None:
+    with pytest.raises(
+        ValueError, match="Can't use group for distribution based methods."
+    ):
+        adjust(
             method="quantile_mapping",
             obs=datasets["+"]["obsh"][:, 0, 0],
             simh=datasets["+"]["simh"][:, 0, 0],

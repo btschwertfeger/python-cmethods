@@ -51,13 +51,13 @@ wip:
 ##
 .PHONY: doc
 doc:
-	cd docs && make html
+	cd doc && make html
 
 ## doctest		Run the documentation tests
 ##
 .PHONY: doctest
 doctest:
-	cd docs && make doctest
+	cd doc && make doctest
 
 ## pre-commit		Pre-Commit
 ##

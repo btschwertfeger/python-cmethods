@@ -6,9 +6,15 @@
 
 """Module providing static information for the python-cmethods package"""
 
+from __future__ import annotations
+
 from typing import List
 
-SCALING_METHODS: List[str] = ["linear_scaling", "variance_scaling", "delta_method"]
+SCALING_METHODS: List[str] = [
+    "linear_scaling",
+    "variance_scaling",
+    "delta_method",
+]
 DISTRIBUTION_METHODS: List[str] = [
     "quantile_mapping",
     "detrended_quantile_mapping",
@@ -20,3 +26,14 @@ METHODS: List[str] = CUSTOM_METHODS
 
 ADDITIVE: List[str] = ["+", "add"]
 MULTIPLICATIVE: List[str] = ["*", "mult"]
+MAX_SCALING_FACTOR: int = 10
+
+__all__ = [
+    "SCALING_METHODS",
+    "DISTRIBUTION_METHODS",
+    "CUSTOM_METHODS",
+    "METHODS",
+    "ADDITIVE",
+    "MULTIPLICATIVE",
+    "MAX_SCALING_FACTOR",
+]
