@@ -9,7 +9,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
 
@@ -96,8 +96,8 @@ def nan_or_equal(value1: float, value2: float) -> bool:
 
 
 def ensure_devidable(
-    numerator: float | np.ndarray,
-    denominator: float | np.ndarray,
+    numerator: Union[float, np.ndarray],
+    denominator: Union[float, np.ndarray],
     max_scaling_factor: float,
 ) -> np.ndarray:
     """
@@ -128,7 +128,10 @@ def ensure_devidable(
     return result
 
 
-def get_pdf(x: list | np.ndarray, xbins: list | np.ndarray) -> np.ndarray:
+def get_pdf(
+    x: Union[list, np.ndarray],
+    xbins: Union[list, np.ndarray],
+) -> np.ndarray:
     r"""
     Compuites and returns the the probability density function :math:`P(x)`
     of ``x`` based on ``xbins``.
@@ -155,7 +158,10 @@ def get_pdf(x: list | np.ndarray, xbins: list | np.ndarray) -> np.ndarray:
     return pdf
 
 
-def get_cdf(x: list | np.ndarray, xbins: list | np.ndarray) -> np.ndarray:
+def get_cdf(
+    x: Union[list, np.ndarray],
+    xbins: Union[list, np.ndarray],
+) -> np.ndarray:
     r"""
     Computes and returns returns the cumulative distribution function :math:`F(x)`
     of ``x`` based on ``xbins``.
@@ -184,9 +190,9 @@ def get_cdf(x: list | np.ndarray, xbins: list | np.ndarray) -> np.ndarray:
 
 
 def get_inverse_of_cdf(
-    base_cdf: list | np.ndarray,
-    insert_cdf: list | np.ndarray,
-    xbins: list | np.ndarray,
+    base_cdf: Union[list, np.ndarray],
+    insert_cdf: Union[list, np.ndarray],
+    xbins: Union[list, np.ndarray],
 ) -> np.ndarray:
     r"""
     Returns the inverse cumulative distribution function as:
@@ -206,7 +212,8 @@ def get_inverse_of_cdf(
 
 
 def get_adjusted_scaling_factor(
-    factor: int | float, max_scaling_factor: int | float
+    factor: Union[int, float],
+    max_scaling_factor: Union[int, float],
 ) -> float:
     r"""
     Returns:

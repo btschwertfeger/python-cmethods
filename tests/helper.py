@@ -8,6 +8,8 @@
 
 from __future__ import annotations
 
+from typing import List
+
 import numpy as np
 import xarray as xr
 from sklearn.metrics import mean_squared_error
@@ -45,9 +47,7 @@ def is_3d_rmse_better(result, obsp, simp) -> bool:
     return (rmse_values_new_ds < rmse_values_old_ds).all()
 
 
-def get_datasets(
-    kind: str,
-) -> tuple[xr.Dataset, xr.Dataset, xr.Dataset, xr.Dataset]:
+def get_datasets(kind: str) -> tuple[xr.Dataset, xr.Dataset, xr.Dataset, xr.Dataset]:
     historical_time = xr.cftime_range(
         "1971-01-01", "2000-12-31", freq="D", calendar="noleap"
     )
@@ -56,7 +56,7 @@ def get_datasets(
     )
     latitudes = np.arange(23, 27, 1)
 
-    def get_hist_temp_for_lat(lat: int) -> list[float]:
+    def get_hist_temp_for_lat(lat: int) -> List[float]:
         """Returns a fake interval time series by latitude value"""
         return 273.15 - (
             lat * np.cos(2 * np.pi * historical_time.dayofyear / 365)
@@ -65,7 +65,7 @@ def get_datasets(
             + 0.1 * (historical_time - historical_time[0]).days / 365
         )
 
-    def get_fake_hist_precipitation_data() -> list[float]:
+    def get_fake_hist_precipitation_data() -> List[float]:
         """Returns ratio based fake time series"""
         pr = (
             np.cos(2 * np.pi * historical_time.dayofyear / 365)

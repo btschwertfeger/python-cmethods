@@ -107,8 +107,3 @@ def test_adjust_failing_no_group_for_distribution(cm: CMethods, datasets: dict) 
             n_quantiles=100,
             group="time.month",
         )
-
-
-def test_get_function_unknown_method(cm: CMethods) -> None:
-    with pytest.raises(UnknownMethodError):
-        cm._CMethods__get_function("not-existing")

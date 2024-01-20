@@ -5,7 +5,8 @@
 #
 
 r"""
-    Module to apply different bias correction techniques to time-series climate data
+    Module to apply different bias correction techniques to time-series
+    climate data.
 
     T = Temperatures ($T$)
     X = Some climate variable ($X$)
@@ -23,7 +24,7 @@ r"""
 
 from __future__ import annotations
 
-from typing import Any, Callable, Optional
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 import numpy as np
 import xarray as xr
@@ -92,7 +93,7 @@ class CMethods:
       due to complex atmospheric and meteorological processes.
     """
 
-    MAX_SCALING_FACTOR: int | float = 10
+    MAX_SCALING_FACTOR: Union[int, float] = 10
 
     # ? -----========= L I N E A R - S C A L I N G =========------
     def linear_scaling(
@@ -442,7 +443,7 @@ class CMethods:
         self: CMethods, method: str, obs: XRData, simh: XRData, simp: XRData, **kwargs
     ) -> XRData:
         """
-        Function to apply a bias correction technique on 1-and 3-dimensional
+        Function to apply a bias correction technique on 1-and multidimensional
         data sets. For more information please refer to the method specific
         requirements and execution examples.
 
@@ -472,6 +473,10 @@ class CMethods:
             )
 
         # No grouped correction | distribution-based technique
+        # NOTE: This is disabled since using groups like "time.month" will lead
+        #       to unrealistic monthly transitions. If such behavior is wanted,
+        #       mock this function or apply ``CMethods.__apply_ufunc` directly
+        #       on your data sets.
         if kwargs.get("group", None) is None:
             return self.__apply_ufunc(method, obs, simh, simp, **kwargs).to_dataset()
 
@@ -484,9 +489,9 @@ class CMethods:
         group: str = kwargs["group"]
         del kwargs["group"]
 
-        obs_g: list[tuple[int, XRData]] = list(obs.groupby(group))
-        simh_g: list[tuple[int, XRData]] = list(simh.groupby(group))
-        simp_g: list[tuple[int, XRData]] = list(simp.groupby(group))
+        obs_g: List[Tuple[int, XRData]] = list(obs.groupby(group))
+        simh_g: List[Tuple[int, XRData]] = list(simh.groupby(group))
+        simp_g: List[Tuple[int, XRData]] = list(simp.groupby(group))
 
         result: Optional[XRData] = None
         for index in range(len(list(obs_g))):
@@ -505,28 +510,6 @@ class CMethods:
 
         return result
 
-    def __get_function(self: CMethods, method: str) -> Callable:
-        """
-        Returns the bias correction function corresponding to the ``method`` name.
-
-        :param method: The method name to get the function for
-        :type method: str
-        :raises UnknownMethodError: If the function is not implemented
-        :return: The function of the corresponding method
-        :rtype: function
-        """
-        if method == "linear_scaling":
-            return self.linear_scaling
-        if method == "variance_scaling":
-            return self.variance_scaling
-        if method == "delta_method":
-            return self.delta_method
-        if method == "quantile_mapping":
-            return self.quantile_mapping
-        if method == "quantile_delta_mapping":
-            return self.quantile_delta_mapping
-        raise UnknownMethodError(method, METHODS)
-
     def __apply_ufunc(
         self: CMethods,
         method: str,
@@ -536,9 +519,11 @@ class CMethods:
         **kwargs: dict,
     ) -> XRData:
         check_xr_types(obs=obs, simh=simh, simp=simp)
+        if method not in METHODS:
+            raise UnknownMethodError(method, METHODS)
 
         result: XRData = xr.apply_ufunc(
-            self.__get_function(method),
+            getattr(self, method),
             obs,
             simh,
             # Need to spoof a fake time axis since 'time' coord on full dataset is different
@@ -562,7 +547,7 @@ class CMethods:
         # order where time is commonly first.
         return result.transpose(*obs.dims)
 
-    def get_available_methods(self: CMethods) -> list[str]:
+    def get_available_methods(self: CMethods) -> List[str]:
         """
         Function to return the available adjustment methods of the CMethods class.
 

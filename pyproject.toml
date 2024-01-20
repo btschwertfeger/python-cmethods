@@ -11,7 +11,7 @@ authors = [
 description = "Collection of bias correction procedures for single and multidimensional climate data"
 readme = "README.md"
 license = { file = "LICENSE" }
-requires-python = ">=3.11"
+requires-python = ">=3.8"
 dependencies = ["xarray>=2022.11.0", "netCDF4>=1.6.1", "numpy"]
 keywords = [
   "climate-science",
@@ -30,7 +30,11 @@ keywords = [
 classifiers = [
   "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
   "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   "Natural Language :: English",
   "Operating System :: MacOS",
   "Operating System :: Unix",
