@@ -38,7 +38,8 @@ The documentation is available at: [https://python-cmethods.readthedocs.io/en/st
 3. [ Installation ](#installation)
 4. [ Usage and Examples ](#examples)
 5. [ Notes ](#notes)
-6. [ References ](#references)
+6. [ Contribution ](#contribution)
+7. [ References ](#references)
 
 ---
 
@@ -251,9 +252,23 @@ Notes:
 
 ---
 
+<a name="contribution"></a>
+
+# 🆕 Contributions
+
+… are welcome but:
+
+- First check if there is an existing issue or PR that addresses your
+  problem/solution. If not - create one first - before creating a PR.
+- Typo fixes, CI, documentation or style/formatting PRs will be
+  rejected. Please create an issue for that.
+- PRs must provide a reasonable, easy to understand and maintain solution for an
+  existing problem. You may want to propose a solution when creating the issue
+  to discuss the approach before creating a PR.
+
 <a name="references"></a>
 
-## 6. References
+## 7. References
 
 - Schwertfeger, Benjamin Thomas and Lohmann, Gerrit and Lipskoch, Henrik (2023) _"Introduction of the BiasAdjustCXX command-line tool for the application of fast and efficient bias corrections in climatic research"_, SoftwareX, Volume 22, 101379, ISSN 2352-7110, (https://doi.org/10.1016/j.softx.2023.101379)
 - Schwertfeger, Benjamin Thomas (2022) _"The influence of bias corrections on variability, distribution, and correlation of temperatures in comparison to observed and modeled climate data in Europe"_ (https://epic.awi.de/id/eprint/56689/)
