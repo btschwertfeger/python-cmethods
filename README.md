@@ -24,10 +24,8 @@ distribution-based bias correction techniques for climatic research
 The documentation is available at: [https://python-cmethods.readthedocs.io/en/stable/](https://python-cmethods.readthedocs.io/en/stable/)
 
 > ⚠️ For the application of bias corrections on _large data sets_ it is
-> recommended to use the command-line tool
-> [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX) since bias
-> corrections are complex statistical transformation which can be very slow in
-> Python compared to the C++ implementation.
+> recommended to also try the command-line tool
+> [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX).
 
 ---
 
@@ -75,7 +73,8 @@ similar to the observed data ($T{obs,p}$) than the raw modeled data
   <figcaption>Figure 2: Temperature per day of year in observed, modeled, and bias-adjusted climate data</figcaption>
 </figure>
 
----
+Please cite this project as described in
+https://zenodo.org/doi/10.5281/zenodo.7652755.
 
 <a name="methods"></a>
 
