@@ -9,7 +9,7 @@
 from __future__ import annotations
 
 import os
-from functools import cache
+from functools import lru_cache
 from typing import Any
 
 import pytest
@@ -92,7 +92,7 @@ def cm() -> CMethods:
     return CMethods()
 
 
-@cache
+@lru_cache(maxsize=None)
 @pytest.fixture()
 def datasets_from_zarr() -> dict:
     return {
