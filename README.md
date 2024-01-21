@@ -273,5 +273,10 @@ Notes:
 - Delta Method based on: Beyer, R. and Krapp, M. and Manica, A.: _"An empirical evaluation of bias correction methods for palaeoclimate simulations"_ (https://doi.org/10.5194/cp-16-1493-2020)
 - Quantile and Detrended Quantile Mapping based on: Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock _"Bias Correction of GCM Precipitation by Quantile Mapping: How Well Do Methods Preserve Changes in Quantiles and Extremes?"_ (https://doi.org/10.1175/JCLI-D-14-00754.1)
 - Quantile Delta Mapping based on: Tong, Y., Gao, X., Han, Z. et al. _"Bias correction of temperature and precipitation over China for RCM simulations using the QM and QDM methods"_. Clim Dyn 57, 1425–1443 (2021). (https://doi.org/10.1007/s00382-020-05447-4)
+- I'd like to express my gratitude to @riley-brady for initiating and
+  contributing to the discussion on
+  https://github.com/btschwertfeger/python-cmethods/issues/47. I appreciate all
+  the valuable suggestions provided throughout the implementation of the
+  subsequent changes.
 
 ---
