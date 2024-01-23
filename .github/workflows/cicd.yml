@@ -11,6 +11,10 @@ on:
   push:
     branches:
       - "**"
+  schedule:
+    - cron: "20 4 * * 0"
+  release:
+    types: [created]
 
 concurrency:
   group: CICD-${{ github.ref }}
@@ -20,24 +24,24 @@ jobs:
   ##    Checks the code logic, style and more
   ##
   Pre-Commit:
-    uses: ./.github/workflows/_pre_commit.yml
+    uses: ./.github/workflows/_pre_commit.yaml
 
   ##  Discover vulnerabilities
   ##
   CodeQL:
-    uses: ./.github/workflows/_codeql.yml
+    uses: ./.github/workflows/_codeql.yaml
 
   ##    Builds the package on multiple OS for multiple
   ##    Python versions
   ##
   Build:
     needs: [Pre-Commit]
-    uses: ./.github/workflows/_build.yml
+    uses: ./.github/workflows/_build.yaml
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     with:
       os: ${{ matrix.os }}
       python-version: ${{ matrix.python-version }}
@@ -46,7 +50,7 @@ jobs:
   ##
   Build-Doc:
     needs: [Pre-Commit]
-    uses: ./.github/workflows/_build_doc.yml
+    uses: ./.github/workflows/_build_doc.yaml
     with:
       os: ubuntu-latest
       python-version: "3.11"
@@ -55,34 +59,57 @@ jobs:
   ##
   Test:
     needs: [Build]
-    uses: ./.github/workflows/_test.yml
+    uses: ./.github/workflows/_test.yaml
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     with:
       os: ${{ matrix.os }}
       python-version: ${{ matrix.python-version }}
+
+  ##    Generates and uploads the coverage statistics to codecov
+  ##
+  CodeCov:
+    if: |
+      success() &&
+      github.actor == 'btschwertfeger' &&
+      github.event_name == 'push'
+    needs: [Test]
+    uses: ./.github/workflows/_codecov.yaml
+    with:
+      os: ubuntu-latest
+      python-version: "3.11"
+    secrets: inherit
 
   ##    Uploads the package to test.pypi.org on master if triggered by
   ##    a regular commit/push.
   ##
   UploadTestPyPI:
-    if: success() && github.ref == 'refs/heads/master'
+    if: |
+      success() &&
+      github.actor == 'btschwertfeger' &&
+      github.ref == 'refs/heads/master' &&
+      github.event_name == 'push'
     needs: [Test]
     name: Upload current development version to Test PyPI
-    uses: ./.github/workflows/_pypi_publish.yml
+    uses: ./.github/workflows/_pypi_publish.yaml
     with:
       REPOSITORY_URL: https://test.pypi.org/legacy/
     secrets:
       API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
 
-  ##    Generates and uploads the coverage statistics to codecov
+  ##    Upload the python-kraken-sdk to Production PyPI
   ##
-  CodeCov:
-    needs: [Test]
-    uses: ./.github/workflows/_codecov.yml
+  UploadPyPI:
+    if: |
+      success() &&
+      github.actor == 'btschwertfeger' &&
+      github.event_name == 'release'
+    needs: [UploadTestPyPI]
+    name: Upload the current release to PyPI
+    uses: ./.github/workflows/_pypi_publish.yaml
     with:
-      os: ubuntu-latest
-      python-version: "3.11"
-    secrets: inherit
+      REPOSITORY_URL: https://upload.pypi.org/legacy/
+    secrets:
+      API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}

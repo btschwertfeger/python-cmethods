@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (C) 2023 Benjamin Thomas Schwertfeger
-# Github: https://github.com/btschwertfeger
+# GitHub: https://github.com/btschwertfeger
 #
 # Note: This is just an example on how to use the python-cmethods module.
 #       This is in no way an optimal solution and exists only for demonstration
@@ -12,7 +12,8 @@ import sys
 import click
 from xarray import open_dataset
 
-from cmethods import CMethods as cm
+from cmethods import adjust
+from cmethods.static import DISTRIBUTION_METHODS, METHODS, SCALING_METHODS
 
 
 def save_to_netcdf(ds, **kwargs) -> None:
@@ -23,7 +24,7 @@ def save_to_netcdf(ds, **kwargs) -> None:
     :type ds: xarray.core.dataarray.Dataset
     """
     ds.to_netcdf(
-        f"{kwargs['method']}_result_var-{kwargs['variable']}{kwargs['descr1']}_kind-{kwargs['kind']}_group-{kwargs['group']}_{kwargs['start_date']}_{kwargs['end_date']}.nc"
+        f"{kwargs['method']}_result_var-{kwargs['variable']}{kwargs['descr1']}_kind-{kwargs['kind']}_group-{kwargs['group']}_{kwargs['start_date']}_{kwargs['end_date']}.nc",
     )
 
 
@@ -50,10 +51,18 @@ def save_to_netcdf(ds, **kwargs) -> None:
     help="The modeled data set to adjust (scenario period)",
 )
 @click.option(
-    "-m", "--method", required=True, type=str, help="The bias correction method"
+    "-m",
+    "--method",
+    required=True,
+    type=str,
+    help="The bias correction method",
 )
 @click.option(
-    "-v", "--variable", required=True, type=str, help="The variable to adjust"
+    "-v",
+    "--variable",
+    required=True,
+    type=str,
+    help="The variable to adjust",
 )
 @click.option(
     "-k",
@@ -87,9 +96,9 @@ def main(**kwargs) -> None:
     """
     The Main program that uses the passed arguments to perform the bias correction procedure.
     """
-    if kwargs["method"] not in cm.get_available_methods():
+    if kwargs["method"] not in METHODS:
         raise ValueError(
-            f"Unknown method {kwargs['method']}. Available methods: {cm.get_available_methods()}"
+            f"Unknown method {kwargs['method']}. Available methods: {METHODS}",
         )
 
     ds_obs = open_dataset(kwargs["ref"])[kwargs["variable"]]
@@ -102,7 +111,7 @@ def main(**kwargs) -> None:
     end_date: str = ds_simp["time"][-1].dt.strftime("%Y%m%d").values.ravel()[0]
 
     descr1 = ""
-    if kwargs["method"] in cm.DISTRIBUTION_METHODS:
+    if kwargs["method"] in DISTRIBUTION_METHODS:
         descr1 = f"_quantiles-{kwargs['quantiles']}"
         kwargs["group"] = None
     else:
@@ -110,37 +119,22 @@ def main(**kwargs) -> None:
 
     kwargs.update({"start_date": start_date, "end_date": end_date, "descr1": descr1})
 
+    xkwargs = {
+        "obs": ds_obs,
+        "simh": ds_simh,
+        "simp": ds_simp,
+        "method": kwargs["method"],
+        "kind": kwargs["kind"],
+    }
+
+    if kwargs["method"] in SCALING_METHODS:
+        xkwargs["group"] = kwargs["group"]
+    if kwargs["method"] in DISTRIBUTION_METHODS:
+        xkwargs["n_quantiles"] = kwargs["quantiles"]
+
     print("**Starting correction**")
 
-    n_dims = len(ds_obs.dims)
-    if 1 == n_dims:
-        result = ds_simp.copy(deep=True)
-        result.values = cm.get_function(kwargs["m"])(
-            obs=ds_obs,
-            simh=ds_simh,
-            simp=ds_simp,
-            kind=kwargs["kind"],
-            n_quantiles=kwargs["quantiles"],
-            group=kwargs["group"],
-            **kwargs,
-        )
-        result = result.to_dataset(name=kwargs["variable"])
-
-    elif 3 == n_dims:
-        result = cm.adjust_3d(
-            method=kwargs["method"],
-            obs=ds_obs,
-            simh=ds_simh,
-            simp=ds_simp,
-            n_quantiles=kwargs["quantiles"],
-            kind=kwargs["kind"],
-            group=kwargs["group"],
-            n_jobs=kwargs["processes"],
-        )
-    else:
-        raise ValueError(
-            "Cannot correct this data! Idk how to handle more than 3 dimensions!"
-        )
+    result = adjust(**xkwargs)
 
     print("**Computation done - saving the result now**")
 

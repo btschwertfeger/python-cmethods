@@ -2,51 +2,83 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2023 Benjamin Thomas Schwertfeger
 # GitHub: https://github.com/btschwertfeger
+#
 
 VENV := venv
-GLOBAL_PYTHON := $(shell which python3)
 PYTHON := $(VENV)/bin/python3
+TESTS := tests
+PYTEST_OPTS := -vv
 
-.PHONY := build dev install test tests doc doctest pre-commit changelog clean
+.PHONY: help
+help:
+	@grep "^##" Makefile | sed -e "s/##//"
 
-##		Builds the python-kraken-sdk
+## build		Builds python-cmethods
 ##
+.PHONY: build
 build:
 	$(PYTHON) -m pip wheel -w dist --no-deps .
 
-##		Installs the package in edit mode
+## dev		Installs the package in edit mode
 ##
+.PHONY: dev
 dev:
+	@git lfs install
 	$(PYTHON) -m pip install -e ".[dev]"
 
-##		Install the package
+## install		Install the package
 ##
+.PHONY: install
 install:
 	$(PYTHON) -m pip install .
 
-##		Run the unit tests
+## test		Run the unit tests
 ##
+.PHONY: test
 test:
-	$(PYTHON) -m pytest tests/
+	$(PYTHON) -m pytest $(PYTEST_OPTS) $(TESTS)
 
+.PHONY: tests
 tests: test
 
-##		Build the documentation
+## wip  	Run tests marked as wip
 ##
+.PHONY: wip
+wip:
+	$(PYTHON) -m pytest $(PYTEST_OPTS) -m "wip" $(TESTS)
+
+## doc		Build the documentation
+##
+.PHONY: doc
 doc:
-	cd docs && make html
+	cd doc && make html
 
-##		Run the documentation tests
+## doctest		Run the documentation tests
 ##
+.PHONY: doctest
 doctest:
-	cd docs && make doctest
+	cd doc && make doctest
 
-##		Pre-Commit
+## pre-commit		Pre-Commit
+##
+.PHONY: pre-commit
 pre-commit:
 	@pre-commit run -a
 
-## 		Create the changelog
+## ruff 	Run ruff without fix
+.PHONY: ruff
+ruff:
+	ruff check --preview .
+
+## ruff-fix 	Run ruff with fix
 ##
+.PHONY: ruff-fix
+ruff-fix:
+	ruff check --fix --preview .
+
+## changelog		Create the changelog
+##
+.PHONY: changelog
 changelog:
 	docker run -it --rm \
 		-v "$(PWD)":/usr/local/src/your-app/ \
@@ -57,10 +89,11 @@ changelog:
 		--breaking-labels Breaking \
 		--enhancement-labels Feature
 
-##		Clean the workspace
+## clean		Clean the workspace
 ##
+.PHONY: clean
 clean:
-	rm -rf .pytest_cache \
+	rm -rf .pytest_cache .cache \
 		build/ dist/ python_cmethods.egg-info \
 		docs/_build \
 		examples/.ipynb_checkpoints .ipynb_checkpoints \

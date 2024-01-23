@@ -3,3 +3,5 @@
 # Copyright (C) 2023 Benjamin Thomas Schwertfeger
 # GitHub: https://github.com/btschwertfeger
 #
+
+# This file is required for being able to import from ".".

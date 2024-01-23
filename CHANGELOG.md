@@ -1,13 +1,22 @@
 # Changelog
 
-## [Unreleased](https://github.com/btschwertfeger/python-cmethods/tree/HEAD)
+## [v1.0.3](https://github.com/btschwertfeger/python-cmethods/tree/v1.0.3) (2023-08-09)
 
-[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v1.0.2...HEAD)
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v1.0.2...v1.0.3)
+
+**Implemented enhancements:**
+
+- Validate types during runtime [\#42](https://github.com/btschwertfeger/python-cmethods/issues/42)
 
 **Fixed bugs:**
 
 - The tool fails when input time series include np.nan for distribution-based methods [\#41](https://github.com/btschwertfeger/python-cmethods/issues/41)
 - Fix error when time series includes nan values [\#40](https://github.com/btschwertfeger/python-cmethods/pull/40) ([btschwertfeger](https://github.com/btschwertfeger))
+
+**Merged pull requests:**
+
+- Merge `.pylintrc` and `.coveragerc` into `pyproject.toml` [\#44](https://github.com/btschwertfeger/python-cmethods/pull/44) ([btschwertfeger](https://github.com/btschwertfeger))
+- Add type checking for parameters of bias correction techniques [\#43](https://github.com/btschwertfeger/python-cmethods/pull/43) ([btschwertfeger](https://github.com/btschwertfeger))
 
 ## [v1.0.2](https://github.com/btschwertfeger/python-cmethods/tree/v1.0.2) (2023-06-18)
 

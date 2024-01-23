@@ -1,0 +1,9 @@
+examples/input_data/*.nc filter=lfs diff=lfs merge=lfs -text
+tests/fixture/temperature_simh.zarr filter=lfs diff=lfs merge=lfs -text
+tests/fixture/temperature_simp.zarr filter=lfs diff=lfs merge=lfs -text
+tests/fixture/precipitation_obsh.zarr filter=lfs diff=lfs merge=lfs -text
+tests/fixture/precipitation_obsp.zarr filter=lfs diff=lfs merge=lfs -text
+tests/fixture/precipitation_simh.zarr filter=lfs diff=lfs merge=lfs -text
+tests/fixture/precipitation_simp.zarr filter=lfs diff=lfs merge=lfs -text
+tests/fixture/temperature_obsh.zarr filter=lfs diff=lfs merge=lfs -text
+tests/fixture/temperature_obsp.zarr filter=lfs diff=lfs merge=lfs -text
