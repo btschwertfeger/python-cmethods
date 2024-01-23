@@ -26,7 +26,7 @@ from cmethods.static import MAX_SCALING_FACTOR
 from cmethods.utils import (
     check_np_types,
     check_xr_types,
-    ensure_devidable,
+    ensure_dividable,
     get_adjusted_scaling_factor,
     get_pdf,
     nan_or_equal,
@@ -102,7 +102,7 @@ def test_get_adjusted_scaling_factor() -> None:
 
 def test_ensure_devidable() -> None:
     assert np.array_equal(
-        ensure_devidable(
+        ensure_dividable(
             np.array((1, 2, 3, 4, 5, 0)),
             np.array((0, 1, 0, 2, 3, 0)),
             MAX_SCALING_FACTOR,

@@ -99,13 +99,13 @@ def nan_or_equal(value1: float, value2: float) -> bool:
     return np.isnan(value1) or np.isnan(value2) or value1 == value2
 
 
-def ensure_devidable(
+def ensure_dividable(
     numerator: Union[float, np.ndarray],
     denominator: Union[float, np.ndarray],
     max_scaling_factor: float,
 ) -> np.ndarray:
     """
-    Ensures that the arrays can be devided. The numerator will be multiplied by
+    Ensures that the arrays can be divided. The numerator will be multiplied by
     the maximum scaling factor of the CMethods class if division by zero.
 
     :param numerator: Numerator to use
@@ -248,7 +248,7 @@ __all__ = [
     "check_adjust_called",
     "check_np_types",
     "check_xr_types",
-    "ensure_devidable",
+    "ensure_dividable",
     "get_adjusted_scaling_factor",
     "get_cdf",
     "get_inverse_of_cdf",

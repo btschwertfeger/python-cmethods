@@ -20,7 +20,7 @@ from cmethods.static import ADDITIVE, MAX_SCALING_FACTOR, MULTIPLICATIVE
 from cmethods.utils import (
     check_adjust_called,
     check_np_types,
-    ensure_devidable,
+    ensure_dividable,
     get_adjusted_scaling_factor,
 )
 
@@ -55,7 +55,7 @@ def linear_scaling(
             MAX_SCALING_FACTOR,
         )
         adj_scaling_factor: Final[float] = get_adjusted_scaling_factor(
-            ensure_devidable(
+            ensure_dividable(
                 np.nanmean(obs),
                 np.nanmean(simh),
                 max_scaling_factor,
@@ -100,7 +100,7 @@ def variance_scaling(
             MAX_SCALING_FACTOR,
         )
         adj_scaling_factor: Final[float] = get_adjusted_scaling_factor(
-            ensure_devidable(
+            ensure_dividable(
                 np.std(np.array(obs)),
                 np.std(VS_1_simh),
                 max_scaling_factor,
@@ -142,7 +142,7 @@ def delta_method(
             MAX_SCALING_FACTOR,
         )
         adj_scaling_factor = get_adjusted_scaling_factor(
-            ensure_devidable(
+            ensure_dividable(
                 np.nanmean(simp),
                 np.nanmean(simh),
                 max_scaling_factor,

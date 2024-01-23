@@ -20,7 +20,7 @@ from cmethods.types import NPData
 from cmethods.utils import (
     check_adjust_called,
     check_np_types,
-    ensure_devidable,
+    ensure_dividable,
     get_cdf,
     get_inverse_of_cdf,
     nan_or_equal,
@@ -155,7 +155,7 @@ def detrended_quantile_mapping(
 
         else:  # kind in cls.MULTIPLICATIVE:
             epsilon = np.interp(  # Eq. 2
-                ensure_devidable(
+                ensure_dividable(
                     (m_simh_mean * m_simp),
                     m_simp_mean,
                     max_scaling_factor=max_scaling_factor,
@@ -165,7 +165,7 @@ def detrended_quantile_mapping(
                 left=kwargs.get("val_min", 0.0),
                 right=kwargs.get("val_max", None),
             )
-            X = np.interp(epsilon, cdf_obs, xbins) * ensure_devidable(
+            X = np.interp(epsilon, cdf_obs, xbins) * ensure_dividable(
                 m_simp_mean,
                 m_simh_mean,
                 max_scaling_factor=max_scaling_factor,
@@ -260,7 +260,7 @@ def quantile_delta_mapping(
         epsilon = np.interp(simp, xbins, cdf_simp)  # Eq. 1.1
         QDM1 = get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 1.2
 
-        delta = ensure_devidable(  # Eq. 2.3
+        delta = ensure_dividable(  # Eq. 2.3
             simp,
             get_inverse_of_cdf(cdf_simh, epsilon, xbins),
             max_scaling_factor=kwargs.get(
