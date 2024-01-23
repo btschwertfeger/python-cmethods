@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.0.3](https://github.com/btschwertfeger/python-cmethods/tree/v2.0.0) (2023-01-23)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v1.0.3...v2.0.0)
+
+**Breaking changes:**
+
+- Rework python-cmethods: replace the `CMethods` class by the new `adjust` function [\#48](https://github.com/btschwertfeger/python-cmethods/pull/48) ([btschwertfeger](https://github.com/btschwertfeger))
+
+**Implemented enhancements:**
+
+- Optimization for `adjust_3d` [\#47](https://github.com/btschwertfeger/python-cmethods/issues/47)
+- Find a solution to process large data sets more efficient [\#6](https://github.com/btschwertfeger/python-cmethods/issues/6)
+
 ## [v1.0.3](https://github.com/btschwertfeger/python-cmethods/tree/v1.0.3) (2023-08-09)
 
 [Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v1.0.2...v1.0.3)
