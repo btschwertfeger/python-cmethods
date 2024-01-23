@@ -27,11 +27,11 @@
 .. |Downloads badge| image:: https://static.pepy.tech/personalized-badge/python-cmethods?period=total&units=abbreviation&left_color=grey&right_color=orange&left_text=downloads
    :target: https://pepy.tech/project/python-cmethods
 
-.. |CodeQL badge| image:: https://github.com/btschwertfeger/python-cmethods/actions/workflows/codeql.yml/badge.svg?branch=master
-   :target: https://github.com/btschwertfeger/python-cmethods/actions/workflows/codeql.yml
+.. |CodeQL badge| image:: https://github.com/btschwertfeger/python-cmethods/actions/workflows/codeql.yaml/badge.svg?branch=master
+   :target: https://github.com/btschwertfeger/python-cmethods/actions/workflows/codeql.yaml
 
-.. |CI/CD badge| image:: https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yml/badge.svg?branch=master
-   :target: https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yml
+.. |CI/CD badge| image:: https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yaml/badge.svg?branch=master
+   :target: https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yaml
 
 .. |codecov badge| image:: https://codecov.io/gh/btschwertfeger/python-cmethods/branch/master/badge.svg
    :target: https://app.codecov.io/gh/btschwertfeger/python-cmethods
