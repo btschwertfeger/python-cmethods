@@ -58,7 +58,7 @@ jobs:
   ##    Run the unit tests for Python 3.8 until 3.11
   ##
   Test:
-    needs: [Build]
+    needs: [Pre-Commit]
     uses: ./.github/workflows/_test.yaml
     strategy:
       matrix:
@@ -75,7 +75,7 @@ jobs:
       success() &&
       github.actor == 'btschwertfeger' &&
       github.event_name == 'push'
-    needs: [Test]
+    needs: [Pre-Commit]
     uses: ./.github/workflows/_codecov.yaml
     with:
       os: ubuntu-latest
