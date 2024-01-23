@@ -24,19 +24,19 @@ jobs:
   ##    Checks the code logic, style and more
   ##
   Pre-Commit:
-    uses: ./.github/workflows/_pre_commit.yml
+    uses: ./.github/workflows/_pre_commit.yaml
 
   ##  Discover vulnerabilities
   ##
   CodeQL:
-    uses: ./.github/workflows/_codeql.yml
+    uses: ./.github/workflows/_codeql.yaml
 
   ##    Builds the package on multiple OS for multiple
   ##    Python versions
   ##
   Build:
     needs: [Pre-Commit]
-    uses: ./.github/workflows/_build.yml
+    uses: ./.github/workflows/_build.yaml
     strategy:
       fail-fast: false
       matrix:
@@ -50,7 +50,7 @@ jobs:
   ##
   Build-Doc:
     needs: [Pre-Commit]
-    uses: ./.github/workflows/_build_doc.yml
+    uses: ./.github/workflows/_build_doc.yaml
     with:
       os: ubuntu-latest
       python-version: "3.11"
@@ -59,7 +59,7 @@ jobs:
   ##
   Test:
     needs: [Build]
-    uses: ./.github/workflows/_test.yml
+    uses: ./.github/workflows/_test.yaml
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -76,7 +76,7 @@ jobs:
       github.actor == 'btschwertfeger' &&
       github.event_name == 'push'
     needs: [Test]
-    uses: ./.github/workflows/_codecov.yml
+    uses: ./.github/workflows/_codecov.yaml
     with:
       os: ubuntu-latest
       python-version: "3.11"
@@ -93,7 +93,7 @@ jobs:
       github.event_name == 'push'
     needs: [Test]
     name: Upload current development version to Test PyPI
-    uses: ./.github/workflows/_pypi_publish.yml
+    uses: ./.github/workflows/_pypi_publish.yaml
     with:
       REPOSITORY_URL: https://test.pypi.org/legacy/
     secrets:
