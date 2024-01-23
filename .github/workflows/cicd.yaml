@@ -91,7 +91,10 @@ jobs:
       github.actor == 'btschwertfeger' &&
       github.ref == 'refs/heads/master' &&
       github.event_name == 'push'
-    needs: [Test]
+    needs:
+      - Test
+      - Build
+      - Build-Doc
     name: Upload current version to Test PyPI
     uses: ./.github/workflows/_pypi_publish.yaml
     with:
@@ -106,7 +109,10 @@ jobs:
       success() &&
       github.actor == 'btschwertfeger' &&
       github.event_name == 'release'
-    needs: [Test]
+    needs:
+      - Test
+      - Build
+      - Build-Doc
     name: Upload the current release to PyPI
     uses: ./.github/workflows/_pypi_publish.yaml
     with:
