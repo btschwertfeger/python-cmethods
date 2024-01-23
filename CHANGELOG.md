@@ -1,6 +1,6 @@
 # Changelog
 
-## [v1.0.3](https://github.com/btschwertfeger/python-cmethods/tree/v2.0.0) (2023-01-23)
+## [v2.0.0](https://github.com/btschwertfeger/python-cmethods/tree/v2.0.0) (2023-01-23)
 
 [Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v1.0.3...v2.0.0)
 
