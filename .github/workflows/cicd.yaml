@@ -90,9 +90,10 @@ jobs:
       success() &&
       github.actor == 'btschwertfeger' &&
       github.ref == 'refs/heads/master' &&
-      github.event_name == 'push'
+      github.event_name == 'push' &&
+      github.event_name == 'release'
     needs: [Test]
-    name: Upload current development version to Test PyPI
+    name: Upload current version to Test PyPI
     uses: ./.github/workflows/_pypi_publish.yaml
     with:
       REPOSITORY_URL: https://test.pypi.org/legacy/
