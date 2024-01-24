@@ -72,9 +72,8 @@ jobs:
   ##
   CodeCov:
     if: |
-      success() &&
-      github.actor == 'btschwertfeger' &&
-      github.event_name == 'push'
+      (success() && github.actor == 'btschwertfeger')
+      && (github.event_name == 'push' || github.event_name == 'release')
     needs: [Pre-Commit]
     uses: ./.github/workflows/_codecov.yaml
     with:
@@ -87,14 +86,17 @@ jobs:
   ##
   UploadTestPyPI:
     if: |
-      success() &&
-      github.actor == 'btschwertfeger' &&
-      github.ref == 'refs/heads/master' &&
-      github.event_name == 'push'
+      (
+        success()
+        && github.actor == 'btschwertfeger'
+        && github.ref == 'refs/heads/master'
+      )
+      && (github.event_name == 'push' || github.event_name == 'release')
     needs:
-      - Test
       - Build
       - Build-Doc
+      - Test
+      - CodeQL
     name: Upload current version to Test PyPI
     uses: ./.github/workflows/_pypi_publish.yaml
     with:
@@ -110,9 +112,10 @@ jobs:
       github.actor == 'btschwertfeger' &&
       github.event_name == 'release'
     needs:
-      - Test
       - Build
       - Build-Doc
+      - Test
+      - CodeQL
     name: Upload the current release to PyPI
     uses: ./.github/workflows/_pypi_publish.yaml
     with:
