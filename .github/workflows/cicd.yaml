@@ -58,7 +58,7 @@ jobs:
   ##    Run the unit tests for Python 3.8 until 3.11
   ##
   Test:
-    needs: [Build]
+    needs: [Pre-Commit]
     uses: ./.github/workflows/_test.yaml
     strategy:
       matrix:
@@ -72,10 +72,9 @@ jobs:
   ##
   CodeCov:
     if: |
-      success() &&
-      github.actor == 'btschwertfeger' &&
-      github.event_name == 'push'
-    needs: [Test]
+      (success() && github.actor == 'btschwertfeger')
+      && (github.event_name == 'push' || github.event_name == 'release')
+    needs: [Pre-Commit]
     uses: ./.github/workflows/_codecov.yaml
     with:
       os: ubuntu-latest
@@ -87,11 +86,17 @@ jobs:
   ##
   UploadTestPyPI:
     if: |
-      success() &&
-      github.actor == 'btschwertfeger' &&
-      github.ref == 'refs/heads/master' &&
-      github.event_name == 'push'
-    needs: [Test]
+      (
+        success()
+        && github.actor == 'btschwertfeger'
+        && github.ref == 'refs/heads/master'
+      )
+      && (github.event_name == 'push' || github.event_name == 'release')
+    needs:
+      - Build
+      - Build-Doc
+      - Test
+      - CodeQL
     name: Upload current version to Test PyPI
     uses: ./.github/workflows/_pypi_publish.yaml
     with:
@@ -106,7 +111,11 @@ jobs:
       success() &&
       github.actor == 'btschwertfeger' &&
       github.event_name == 'release'
-    needs: [Test]
+    needs:
+      - Build
+      - Build-Doc
+      - Test
+      - CodeQL
     name: Upload the current release to PyPI
     uses: ./.github/workflows/_pypi_publish.yaml
     with:
