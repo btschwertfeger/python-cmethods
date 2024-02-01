@@ -13,6 +13,8 @@ The Linear Scaling bias correction technique can be applied on stochastic and
 non-stochastic climate variables to minimize deviations in the mean values
 between predicted and observed time-series of past and future time periods.
 
+This method requires that the time series can be grouped by ``time.month``.
+
 Since the multiplicative scaling can result in very high scaling factors, a
 maximum scaling factor of 10 is set. This can be changed by passing the desired
 value to the hidden ``max_scaling_factor`` argument.
@@ -75,6 +77,8 @@ Variance Scaling
 The Variance Scaling bias correction technique can be applied only on
 non-stochastic climate variables to minimize deviations in the mean and variance
 between predicted and observed time-series of past and future time periods.
+
+This method requires that the time series can be grouped by ``time.month``.
 
 Since the the scaling by ratio can result in very high scaling factors, a
 maximum scaling factor of 10 is set. This can be changed by passing the desired
@@ -147,6 +151,8 @@ Delta Method
 The Delta Method bias correction technique can be applied on stochastic and
 non-stochastic climate variables to minimize deviations in the mean values
 between predicted and observed time-series of past and future time periods.
+
+This method requires that the time series can be grouped by ``time.month``.
 
 Since the multiplicative scaling can result in very high scaling factors, a
 maximum scaling factor of 10 is set. This can be changed by passing the desired
@@ -298,7 +304,7 @@ distributional biases between modeled and observed time-series climate data like
 the regular Quantile Mapping. Detrending means, that the values of
 :math:`X_{sim,p}` are shifted to the value range of :math:`X_{sim,h}` before the
 regular Quantile Mapping is applied. After the Quantile Mapping was applied, the
-mean is shifted back. Since it does not make sens to take the whole mean to
+mean is shifted back. Since it does not make sense to take the whole mean to
 rescale the data, the month-dependent long-term mean is used.
 
 This method must be applied on a 1-dimensional data set i.e., there is only one
@@ -315,21 +321,27 @@ equations of Alex J. Cannon and Stephen R. Sobie and Trevor Q. Murdock (2015)
 Preserve Changes in Quantiles and Extremes?"*
 (https://doi.org/10.1175/JCLI-D-14-00754.1).
 
-In the following the equations of Alex J. Cannon (2015) are shown (without
-detrending; see QM for explanations):
+The following equations qre based on Alex J. Cannon (2015) but extended the
+shift of :math:`X_{\text{sim},p}(i)`:
+
+**Shift of value range**:
+
+.. math::
+
+    X_{\text{sim},p}^{*DT}(i) = X_{\text{sim},p}(i) + \Delta\mu
 
 **Additive**:
 
     .. math::
 
-        X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h} \left\{F_{sim,h}\left[X_{sim,p}(i)\right]\right\}
+        X_{\text{sim},p}^{*DQM}(i) = F_{\text{obs},h}^{-1}\left\{F_{\text{sim},h}\left[X_{\text{sim},p}^{*DT}(i)\right]\right\}
 
 
 **Multiplicative**:
 
     .. math::
 
-        X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot \mu{X_{sim,p}(i)}}{\mu{X_{sim,p}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}(i)}}{\mu{X_{sim,h}}}
+        X^{*DQM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot \mu{X_{\text{sim},p}^{*DT}(i)}}{\mu{X_{\text{sim},p}^{*DT}(i)}}\right]\Biggr\}\frac{\mu{X_{\text{sim},p}^{*DT}(i)}}{\mu{X_{sim,h}}}
 
 
 .. code-block:: python
