@@ -93,11 +93,11 @@ changelog:
 ##
 .PHONY: clean
 clean:
-	rm -rf .pytest_cache .cache \
+	rm -rf .mypy_cache .pytest_cache .cache \
 		build/ dist/ python_cmethods.egg-info \
 		docs/_build \
 		examples/.ipynb_checkpoints .ipynb_checkpoints \
-		.mypy_cache .pytest_cache
+		doc/_build
 
 	rm -f .coverage cmethods/_version.py
 
