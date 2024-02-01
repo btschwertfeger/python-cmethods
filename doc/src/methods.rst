@@ -322,26 +322,26 @@ Preserve Changes in Quantiles and Extremes?"*
 (https://doi.org/10.1175/JCLI-D-14-00754.1).
 
 The following equations qre based on Alex J. Cannon (2015) but extended the
-shift of :math:`X_{\text{sim},p}(i)`:
+shift of :math:`X_{sim,p}(i)`:
 
 **Shift of value range**:
 
 .. math::
 
-    X_{\text{sim},p}^{*DT}(i) = X_{\text{sim},p}(i) + \Delta\mu
+    X_{sim,p}^{*DT}(i) = X_{sim,p}(i) + \Delta\mu
 
 **Additive**:
 
     .. math::
 
-        X_{\text{sim},p}^{*DQM}(i) = F_{\text{obs},h}^{-1}\left\{F_{\text{sim},h}\left[X_{\text{sim},p}^{*DT}(i)\right]\right\}
+        X_{sim,p}^{*DQM}(i) = F_{obs,h}^{-1}\left\{F_{sim,h}\left[X_{sim,p}^{*DT}(i)\right]\right\}
 
 
 **Multiplicative**:
 
     .. math::
 
-        X^{*DQM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot \mu{X_{\text{sim},p}^{*DT}(i)}}{\mu{X_{\text{sim},p}^{*DT}(i)}}\right]\Biggr\}\frac{\mu{X_{\text{sim},p}^{*DT}(i)}}{\mu{X_{sim,h}}}
+        X^{*DQM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot \mu{X_{sim,p}^{*DT}(i)}}{\mu{X_{sim,p}^{*DT}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}^{*DT}(i)}}{\mu{X_{sim,h}}}
 
 
 .. code-block:: python
