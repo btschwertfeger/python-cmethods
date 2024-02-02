@@ -37,7 +37,7 @@ def linear_scaling(
     **kwargs: Any,
 ) -> NPData:
     r"""
-    **Do not call this function directly, please use :func:`cmethods.CMethods.adjust`**
+    **Do not call this function directly, please use :func:`cmethods.adjust`**
 
     See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#linear-scaling
     """
@@ -125,7 +125,7 @@ def delta_method(
     **kwargs: Any,
 ) -> NPData:
     r"""
-    **Do not call this function directly, please use :func:`cmethods.CMethods.adjust`**
+    **Do not call this function directly, please use :func:`cmethods.adjust`**
     See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#delta-method
     """
     check_adjust_called(

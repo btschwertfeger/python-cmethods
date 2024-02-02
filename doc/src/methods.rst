@@ -269,9 +269,9 @@ In the following the equations of Alex J. Cannon (2015) are shown and explained:
 
 **Multiplicative**:
 
-    .. math::
-
-        X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot X_{sim,p}(i)}{\mu{X_{sim,p}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}(i)}}{\mu{X_{sim,h}}}
+    The formula is the same as for the additive variant, but the values are
+    bound to the lower level of zero. The upper and lower boundary can be
+    adjusted by passing the hidden arguments ``val_min`` and ``val_max``.
 
 .. code-block:: python
     :linenos:
@@ -324,24 +324,20 @@ Preserve Changes in Quantiles and Extremes?"*
 The following equations qre based on Alex J. Cannon (2015) but extended the
 shift of :math:`X_{sim,p}(i)`:
 
-**Shift of value range**:
-
-.. math::
-
-    X_{sim,p}^{*DT}(i) = X_{sim,p}(i) + \Delta\mu
-
 **Additive**:
 
     .. math::
 
-        X_{sim,p}^{*DQM}(i) = F_{obs,h}^{-1}\left\{F_{sim,h}\left[X_{sim,p}^{*DT}(i)\right]\right\}
+        X_{sim,p}^{*DT}(i) & = X_{sim,p}(i) + \Delta\mu \\[1pt]
+        X_{sim,p}^{*DQM}(i) & = F_{obs,h}^{-1}\left\{F_{sim,h}\left[X_{sim,p}^{*DT}(i)\right]\right\}
 
 
 **Multiplicative**:
 
     .. math::
 
-        X^{*DQM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot X_{sim,p}^{*DT}(i)}{\mu{X_{sim,p}^{*DT}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}^{*DT}(i)}}{\mu{X_{sim,h}}}
+        X_{sim,p}^{*DT}(i) & = X_{sim,p}(i) \cdot \Delta\mu \\[1pt]
+        X^{*DQM}_{sim,p}(i) & = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot X_{sim,p}^{*DT}(i)}{\mu{X_{sim,p}^{*DT}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}^{*DT}(i)}}{\mu{X_{sim,h}}}
 
 
 .. code-block:: python
