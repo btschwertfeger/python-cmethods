@@ -324,13 +324,12 @@ Preserve Changes in Quantiles and Extremes?"*
 The following equations qre based on Alex J. Cannon (2015) but extended the
 shift of :math:`X_{sim,p}(i)`:
 
-**Shift of value range**:
-
-.. math::
-
-    X_{sim,p}^{*DT}(i) = X_{sim,p}(i) + \Delta\mu
 
 **Additive**:
+
+    .. math::
+
+        X_{sim,p}^{*DT}(i) = X_{sim,p}(i) + \Delta\mu
 
     .. math::
 
@@ -338,6 +337,10 @@ shift of :math:`X_{sim,p}(i)`:
 
 
 **Multiplicative**:
+
+    .. math::
+
+        X_{sim,p}^{*DT}(i) = X_{sim,p}(i) \cdot \Delta\mu
 
     .. math::
 
