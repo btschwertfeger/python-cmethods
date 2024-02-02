@@ -37,7 +37,7 @@ def quantile_mapping(
     **kwargs: Any,
 ) -> np.ndarray:
     r"""
-    **Do not call this function directly, please use :func:`cmethods.CMethods.adjust`**
+    **Do not call this function directly, please use :func:`cmethods.adjust`**
     See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#quantile-mapping
     """
     check_adjust_called(
@@ -205,7 +205,7 @@ def quantile_delta_mapping(
     **kwargs: Any,
 ) -> NPData:
     r"""
-    **Do not call this function directly, please use :func:`cmethods.CMethods.adjust`**
+    **Do not call this function directly, please use :func:`cmethods.adjust`**
 
     See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#quantile-delta-mapping
     """

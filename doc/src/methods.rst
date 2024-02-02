@@ -269,9 +269,9 @@ In the following the equations of Alex J. Cannon (2015) are shown and explained:
 
 **Multiplicative**:
 
-    .. math::
-
-        X^{*QM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot X_{sim,p}(i)}{\mu{X_{sim,p}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}(i)}}{\mu{X_{sim,h}}}
+    The formula is the same as for the additive variant, but the values are
+    bound to the lower level of zero. The upper and lower boundary can be
+    adjusted by passing the hidden arguments ``val_min`` and ``val_max``.
 
 .. code-block:: python
     :linenos:
