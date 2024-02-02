@@ -324,27 +324,20 @@ Preserve Changes in Quantiles and Extremes?"*
 The following equations qre based on Alex J. Cannon (2015) but extended the
 shift of :math:`X_{sim,p}(i)`:
 
-
 **Additive**:
 
     .. math::
 
-        X_{sim,p}^{*DT}(i) = X_{sim,p}(i) + \Delta\mu
-
-    .. math::
-
-        X_{sim,p}^{*DQM}(i) = F_{obs,h}^{-1}\left\{F_{sim,h}\left[X_{sim,p}^{*DT}(i)\right]\right\}
+        X_{sim,p}^{*DT}(i) & = X_{sim,p}(i) + \Delta\mu \\[1pt]
+        X_{sim,p}^{*DQM}(i) & = F_{obs,h}^{-1}\left\{F_{sim,h}\left[X_{sim,p}^{*DT}(i)\right]\right\}
 
 
 **Multiplicative**:
 
     .. math::
 
-        X_{sim,p}^{*DT}(i) = X_{sim,p}(i) \cdot \Delta\mu
-
-    .. math::
-
-        X^{*DQM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot X_{sim,p}^{*DT}(i)}{\mu{X_{sim,p}^{*DT}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}^{*DT}(i)}}{\mu{X_{sim,h}}}
+        X_{sim,p}^{*DT}(i) & = X_{sim,p}(i) \cdot \Delta\mu \\[1pt]
+        X^{*DQM}_{sim,p}(i) & = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot X_{sim,p}^{*DT}(i)}{\mu{X_{sim,p}^{*DT}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}^{*DT}(i)}}{\mu{X_{sim,h}}}
 
 
 .. code-block:: python
