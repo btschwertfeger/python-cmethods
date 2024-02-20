@@ -30,7 +30,7 @@ method specific documentation.
     simp = xr.open_dataset("input_data/scenario.nc")
 
     ls_result = adjust(
-        mathod="linear_scaling",
+        method="linear_scaling",
         obs=obsh["tas"][:, 0, 0],
         simh=simh["tas"][:, 0, 0],
         simp=simp["tas"][:, 0, 0],

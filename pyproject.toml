@@ -8,6 +8,9 @@ dynamic = ["version"]
 authors = [
   { name = "Benjamin Thomas Schwertfeger", email = "contact@b-schwertfeger.de" },
 ]
+maintainers = [
+  { name = "Benjamin Thomas Schwertfeger", email = "contact@b-schwertfeger.de" },
+]
 description = "Collection of bias correction procedures for single and multidimensional climate data"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -98,6 +101,8 @@ dev = [
 
 examples = ["click", "matplotlib"]
 
+[tool.codespell]
+check-filenames = true
 
 # ========= T Y P I N G ========================================================
 #
