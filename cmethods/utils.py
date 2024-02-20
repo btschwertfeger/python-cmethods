@@ -112,7 +112,7 @@ def ensure_dividable(
     :type numerator: np.ndarray
     :param denominator: Denominator that can be zero
     :type denominator: np.ndarray
-    :return: Zero-ensured devision
+    :return: Zero-ensured division
     :rtype: np.ndarray | float
     """
     with np.errstate(divide="ignore", invalid="ignore"):
