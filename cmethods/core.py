@@ -171,6 +171,8 @@ def adjust(
         simh_group = group["simh"]
         simp_group = group["simp"]
 
+    del kwargs["group"]
+
     result: Optional[XRData] = None
     for (_, obs_gds), (_, simh_gds), (_, simp_gds) in zip(
         obs.groupby(obs_group),
