@@ -1,6 +1,36 @@
 # Changelog
 
-## [v2.0.0](https://github.com/btschwertfeger/python-cmethods/tree/v2.0.0) (2023-01-23)
+## [Unreleased](https://github.com/btschwertfeger/python-cmethods/tree/HEAD)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.0.2...HEAD)
+
+**Merged pull requests:**
+
+- Fix typos and update pre-commit hooks [\#64](https://github.com/btschwertfeger/python-cmethods/pull/64) ([btschwertfeger](https://github.com/btschwertfeger))
+
+## [v2.0.2](https://github.com/btschwertfeger/python-cmethods/tree/v2.0.2) (2024-02-02)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.0.1...v2.0.2)
+
+**Merged pull requests:**
+
+- Update documentation -- QM and QDM formulas [\#62](https://github.com/btschwertfeger/python-cmethods/pull/62) ([btschwertfeger](https://github.com/btschwertfeger))
+- Bump GitHub action versions [\#59](https://github.com/btschwertfeger/python-cmethods/pull/59) ([btschwertfeger](https://github.com/btschwertfeger))
+
+## [v2.0.1](https://github.com/btschwertfeger/python-cmethods/tree/v2.0.1) (2024-02-01)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.0.0...v2.0.1)
+
+**Closed issues:**
+
+- The latest documentation still describes the legacy max_scaling_factor [\#60](https://github.com/btschwertfeger/python-cmethods/issues/60)
+
+**Merged pull requests:**
+
+- adjust CI workflows [\#58](https://github.com/btschwertfeger/python-cmethods/pull/58) ([btschwertfeger](https://github.com/btschwertfeger))
+- Resolve "The latest documentation still describes the legacy max scaling factor" [\#61](https://github.com/btschwertfeger/python-cmethods/pull/61) ([btschwertfeger](https://github.com/btschwertfeger))
+
+## [v2.0.0](https://github.com/btschwertfeger/python-cmethods/tree/v2.0.0) (2024-01-23)
 
 [Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v1.0.3...v2.0.0)
 
@@ -12,6 +42,10 @@
 
 - Optimization for `adjust_3d` [\#47](https://github.com/btschwertfeger/python-cmethods/issues/47)
 - Find a solution to process large data sets more efficient [\#6](https://github.com/btschwertfeger/python-cmethods/issues/6)
+
+**Merged pull requests:**
+
+- Fix the CodeQL workflow execution; prepare v2.0.0 release [\#50](https://github.com/btschwertfeger/python-cmethods/pull/50) ([btschwertfeger](https://github.com/btschwertfeger))
 
 ## [v1.0.3](https://github.com/btschwertfeger/python-cmethods/tree/v1.0.3) (2023-08-09)
 
