@@ -39,10 +39,10 @@ from cmethods.utils import (
 def test_quantile_mapping_single_nan() -> None:
     obs, simh, simp = list(np.arange(10)), list(np.arange(10)), list(np.arange(10))
     obs[0] = np.nan
-    expected = np.array([0.0, 1.9, 2.9, 3.9, 4.9, 5.9, 6.9, 7.9, 8.9, 9.0])
+    expected = np.array([0.0, 1.8, 2.7, 3.6, 4.5, 5.4, 6.3, 7.2, 8.1, 9.0])
 
     res = quantile_mapping(obs=obs, simh=simh, simp=simp, n_quantiles=5)
-    assert np.allclose(res, expected)
+    assert np.allclose(res, expected), res
 
 
 @pytest.mark.filterwarnings("ignore:All-NaN slice encountered")

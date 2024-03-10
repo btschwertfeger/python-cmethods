@@ -50,26 +50,45 @@ def apply_ufunc(
     if method not in __METHODS_FUNC__:
         raise UnknownMethodError(method, __METHODS_FUNC__.keys())
 
+    if kwargs.get("input_core_dims"):
+        if not isinstance(kwargs["input_core_dims"], dict):
+            raise TypeError("input_core_dims must be an object of type 'dict'")
+        if not len(kwargs["input_core_dims"]) == 3 or any(
+            not isinstance(value, str) for value in kwargs["input_core_dims"].values()
+        ):
+            raise ValueError(
+                "input_core_dims must have three key-value pairs like: "
+                '{"obs": "time", "simh": "time", "simp": "time"}',
+            )
+
+        input_core_dims = kwargs["input_core_dims"]
+    else:
+        input_core_dims = {"obs": "time", "simh": "time", "simp": "time"}
+
     result: XRData = xr.apply_ufunc(
         __METHODS_FUNC__[method],
         obs,
         simh,
         # Need to spoof a fake time axis since 'time' coord on full dataset is different
         # than 'time' coord on training dataset.
-        simp.rename({"time": "t2"}),
+        simp.rename({input_core_dims["simp"]: "__t_simp__"}),
         dask="parallelized",
         vectorize=True,
         # This will vectorize over the time dimension, so will submit each grid cell
         # independently
-        input_core_dims=[["time"], ["time"], ["t2"]],
+        input_core_dims=[
+            [input_core_dims["obs"]],
+            [input_core_dims["simh"]],
+            ["__t_simp__"],
+        ],
         # Need to denote that the final output dataset will be labeled with the
         # spoofed time coordinate
-        output_core_dims=[["t2"]],
+        output_core_dims=[["__t_simp__"]],
         kwargs=dict(kwargs),
     )
 
     # Rename to proper coordinate name.
-    result = result.rename({"t2": "time"})
+    result = result.rename({"__t_simp__": input_core_dims["simp"]})
 
     # ufunc will put the core dimension to the end (time), so want to preserve original
     # order where time is commonly first.
@@ -89,6 +108,14 @@ def adjust(
     requirements and execution examples.
 
     See https://python-cmethods.readthedocs.io/en/latest/src/methods.html
+
+
+    The time dimension of ``obs``, ``simh`` and ``simp`` must be named ``time``.
+
+    If the sizes of time dimensions of the input data sets differ, you have to
+    pass the hidden ``input_core_dims`` parameter, see
+    https://python-cmethods.readthedocs.io/en/latest/src/getting_started.html#advanced-usage
+    for more information.
 
     :param method: Technique to apply
     :type method: str
@@ -127,14 +154,30 @@ def adjust(
         )
 
     # Grouped correction | scaling-based technique
-    group: str = kwargs["group"]
+    group: str | dict[str, str] = kwargs["group"]
+    if isinstance(group, str):
+        # only for same sized time dimensions
+        obs_group = group
+        simh_group = group
+        simp_group = group
+    elif isinstance(group, dict):
+        if any(key not in {"obs", "simh", "simp"} for key in group):
+            raise ValueError(
+                "group must either be a string like 'time' or a dict like "
+                '{"obs": "time.month", "simh": "t_simh.month", "simp": "time.month"}',
+            )
+        # for different sized time dimensions
+        obs_group = group["obs"]
+        simh_group = group["simh"]
+        simp_group = group["simp"]
+
     del kwargs["group"]
 
     result: Optional[XRData] = None
     for (_, obs_gds), (_, simh_gds), (_, simp_gds) in zip(
-        obs.groupby(group),
-        simh.groupby(group),
-        simp.groupby(group),
+        obs.groupby(obs_group),
+        simh.groupby(simh_group),
+        simp.groupby(simp_group),
     ):
         monthly_result = apply_ufunc(
             method,

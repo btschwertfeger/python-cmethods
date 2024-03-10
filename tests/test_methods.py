@@ -110,6 +110,55 @@ def test_3d_scaling(
 @pytest.mark.parametrize(
     ("method", "kind"),
     [
+        ("linear_scaling", "+"),
+        ("variance_scaling", "+"),
+        ("linear_scaling", "*"),
+    ],
+)
+def test_3d_scaling_different_time_span(
+    datasets: dict,
+    method: str,
+    kind: str,
+) -> None:
+    obsh: XRData_t = datasets[kind]["obsh"]
+    obsp: XRData_t = datasets[kind]["obsp"]
+    simh: XRData_t = datasets[kind]["simh"]
+    simp: XRData_t = datasets[kind]["simp"]
+    simh = simh.sel(time=slice(simh.time[1], None)).rename({"time": "t_simh"})
+
+    time_names = {"obs": "time", "simh": "t_simh", "simp": "time"}
+
+    # not grouped
+    result: XRData_t = adjust(
+        method=method,
+        obs=obsh,
+        simh=simh,
+        simp=simp,
+        kind=kind,
+        input_core_dims=time_names,
+    )
+
+    assert isinstance(result, XRData_t)
+    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
+
+    # grouped
+    result: XRData_t = adjust(
+        method=method,
+        obs=obsh,
+        simh=simh,
+        simp=simp,
+        kind=kind,
+        group={"obs": "time.month", "simh": "t_simh.month", "simp": "time.month"},
+        input_core_dims=time_names,
+    )
+
+    assert isinstance(result, XRData_t)
+    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
+
+
+@pytest.mark.parametrize(
+    ("method", "kind"),
+    [
         ("quantile_mapping", "+"),
         ("quantile_delta_mapping", "+"),
         ("quantile_mapping", "*"),
@@ -165,6 +214,42 @@ def test_3d_distribution(
         simp=simp,
         kind=kind,
         n_quantiles=N_QUANTILES,
+    )
+
+    assert isinstance(result, XRData_t)
+    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
+
+
+@pytest.mark.parametrize(
+    ("method", "kind"),
+    [
+        ("quantile_mapping", "+"),
+        ("quantile_delta_mapping", "+"),
+        ("quantile_mapping", "*"),
+        ("quantile_delta_mapping", "*"),
+    ],
+)
+def test_3d_distribution_different_time_span(
+    datasets: dict,
+    method: str,
+    kind: str,
+) -> None:
+    obsh: XRData_t = datasets[kind]["obsh"]
+    obsp: XRData_t = datasets[kind]["obsp"]
+    simh: XRData_t = datasets[kind]["simh"]
+    simp: XRData_t = datasets[kind]["simp"]
+
+    simh = simh.sel(time=slice(simh.time[1], None)).rename({"time": "t_simh"})
+    time_names = {"obs": "time", "simh": "t_simh", "simp": "time"}
+
+    result: XRData_t = adjust(
+        method=method,
+        obs=obsh,
+        simh=simh,
+        simp=simp,
+        kind=kind,
+        n_quantiles=N_QUANTILES,
+        input_core_dims=time_names,
     )
 
     assert isinstance(result, XRData_t)
