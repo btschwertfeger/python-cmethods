@@ -61,9 +61,10 @@ instrument calibration, spatial resolution, or model deficiencies.
 python-cmethods empowers scientists to effectively address those biases in
 climate data, ensuring greater accuracy and reliability in research and
 decision-making processes. By leveraging cutting-edge techniques and seamless
-integration with popular libraries like `xarray`_ and `Dask`_, this package
-simplifies the process of bias adjustment, even when dealing with large-scale
-climate simulations and extensive spatial domains.
+integration with popular libraries like [xarray](https://xarray.dev/) and
+[Dask](https://docs.dask.org/en/stable/), this package simplifies the process
+of bias adjustment, even when dealing with large-scale climate simulations and
+extensive spatial domains.
 
 In this way, for example, modeled data, which on average represent values that
 are too cold, can be easily bias-corrected by applying any adjustment procedure
@@ -111,16 +112,16 @@ https://python-cmethods.readthedocs.io/en/stable/
   non-stochastic climate variables. Variance scaling can only be applied on
   non-stochastic climate variables.
 
-  - Non-stochastic climate variables are those that can be predicted with relative
-    certainty based on factors such as location, elevation, and season. Examples
-    of non-stochastic climate variables include air temperature, air pressure, and
-    solar radiation.
+  - Non-stochastic climate variables are those that can be predicted with
+    relative certainty based on factors such as location, elevation, and season.
+    Examples of non-stochastic climate variables include air temperature, air
+    pressure, and solar radiation.
 
-  - Stochastic climate variables, on the other hand, are those that exhibit a high
-    degree of variability and unpredictability, making them difficult to forecast
-    accurately. Precipitation is an example of a stochastic climate variable
-    because it can vary greatly in timing, intensity, and location due to complex
-    atmospheric and meteorological processes.
+  - Stochastic climate variables, on the other hand, are those that exhibit a
+    high degree of variability and unpredictability, making them difficult to
+    forecast accurately. Precipitation is an example of a stochastic climate
+    variable because it can vary greatly in timing, intensity, and location due
+    to complex atmospheric and meteorological processes.
 
 - Except for the detrended quantile mapping (DQM) technique, all methods can be
   applied to 1- and 3-dimensional data sets. The implementation of DQM to
@@ -129,7 +130,8 @@ https://python-cmethods.readthedocs.io/en/stable/
 - Except for DQM, all methods can be applied using `cmethods.adjust`. Chunked
   data for computing e.g. in a dask cluster is possible as well.
 
-- For any questions -- please open an issue at https://github.com/btschwertfeger/python-cmethods/issues
+- For any questions -- please open an issue at
+  https://github.com/btschwertfeger/python-cmethods/issues
 
 <a name="installation"></a>
 
@@ -191,8 +193,9 @@ Notes:
 
 Notebook with different methods and plots: `/examples/examples.ipynb`
 
-There is also an example script (`/examples/biasadjust.py`) that can be used to apply the available bias correction methods
-on 1- and 3-dimensional data sets (see `/examples/input_data/*.nc`).
+There is also an example script (`/examples/biasadjust.py`) that can be used to
+apply the available bias correction methods on 1- and 3-dimensional data sets
+(see `/examples/input_data/*.nc`).
 
 Help:
 
