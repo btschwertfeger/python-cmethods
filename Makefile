@@ -104,3 +104,6 @@ clean:
 	find tests -name "__pycache__" | xargs rm -rf
 	find cmethods -name "__pycache__" | xargs rm -rf
 	find examples -name "__pycache__" | xargs rm -rf
+
+# for file in `ls .github/workflows`; do sed -i '' 's/actions\/checkout@v4/actions\/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2  # v4.0.0/g' .github/workflows/$file; done
+# for file in `ls .github/workflows`; do sed -i '' 's/actions\/setup-python@v5/actions\/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0/g' .github/workflows/$file; done

@@ -10,6 +10,9 @@
 [![CI/CD](https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yaml/badge.svg?branch=master)](https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yaml)
 [![codecov](https://codecov.io/github/btschwertfeger/python-cmethods/branch/master/graph/badge.svg?token=OSO4PAABPD)](https://codecov.io/github/btschwertfeger/python-cmethods)
 
+[![OpenSSF ScoreCard](https://img.shields.io/ossf-scorecard/github.com/btschwertfeger/python-cmethods?label=openssf%20scorecard&style=flat)](https://securityscorecards.dev/viewer/?uri=github.com/btschwertfeger/python-cmethods)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8666/badge)](https://www.bestpractices.dev/projects/8666)
+
 ![release](https://shields.io/github/release-date/btschwertfeger/python-cmethods)
 ![release](https://shields.io/github/v/release/btschwertfeger/python-cmethods?display_name=tag)
 [![DOI](https://zenodo.org/badge/496160109.svg)](https://zenodo.org/badge/latestdoi/496160109)
@@ -17,19 +20,14 @@
 
 </div>
 
-This Python module serves as a collection of different scale- and
-distribution-based bias correction techniques for climate sciences.
-
-The documentation is available at: [https://python-cmethods.readthedocs.io/en/stable/](https://python-cmethods.readthedocs.io/en/stable/)
+Welcome to python-cmethods, a powerful Python package designed for bias
+correction and adjustment of climate data. Built with a focus on ease of use and
+efficiency, python-cmethods offers a comprehensive suite of functions tailored
+for applying bias correction methods to climate model simulations and
+observational datasets.
 
 Please cite this project as described in
 https://zenodo.org/doi/10.5281/zenodo.7652755.
-
-> ⚠️ For the application of bias corrections on _large data sets_ it is
-> recommended to also try the command-line tool
-> [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX).
-
----
 
 ## Table of Contents
 
@@ -41,16 +39,16 @@ https://zenodo.org/doi/10.5281/zenodo.7652755.
 6. [ Contribution ](#contribution)
 7. [ References ](#references)
 
----
-
 <a name="about"></a>
 
 ## 1. About
 
-These programs and data structures are developed with the aim of reducing
-discrepancies between modeled and observed climate data. Historical data is
-utilized to calibrate variables from current and future time series to achieve
-distributional properties that closely resemble the possible actual values.
+Bias correction in climate research involves the adjustment of systematic errors
+or biases present in climate model simulations or observational datasets to
+improve their accuracy and reliability, ensuring that the data better represents
+actual climate conditions. This process typically involves statistical methods
+or empirical relationships to correct for biases caused by factors such as
+instrument calibration, spatial resolution, or model deficiencies.
 
 <figure>
   <img
@@ -60,12 +58,24 @@ distributional properties that closely resemble the possible actual values.
   <figcaption>Figure 1: Schematic representation of a bias adjustment procedure</figcaption>
 </figure>
 
-For instance, modeled data typically indicate values that are colder than the
-actual values. To address this issue, an adjustment procedure is employed. The
-figure below illustrates the observed, modeled, and adjusted values, revealing
-that the delta adjusted time series ($T^{*DM}_{sim,p}$) are significantly more
-similar to the observed data ($T{obs,p}$) than the raw modeled data
-($T_{sim,p}$).
+python-cmethods empowers scientists to effectively address those biases in
+climate data, ensuring greater accuracy and reliability in research and
+decision-making processes. By leveraging cutting-edge techniques and seamless
+integration with popular libraries like [xarray](https://xarray.dev/) and
+[Dask](https://docs.dask.org/en/stable/), this package simplifies the process
+of bias adjustment, even when dealing with large-scale climate simulations and
+extensive spatial domains.
+
+In this way, for example, modeled data, which on average represent values that
+are too cold, can be easily bias-corrected by applying any adjustment procedure
+included in this package.
+
+For instance, modeled data can report values that are way colder than the those
+data reported by reanalysis time-series. To address this issue, an adjustment
+procedure can be employed. The figure below illustrates the observed, modeled,
+and adjusted values, revealing that the delta-adjusted time series
+($T^{*DM}_{sim,p}$) is significantly more similar to the observational data
+($T{obs,p}$) than the raw model output ($T_{sim,p}$).
 
 <figure>
   <img
@@ -74,6 +84,12 @@ similar to the observed data ($T{obs,p}$) than the raw modeled data
   style="background-color: white; border-radius: 7px">
   <figcaption>Figure 2: Temperature per day of year in observed, modeled, and bias-adjusted climate data</figcaption>
 </figure>
+
+The mathematical foundations supporting each bias correction technique
+implemented in python-cmethods are integral to the package, ensuring
+transparency and reproducibility in the correction process. Each method is
+accompanied by references to trusted publications, reinforcing the reliability
+and rigor of the corrections applied.
 
 <a name="methods"></a>
 
@@ -96,16 +112,16 @@ https://python-cmethods.readthedocs.io/en/stable/
   non-stochastic climate variables. Variance scaling can only be applied on
   non-stochastic climate variables.
 
-  - Non-stochastic climate variables are those that can be predicted with relative
-    certainty based on factors such as location, elevation, and season. Examples
-    of non-stochastic climate variables include air temperature, air pressure, and
-    solar radiation.
+  - Non-stochastic climate variables are those that can be predicted with
+    relative certainty based on factors such as location, elevation, and season.
+    Examples of non-stochastic climate variables include air temperature, air
+    pressure, and solar radiation.
 
-  - Stochastic climate variables, on the other hand, are those that exhibit a high
-    degree of variability and unpredictability, making them difficult to forecast
-    accurately. Precipitation is an example of a stochastic climate variable
-    because it can vary greatly in timing, intensity, and location due to complex
-    atmospheric and meteorological processes.
+  - Stochastic climate variables, on the other hand, are those that exhibit a
+    high degree of variability and unpredictability, making them difficult to
+    forecast accurately. Precipitation is an example of a stochastic climate
+    variable because it can vary greatly in timing, intensity, and location due
+    to complex atmospheric and meteorological processes.
 
 - Except for the detrended quantile mapping (DQM) technique, all methods can be
   applied to 1- and 3-dimensional data sets. The implementation of DQM to
@@ -114,7 +130,8 @@ https://python-cmethods.readthedocs.io/en/stable/
 - Except for DQM, all methods can be applied using `cmethods.adjust`. Chunked
   data for computing e.g. in a dask cluster is possible as well.
 
-- For any questions -- please open an issue at https://github.com/btschwertfeger/python-cmethods/issues
+- For any questions -- please open an issue at
+  https://github.com/btschwertfeger/python-cmethods/issues
 
 <a name="installation"></a>
 
@@ -123,8 +140,6 @@ https://python-cmethods.readthedocs.io/en/stable/
 ```bash
 python3 -m pip install python-cmethods
 ```
-
----
 
 <a name="examples"></a>
 
@@ -178,8 +193,9 @@ Notes:
 
 Notebook with different methods and plots: `/examples/examples.ipynb`
 
-There is also an example script (`/examples/biasadjust.py`) that can be used to apply the available bias correction methods
-on 1- and 3-dimensional data sets (see `/examples/input_data/*.nc`).
+There is also an example script (`/examples/biasadjust.py`) that can be used to
+apply the available bias correction methods on 1- and 3-dimensional data sets
+(see `/examples/input_data/*.nc`).
 
 Help:
 
@@ -219,8 +235,6 @@ Notes:
 - This script is far away from perfect - so please see it, as a starting point.
   (:
 
----
-
 <a name="notes"></a>
 
 ## 5. Notes
@@ -245,8 +259,6 @@ Notes:
   takes so much time, that it is not worth implementing it in python - but this
   is available in
   [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX).
-
----
 
 <a name="contribution"></a>
 
@@ -277,5 +289,3 @@ Notes:
   https://github.com/btschwertfeger/python-cmethods/issues/47. I appreciate all
   the valuable suggestions provided throughout the implementation of the
   subsequent changes.
-
----

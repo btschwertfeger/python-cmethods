@@ -1,20 +1,27 @@
 .. This is the introduction
 
-Introduction
-=============
+python-cmethods
+===============
 
 |GitHub badge| |License badge| |PyVersions badge| |Downloads badge|
-|CI/CD badge| |codecov badge|
+|CI/CD badge| |codecov badge| |OSSF Scorecard| |OSSF Best Practices|
 |Release date badge| |Release version badge| |DOI badge| |Docs stable|
 
 About
 -----
 
-This Python module and the provided data structures are designed to help
-minimize discrepancies between modeled and observed climate data of different
-time periods. Data from past periods are used to adjust variables from current
-and future time series so that their distributional properties approximate
-possible actual values.
+Welcome to `python-cmethods`_, a powerful Python package designed for bias
+correction and adjustment of climate data. Built with a focus on ease of use and
+efficiency, python-cmethods offers a comprehensive suite of functions tailored
+for applying bias correction methods to climate model simulations and
+observational datasets.
+
+Bias correction in climate research involves the adjustment of systematic errors
+or biases present in climate model simulations or observational datasets to
+improve their accuracy and reliability, ensuring that the data better represents
+actual climate conditions. This process typically involves statistical methods
+or empirical relationships to correct for biases caused by factors such as
+instrument calibration, spatial resolution, or model deficiencies.
 
 .. figure:: ../_static/images/biasCdiagram.png
     :width: 600
@@ -23,13 +30,16 @@ possible actual values.
 
     Fig 1: Schematic representation of a bias adjustment procedure
 
-
 In this way, for example, modeled data, which on average represent values that
-are too cold, can be bias-corrected by applying an adjustment procedure. The
-following figure shows the observed, the modeled, and the bias-corrected values.
-It is directly visible that the delta adjusted time series
-(:math:`T^{*DM}_{sim,p}`) are much more similar to the observed data
-(:math:`T_{obs,p}`) than the raw modeled data (:math:`T_{sim,p}`).
+are too cold, can be easily bias-corrected by applying any adjustment procedure
+included in this package.
+
+For instance, modeled data can report values that are way colder than the those
+data reported by reanalysis time-series. To address this issue, an adjustment
+procedure can be employed. The figure below illustrates the observed, modeled,
+and adjusted values, revealing that the delta-adjusted time series
+(:math:`T^{*DM}_{sim,p}`) is significantly more similar to the observational
+data (:math:`T_{obs,p}`) than the raw model output (:math:`T_{sim,p}`).
 
 .. figure:: ../_static/images/dm-doy-plot.png
     :width: 600
@@ -38,18 +48,24 @@ It is directly visible that the delta adjusted time series
 
     Fig 2: Temperature per day of year in modeled, observed and bias-adjusted climate data
 
+The mathematical foundations supporting each bias correction technique
+implemented in python-cmethods are integral to the package, ensuring
+transparency and reproducibility in the correction process. Each method is
+accompanied by references to trusted publications, reinforcing the reliability
+and rigor of the corrections applied.
+
 
 Available Methods
 -----------------
 
 python-cmethods provides the following bias correction techniques:
 
-- Linear Scaling
-- Variance Scaling
-- Delta Method
-- Quantile Mapping
-- Detrended Quantile Mapping
-- Quantile Delta Mapping
+- :ref:`Linear Scaling<linear-scaling>`
+- :ref:`Variance Scaling<variance-scaling>`
+- :ref:`Delta Method<delta-method>`
+- :ref:`Quantile Mapping<quantile-mapping>`
+- :ref:`Detrended Quantile Mapping<detrended-quantile-mapping>`
+- :ref:`Quantile Delta Mapping<quantile-delta-mapping>`
 
 Please refer to the official documentation for more information about these
 methods as well as sample scripts:

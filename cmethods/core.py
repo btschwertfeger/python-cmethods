@@ -107,14 +107,14 @@ def adjust(
     data sets. For more information please refer to the method specific
     requirements and execution examples.
 
-    See https://python-cmethods.readthedocs.io/en/latest/src/methods.html
+    See https://python-cmethods.readthedocs.io/en/latest/methods.html
 
 
     The time dimension of ``obs``, ``simh`` and ``simp`` must be named ``time``.
 
     If the sizes of time dimensions of the input data sets differ, you have to
     pass the hidden ``input_core_dims`` parameter, see
-    https://python-cmethods.readthedocs.io/en/latest/src/getting_started.html#advanced-usage
+    https://python-cmethods.readthedocs.io/en/latest/getting_started.html#advanced-usage
     for more information.
 
     :param method: Technique to apply
