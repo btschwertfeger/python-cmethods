@@ -13,6 +13,7 @@
 .. _xclim: https://zenodo.org/record/7535677
 
 .. _xarray: https://xarray.dev/
+
 .. _dask: https://docs.dask.org/en/stable/
 
 
@@ -52,3 +53,11 @@
 .. |Docs stable| image:: https://readthedocs.org/projects/python-cmethods/badge/?version=stable
     :target: https://python-cmethods.readthedocs.io/en/stable
     :alt: Documentation Status stable
+
+.. |OSSF Scorecard| image:: https://img.shields.io/ossf-scorecard/github.com/btschwertfeger/python-cmethods?label=openssf%20scorecard&style=flat
+   :target: https://securityscorecards.dev/viewer/?uri=github.com/btschwertfeger/python-cmethods
+   :alt: OSSF Scorecard
+
+.. |OSSF Best Practices| image:: https://www.bestpractices.dev/projects/8666/badge
+   :target: https://www.bestpractices.dev/projects/8666
+   :alt: OSSF Best Practices

@@ -9,6 +9,8 @@
 
 [![CI/CD](https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yaml/badge.svg?branch=master)](https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yaml)
 [![codecov](https://codecov.io/github/btschwertfeger/python-cmethods/branch/master/graph/badge.svg?token=OSO4PAABPD)](https://codecov.io/github/btschwertfeger/python-cmethods)
+
+[![OpenSSF ScoreCard](https://img.shields.io/ossf-scorecard/github.com/btschwertfeger/python-cmethods?label=openssf%20scorecard&style=flat)](https://securityscorecards.dev/viewer/?uri=github.com/btschwertfeger/python-cmethods)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8666/badge)](https://www.bestpractices.dev/projects/8666)
 
 ![release](https://shields.io/github/release-date/btschwertfeger/python-cmethods)
@@ -18,17 +20,14 @@
 
 </div>
 
-This Python module serves as collection of different scale- and
-distribution-based bias correction techniques for climate sciences.
+Welcome to python-cmethods, a powerful Python package designed for bias
+correction and adjustment of climate data. Built with a focus on ease of use and
+efficiency, python-cmethods offers a comprehensive suite of functions tailored
+for applying bias correction methods to climate model simulations and
+observational datasets.
 
 Please cite this project as described in
 https://zenodo.org/doi/10.5281/zenodo.7652755.
-
-> ⚠️ For the application of bias corrections on _large data sets_ it is
-> recommended to also try the command-line tool
-> [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX).
-
----
 
 ## Table of Contents
 
@@ -40,17 +39,9 @@ https://zenodo.org/doi/10.5281/zenodo.7652755.
 6. [ Contribution ](#contribution)
 7. [ References ](#references)
 
----
-
 <a name="about"></a>
 
 ## 1. About
-
-Welcome to `python-cmethods`\_, a powerful Python package designed for bias
-correction and adjustment of climate data. Built with a focus on ease of use and
-efficiency, python-cmethods offers a comprehensive suite of functions tailored
-for applying bias correction methods to climate model simulations and
-observational datasets.
 
 Bias correction in climate research involves the adjustment of systematic errors
 or biases present in climate model simulations or observational datasets to
@@ -148,8 +139,6 @@ https://python-cmethods.readthedocs.io/en/stable/
 python3 -m pip install python-cmethods
 ```
 
----
-
 <a name="examples"></a>
 
 ## 4. Usage and Examples
@@ -243,8 +232,6 @@ Notes:
 - This script is far away from perfect - so please see it, as a starting point.
   (:
 
----
-
 <a name="notes"></a>
 
 ## 5. Notes
@@ -269,8 +256,6 @@ Notes:
   takes so much time, that it is not worth implementing it in python - but this
   is available in
   [BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX).
-
----
 
 <a name="contribution"></a>
 
@@ -301,5 +286,3 @@ Notes:
   https://github.com/btschwertfeger/python-cmethods/issues/47. I appreciate all
   the valuable suggestions provided throughout the implementation of the
   subsequent changes.
-
----

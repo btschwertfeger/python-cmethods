@@ -4,7 +4,7 @@ python-cmethods
 ===============
 
 |GitHub badge| |License badge| |PyVersions badge| |Downloads badge|
-|CI/CD badge| |codecov badge|
+|CI/CD badge| |codecov badge| |OSSF Scorecard| |OSSF Best Practices|
 |Release date badge| |Release version badge| |DOI badge| |Docs stable|
 
 About
