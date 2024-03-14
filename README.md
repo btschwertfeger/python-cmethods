@@ -18,10 +18,8 @@
 
 </div>
 
-This Python module serves as a collection of different scale- and
+This Python module serves as collection of different scale- and
 distribution-based bias correction techniques for climate sciences.
-
-The documentation is available at: [https://python-cmethods.readthedocs.io/en/stable/](https://python-cmethods.readthedocs.io/en/stable/)
 
 Please cite this project as described in
 https://zenodo.org/doi/10.5281/zenodo.7652755.

@@ -12,6 +12,8 @@
 
 name: CodeQL
 
+permissions: read-all
+
 on:
   workflow_call:
 

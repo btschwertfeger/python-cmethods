@@ -7,6 +7,8 @@
 
 name: Pre-Commit
 
+permissions: read-all
+
 on:
   workflow_call:
 
