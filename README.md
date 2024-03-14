@@ -9,6 +9,7 @@
 
 [![CI/CD](https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yaml/badge.svg?branch=master)](https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yaml)
 [![codecov](https://codecov.io/github/btschwertfeger/python-cmethods/branch/master/graph/badge.svg?token=OSO4PAABPD)](https://codecov.io/github/btschwertfeger/python-cmethods)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8666/badge)](https://www.bestpractices.dev/projects/8666)
 
 ![release](https://shields.io/github/release-date/btschwertfeger/python-cmethods)
 ![release](https://shields.io/github/v/release/btschwertfeger/python-cmethods?display_name=tag)
@@ -47,10 +48,18 @@ https://zenodo.org/doi/10.5281/zenodo.7652755.
 
 ## 1. About
 
-These programs and data structures are developed with the aim of reducing
-discrepancies between modeled and observed climate data. Historical data is
-utilized to calibrate variables from current and future time series to achieve
-distributional properties that closely resemble the possible actual values.
+Welcome to `python-cmethods`\_, a powerful Python package designed for bias
+correction and adjustment of climate data. Built with a focus on ease of use and
+efficiency, python-cmethods offers a comprehensive suite of functions tailored
+for applying bias correction methods to climate model simulations and
+observational datasets.
+
+Bias correction in climate research involves the adjustment of systematic errors
+or biases present in climate model simulations or observational datasets to
+improve their accuracy and reliability, ensuring that the data better represents
+actual climate conditions. This process typically involves statistical methods
+or empirical relationships to correct for biases caused by factors such as
+instrument calibration, spatial resolution, or model deficiencies.
 
 <figure>
   <img
@@ -60,12 +69,23 @@ distributional properties that closely resemble the possible actual values.
   <figcaption>Figure 1: Schematic representation of a bias adjustment procedure</figcaption>
 </figure>
 
-For instance, modeled data typically indicate values that are colder than the
-actual values. To address this issue, an adjustment procedure is employed. The
-figure below illustrates the observed, modeled, and adjusted values, revealing
-that the delta adjusted time series ($T^{*DM}_{sim,p}$) are significantly more
-similar to the observed data ($T{obs,p}$) than the raw modeled data
-($T_{sim,p}$).
+python-cmethods empowers scientists to effectively address those biases in
+climate data, ensuring greater accuracy and reliability in research and
+decision-making processes. By leveraging cutting-edge techniques and seamless
+integration with popular libraries like `xarray`_ and `Dask`_, this package
+simplifies the process of bias adjustment, even when dealing with large-scale
+climate simulations and extensive spatial domains.
+
+In this way, for example, modeled data, which on average represent values that
+are too cold, can be easily bias-corrected by applying any adjustment procedure
+included in this package.
+
+For instance, modeled data can report values that are way colder than the those
+data reported by reanalysis time-series. To address this issue, an adjustment
+procedure can be employed. The figure below illustrates the observed, modeled,
+and adjusted values, revealing that the delta-adjusted time series
+($T^{*DM}_{sim,p}$) is significantly more similar to the observational data
+($T{obs,p}$) than the raw model output ($T_{sim,p}$).
 
 <figure>
   <img
@@ -74,6 +94,12 @@ similar to the observed data ($T{obs,p}$) than the raw modeled data
   style="background-color: white; border-radius: 7px">
   <figcaption>Figure 2: Temperature per day of year in observed, modeled, and bias-adjusted climate data</figcaption>
 </figure>
+
+The mathematical foundations supporting each bias correction technique
+implemented in python-cmethods are integral to the package, ensuring
+transparency and reproducibility in the correction process. Each method is
+accompanied by references to trusted publications, reinforcing the reliability
+and rigor of the corrections applied.
 
 <a name="methods"></a>
 

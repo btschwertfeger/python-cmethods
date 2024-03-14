@@ -12,6 +12,9 @@
 
 .. _xclim: https://zenodo.org/record/7535677
 
+.. _xarray: https://xarray.dev/
+.. _dask: https://docs.dask.org/en/stable/
+
 
 .. BADGES
 

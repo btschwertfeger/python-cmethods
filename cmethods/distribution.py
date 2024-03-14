@@ -38,7 +38,7 @@ def quantile_mapping(
 ) -> np.ndarray:
     r"""
     **Do not call this function directly, please use :func:`cmethods.adjust`**
-    See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#quantile-mapping
+    See https://python-cmethods.readthedocs.io/en/latest/methods.html#quantile-mapping
     """
     check_adjust_called(
         function_name="quantile_mapping",
@@ -99,7 +99,7 @@ def detrended_quantile_mapping(
     **kwargs: Any,
 ) -> NPData:
     r"""
-    See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#detrended_quantile_mapping
+    See https://python-cmethods.readthedocs.io/en/latest/methods.html#detrended_quantile_mapping
 
     This function can only be applied to 1-dimensional data.
     """
@@ -217,7 +217,7 @@ def quantile_delta_mapping(
     r"""
     **Do not call this function directly, please use :func:`cmethods.adjust`**
 
-    See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#quantile-delta-mapping
+    See https://python-cmethods.readthedocs.io/en/latest/methods.html#quantile-delta-mapping
     """
     check_adjust_called(
         function_name="quantile_delta_mapping",

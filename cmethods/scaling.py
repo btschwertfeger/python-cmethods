@@ -39,7 +39,7 @@ def linear_scaling(
     r"""
     **Do not call this function directly, please use :func:`cmethods.adjust`**
 
-    See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#linear-scaling
+    See https://python-cmethods.readthedocs.io/en/latest/methods.html#linear-scaling
     """
     check_adjust_called(
         function_name="linear_scaling",
@@ -81,7 +81,7 @@ def variance_scaling(
     r"""
     **Do not call this function directly, please use :func:`cmethods.CMethods.adjust`**
 
-    See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#variance-scaling
+    See https://python-cmethods.readthedocs.io/en/latest/methods.html#variance-scaling
     """
     check_adjust_called(
         function_name="variance_scaling",
@@ -126,7 +126,7 @@ def delta_method(
 ) -> NPData:
     r"""
     **Do not call this function directly, please use :func:`cmethods.adjust`**
-    See https://python-cmethods.readthedocs.io/en/latest/src/methods.html#delta-method
+    See https://python-cmethods.readthedocs.io/en/latest/methods.html#delta-method
     """
     check_adjust_called(
         function_name="delta_method",

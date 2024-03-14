@@ -6,6 +6,8 @@ Please note that the formulas are meant to be applied to a single time series.
 The python-cmethods package can apply these formulas to single and
 multidimensional data.
 
+.. _linear-scaling:
+
 Linear Scaling
 --------------
 
@@ -70,6 +72,7 @@ for both additive and multiplicative Linear Scaling are shown:
     ...     group="time.month" # this is important!
     ... )
 
+.. _variance-scaling:
 
 Variance Scaling
 ----------------
@@ -144,6 +147,7 @@ enables the adjustment of the standard deviation in the following step.
     ...     group="time.month" # this is important!
     ... )
 
+.. _delta-method:
 
 Delta Method
 ------------
@@ -213,6 +217,7 @@ for both additive and multiplicative Delta Method are shown:
     ...     group="time.month" # this is important!
     ... )
 
+.. _quantile-mapping:
 
 Quantile Mapping
 ----------------
@@ -295,6 +300,7 @@ In the following the equations of Alex J. Cannon (2015) are shown and explained:
     ...     kind="+",
     ... )
 
+.. _detrended-quantile-mapping:
 
 Detrended Quantile Mapping
 --------------------------
@@ -361,6 +367,8 @@ shift of :math:`X_{sim,p}(i)`:
     ...     kind="+"
     ... )
 
+
+.. _quantile-delta-mapping:
 
 Quantile Delta Mapping
 -----------------------
