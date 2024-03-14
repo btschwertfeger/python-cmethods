@@ -94,7 +94,7 @@ dev = [
   # linting
   "pylint",
   "flake8",
-  "ruff==0.1.13",
+  "ruff==0.3.2",
   # typing
   "mypy",
 ]
