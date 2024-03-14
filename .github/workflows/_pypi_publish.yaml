@@ -9,7 +9,8 @@
 
 name: PyPI Publish
 
-permissions: read-all
+permissions:
+  contents: read
 
 on:
   workflow_call:
