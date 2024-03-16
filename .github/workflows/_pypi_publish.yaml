@@ -9,9 +9,6 @@
 
 name: PyPI Publish
 
-permissions:
-  contents: read
-
 on:
   workflow_call:
     inputs:
@@ -21,6 +18,8 @@ on:
     secrets:
       API_TOKEN:
         required: true
+
+permissions: read-all
 
 jobs:
   PyPI-Publish:

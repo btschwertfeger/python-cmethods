@@ -7,11 +7,10 @@
 
 name: Pre-Commit
 
-permissions:
-  contents: read
-
 on:
   workflow_call:
+
+permissions: read-all
 
 jobs:
   Pre-Commit:

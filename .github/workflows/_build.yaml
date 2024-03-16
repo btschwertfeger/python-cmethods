@@ -8,9 +8,6 @@
 
 name: Build
 
-permissions:
-  contents: read
-
 on:
   workflow_call:
     inputs:
@@ -20,6 +17,8 @@ on:
       python-version:
         type: string
         required: true
+
+permissions: read-all
 
 jobs:
   Build:
