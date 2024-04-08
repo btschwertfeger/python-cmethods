@@ -22,7 +22,6 @@ from tempfile import TemporaryDirectory
 from cmethods import cli
 
 
-@pytest.mark.wip()
 @pytest.mark.parametrize(
     ("method", "kind", "exclusive"),
     [
@@ -71,7 +70,6 @@ def test_cli_runner(
             assert phrase in caplog.text
 
 
-@pytest.mark.wip()
 def test_cli_runner_missing_variable(
     cli_runner: CliRunner,
     caplog: pytest.LogCaptureFixture,
