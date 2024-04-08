@@ -143,7 +143,59 @@ python3 -m pip install python-cmethods
 
 <a name="examples"></a>
 
-## 4. Usage and Examples
+## 4. CLI Usage
+
+The python-cmethods package provides a command-line interface for applying
+various bias correction methods out of the box.
+
+Listing the parameters and their requirements is available by passing the
+`--help` option:
+
+```bash
+cmethods --help
+```
+
+Applying the cmethods tool on the provided example data using the linear scaling
+approach is shown below:
+
+```bash
+cmethods \
+  --obs examples/input_data/observations.nc \
+  --simh examples/input_data/control.nc \
+  --simp examples/input_data/scenario.nc \
+  --method linear_scaling \
+  --kind add \
+  --variable tas \
+  --group time.month \
+  --output linear_scaling.nc
+
+2024/04/08 18:11:12     INFO | Loading data sets ...
+2024/04/08 18:11:12     INFO | Data sets loaded ...
+2024/04/08 18:11:12     INFO | Applying linear_scaling ...
+2024/04/08 18:11:15     INFO | Saving result to linear_scaling.nc ...
+```
+
+For applying a distribution-based bias correction technique, the following
+example may help:
+
+```bash
+cmethods \
+  --obs examples/input_data/observations.nc \
+  --simh examples/input_data/control.nc \
+  --simp examples/input_data/scenario.nc \
+  --method quantile_delta_mapping \
+  --kind add \
+  --variable tas \
+  --quantiles 1000 \
+  --output quantile_delta_mapping.nc
+
+2024/04/08 18:16:34     INFO | Loading data sets ...
+2024/04/08 18:16:35     INFO | Data sets loaded ...
+2024/04/08 18:16:35     INFO | Applying quantile_delta_mapping ...
+2024/04/08 18:16:35     INFO | Saving result to quantile_delta_mapping.nc ...
+```
+
+## 5. API Usage and Examples
 
 ```python
 import xarray as xr

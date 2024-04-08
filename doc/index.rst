@@ -10,6 +10,7 @@ Welcome to python-cmethods's documentation!
 
    introduction.rst
    getting_started.rst
+   cli.rst
    cmethods.rst
    methods.rst
    issues.rst

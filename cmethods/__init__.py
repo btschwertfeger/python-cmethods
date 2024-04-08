@@ -28,6 +28,7 @@ r"""
 from __future__ import annotations
 
 import logging
+import sys
 
 import cloup
 import xarray as xr
@@ -104,7 +105,7 @@ formatter_settings = HelpFormatter.settings(
 @option(
     "--kind",
     required=True,
-    type=cloup.Choice(["add", "mult"]),
+    type=cloup.Choice(["+", "add", "*", "mult"]),
     help="Kind of adjustment",
 )
 @option(
@@ -118,9 +119,7 @@ formatter_settings = HelpFormatter.settings(
     "--output",
     required=True,
     type=str,
-    callback=lambda _, _, value: (  # noqa: E999
-        value if value.endswith(".nc") else f"{value}.nc"
-    ),
+    callback=lambda _, __, value: (value if value.endswith(".nc") else f"{value}.nc"),
     help="Output file name",
 )
 @option_group(
@@ -128,8 +127,7 @@ formatter_settings = HelpFormatter.settings(
     option(
         "--group",
         type=str,
-        default="time.month",
-        help="Temporal grouping to apply",
+        help="Temporal grouping",
     ),
     constraint=If(
         Equal("method", "linear_scaling")
@@ -151,7 +149,12 @@ formatter_settings = HelpFormatter.settings(
     ),
 )
 def cli(**kwargs) -> None:
-    """Command line tool to apply bias adjustment procedures to climate data."""
+    """
+    Command-line tool to apply bias correction procedures to climate data.
+
+    Copyright (C) 2023 Benjamin Thomas Schwertfeger\n
+    GitHub: https://github.com/btschwertfeger/python-cmethods
+    """
 
     logging.basicConfig(
         format="%(asctime)s %(levelname)8s | %(message)s",
@@ -160,14 +163,33 @@ def cli(**kwargs) -> None:
     )
 
     logging.info("Loading data sets ...")
-    kwargs["obs"] = xr.open_dataset(kwargs["obs"])[kwargs["variable"]]
-    kwargs["simh"] = xr.open_dataset(kwargs["simh"])[kwargs["variable"]]
-    kwargs["simp"] = xr.open_dataset(kwargs["simp"])[kwargs["variable"]]
+    try:
+        for key, message in zip(
+            ("obs", "simh", "simp"),
+            (
+                "observation data set",
+                "modeled data set of the control period",
+                "modeled data set of the scenario period",
+            ),
+        ):
+            kwargs[key] = xr.open_dataset(kwargs[key])
+            if not isinstance(kwargs[key], xr.Dataset):
+                raise TypeError("The data sets must be type xarray.Dataset")
+            if kwargs["variable"] not in kwargs[key]:
+                raise KeyError(
+                    f"Variable '{kwargs['variable']}' is missing in the {message}",
+                )
+            kwargs[key] = kwargs[key][kwargs["variable"]]
+    except (TypeError, KeyError) as exc:
+        logging.error(exc)
+        sys.exit(1)
+
     logging.info("Data sets loaded ...")
+    kwargs["n_quantiles"] = kwargs["quantiles"]
+    del kwargs["quantiles"]
 
     logging.info("Applying %s ..." % kwargs["method"])
     result = adjust(**kwargs)
 
     logging.info("Saving result to %s ..." % kwargs["output"])
-
     result.to_netcdf(kwargs["output"])

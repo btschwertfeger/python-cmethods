@@ -14,11 +14,18 @@ from typing import Any
 
 import pytest
 import xarray as xr
+from click.testing import CliRunner
 from dask.distributed import LocalCluster
 
 from .helper import get_datasets
 
 FIXTURE_DIR: str = os.path.join(os.path.dirname(__file__), "fixture")
+
+
+@pytest.fixture()
+def cli_runner() -> CliRunner:
+    """Provide a cli-runner for testing the CLI"""
+    return CliRunner()
 
 
 @pytest.fixture(scope="session")
