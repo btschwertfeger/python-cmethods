@@ -1,3 +1,8 @@
+.. -*- coding: utf-8 -*-
+.. Copyright (C) 2023 Benjamin Thomas Schwertfeger
+.. GitHub: https://github.com/btschwertfeger
+..
+
 Known Issues
 ============
 
@@ -9,11 +14,3 @@ Known Issues
    surrounding values over all years as the basis for calculating the mean
    values. This is not yet implemented in this module, but is available in the
    command-line tool `BiasAdjustCXX`_.
--  Using this module or especially Python to apply bias correction techniques on
-   large data sets can be a very time-consuming task. So this module is more
-   about showing how to apply different methods on climate data and maybe even
-   to bias-correct small data sets. When it comes to large ensembles it is
-   preferred to use the way more efficient tool `BiasAdjustCXX`_. A speed
-   comparison between `python-cmethods`_, `BiasAdjustCXX`_, and `xclim`_ was
-   made this `tool comparison`_. Since the development of python-cmethods is
-   continuing, speed improvements have been done since the last bench.

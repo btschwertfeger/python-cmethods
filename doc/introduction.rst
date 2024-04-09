@@ -1,4 +1,7 @@
-.. This is the introduction
+.. -*- coding: utf-8 -*-
+.. Copyright (C) 2023 Benjamin Thomas Schwertfeger
+.. GitHub: https://github.com/btschwertfeger
+..
 
 python-cmethods
 ===============
@@ -23,7 +26,7 @@ actual climate conditions. This process typically involves statistical methods
 or empirical relationships to correct for biases caused by factors such as
 instrument calibration, spatial resolution, or model deficiencies.
 
-.. figure:: ../_static/images/biasCdiagram.png
+.. figure:: _static/images/biasCdiagram.png
     :width: 600
     :align: center
     :alt: Schematic representation of a bias adjustment procedure
@@ -41,7 +44,7 @@ and adjusted values, revealing that the delta-adjusted time series
 (:math:`T^{*DM}_{sim,p}`) is significantly more similar to the observational
 data (:math:`T_{obs,p}`) than the raw model output (:math:`T_{sim,p}`).
 
-.. figure:: ../_static/images/dm-doy-plot.png
+.. figure:: _static/images/dm-doy-plot.png
     :width: 600
     :align: center
     :alt: Temperature per day of year in modeled, observed and bias-adjusted climate data

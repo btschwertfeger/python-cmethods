@@ -1,3 +1,8 @@
+.. -*- coding: utf-8 -*-
+.. Copyright (C) 2023 Benjamin Thomas Schwertfeger
+.. GitHub: https://github.com/btschwertfeger
+..
+
 Getting Started
 ===============
 
@@ -11,12 +16,73 @@ The `python-cmethods`_ module can be installed using the package manager pip:
     python3 -m pip install python-cmethods
 
 
-Usage and Examples
-------------------
+Command-Line Interface Usage
+----------------------------
 
-The `python-cmethods`_ module can be imported and applied as showing in the following examples.
-For more detailed description of the methods, please have a look at the
-method specific documentation.
+The python-cmethods package provides a command-line interface for applying
+various bias correction methods out of the box.
+
+Keep in mind that due to the various kinds of data and possibilities to
+pre-process those, the CLI only provides a basic application of the implemented
+techniques. For special parameters, adjustments, and data preparation, please
+use programming interface.
+
+Listing the parameters and their requirements is available by passing the
+``--help`` option:
+
+.. code-block:: bash
+
+    cmethods --help
+
+Applying the cmethods tool on the provided example data using the linear scaling
+approach is shown below:
+
+.. code-block:: bash
+    :caption: Apply Linear Scaling via command-line
+
+    cmethods \
+      --obs examples/input_data/observations.nc \
+      --simh examples/input_data/control.nc \
+      --simp examples/input_data/scenario.nc \
+      --method linear_scaling \
+      --kind add \
+      --variable tas \
+      --group time.month \
+      --output linear_scaling.nc
+
+    2024/04/08 18:11:12     INFO | Loading data sets ...
+    2024/04/08 18:11:12     INFO | Data sets loaded ...
+    2024/04/08 18:11:12     INFO | Applying linear_scaling ...
+    2024/04/08 18:11:15     INFO | Saving result to linear_scaling.nc ...
+
+
+For applying a distribution-based bias correction technique, the following
+example may help:
+
+.. code-block:: bash
+    :caption: Apply Quantile Delta Mapping via command-line
+
+    cmethods \
+      --obs examples/input_data/observations.nc \
+      --simh examples/input_data/control.nc \
+      --simp examples/input_data/scenario.nc \
+      --method quantile_delta_mapping \
+      --kind add \
+      --variable tas \
+      --quantiles 1000 \
+      --output quantile_delta_mapping.nc
+
+    2024/04/08 18:16:34     INFO | Loading data sets ...
+    2024/04/08 18:16:35     INFO | Data sets loaded ...
+    2024/04/08 18:16:35     INFO | Applying quantile_delta_mapping ...
+    2024/04/08 18:16:35     INFO | Saving result to quantile_delta_mapping.nc ...
+
+Programming Interface Usage and Examples
+----------------------------------------
+
+The `python-cmethods`_ module can be imported and applied as showing in the
+following examples. For more detailed description of the methods, please have a
+look at the method specific documentation.
 
 .. code-block:: python
     :linenos:

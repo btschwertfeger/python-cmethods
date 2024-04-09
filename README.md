@@ -24,7 +24,7 @@ Welcome to python-cmethods, a powerful Python package designed for bias
 correction and adjustment of climate data. Built with a focus on ease of use and
 efficiency, python-cmethods offers a comprehensive suite of functions tailored
 for applying bias correction methods to climate model simulations and
-observational datasets.
+observational datasets via command-line interface and API.
 
 Please cite this project as described in
 https://zenodo.org/doi/10.5281/zenodo.7652755.
@@ -143,7 +143,64 @@ python3 -m pip install python-cmethods
 
 <a name="examples"></a>
 
-## 4. Usage and Examples
+## 4. CLI Usage
+
+The python-cmethods package provides a command-line interface for applying
+various bias correction methods out of the box.
+
+Keep in mind that due to the various kinds of data and possibilities to
+pre-process those, the CLI only provides a basic application of the implemented
+techniques. For special parameters, adjustments, and data preparation, please
+use programming interface.
+
+Listing the parameters and their requirements is available by passing the
+`--help` option:
+
+```bash
+cmethods --help
+```
+
+Applying the cmethods tool on the provided example data using the linear scaling
+approach is shown below:
+
+```bash
+cmethods \
+  --obs examples/input_data/observations.nc \
+  --simh examples/input_data/control.nc \
+  --simp examples/input_data/scenario.nc \
+  --method linear_scaling \
+  --kind add \
+  --variable tas \
+  --group time.month \
+  --output linear_scaling.nc
+
+2024/04/08 18:11:12     INFO | Loading data sets ...
+2024/04/08 18:11:12     INFO | Data sets loaded ...
+2024/04/08 18:11:12     INFO | Applying linear_scaling ...
+2024/04/08 18:11:15     INFO | Saving result to linear_scaling.nc ...
+```
+
+For applying a distribution-based bias correction technique, the following
+example may help:
+
+```bash
+cmethods \
+  --obs examples/input_data/observations.nc \
+  --simh examples/input_data/control.nc \
+  --simp examples/input_data/scenario.nc \
+  --method quantile_delta_mapping \
+  --kind add \
+  --variable tas \
+  --quantiles 1000 \
+  --output quantile_delta_mapping.nc
+
+2024/04/08 18:16:34     INFO | Loading data sets ...
+2024/04/08 18:16:35     INFO | Data sets loaded ...
+2024/04/08 18:16:35     INFO | Applying quantile_delta_mapping ...
+2024/04/08 18:16:35     INFO | Saving result to quantile_delta_mapping.nc ...
+```
+
+## 5. Programming Interface Usage and Examples
 
 ```python
 import xarray as xr

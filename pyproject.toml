@@ -15,7 +15,7 @@ description = "Collection of bias correction procedures for single and multidime
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.8"
-dependencies = ["xarray>=2022.11.0", "netCDF4>=1.6.1", "numpy"]
+dependencies = ["xarray>=2022.11.0", "netCDF4>=1.6.1", "numpy", "cloup"]
 keywords = [
   "climate-science",
   "bias",
@@ -42,6 +42,8 @@ classifiers = [
   "Operating System :: MacOS",
   "Operating System :: Unix",
 ]
+[project.scripts]
+cmethods = "cmethods:cli"
 
 [project.urls]
 "Homepage" = "https://github.com/btschwertfeger/python-cmethods"
@@ -79,13 +81,6 @@ skip_empty = true
 [project.optional-dependencies]
 jupyter = ["venv-kernel"]
 dev = [
-  # testing
-  "pytest",
-  "pytest-cov",
-  "zarr",
-  "dask[distributed]",
-  "scikit-learn",
-  "scipy",
   # building
   "setuptools_scm",
   # documentation
@@ -94,11 +89,19 @@ dev = [
   # linting
   "pylint",
   "flake8",
-  "ruff==0.1.13",
+  "ruff==0.3.5",
   # typing
   "mypy",
 ]
-
+test = [
+  # testing
+  "pytest",
+  "pytest-cov",
+  "zarr",
+  "dask[distributed]",
+  "scikit-learn",
+  "scipy",
+]
 examples = ["click", "matplotlib"]
 
 [tool.codespell]
@@ -173,7 +176,7 @@ strict = true
 # https://beta.ruff.rs/docs/settings/
 # src = ["cmethods"]
 
-select = [
+lint.select = [
   "A",     # flake8-builtins
   "AIR",   # Airflow
   "ASYNC", # flake8-async
@@ -210,34 +213,52 @@ select = [
   "TCH",   # flake8-type-checking
   "TID",   # flake8-tidy-imports
   "ARG",   # flake8-unused-arguments
-  "CPY",   # flake8-copyright
-  "FBT",   # boolean trap
-  "PTH",   # flake8-use-pathlib
-  "FURB",  # refurb
+  # "CPY",   # flake8-copyright
+  "FBT",  # boolean trap
+  "PTH",  # flake8-use-pathlib
+  "FURB", # refurb
   # "ERA", # eradicate # commented-out code
   # "FIX", # flake8-fixme
   # "TD",  # flake8-todos
   # "TRY", # tryceratops # specify exception messages in class; not important
 ]
-fixable = [
-  "I",
+lint.fixable = [
   "C4",
-  "Q",
-  "PT",
-  "ICN",
+  "C4",
   "COM",
-  "RSE",
-  "PT",
+  "COM",
+  "E202",    # Missing Whitespace before ')'
+  "E221",    # Multiple spaces before operator
+  "E225",    # Missing whitespace around operator
+  "E227",    # Missing whitespace around bitwise or shift operator
+  "E231",    # Missing whitespace after ':'
+  "E252",    # Missing whitespace around parameter equals
+  "E261",    # Missing insert at least two spaces before inline comment
+  "E302",    # Expected 2 blank lines, found x
+  "E303",    # Too many blank lines
+  "E701",    # Multiple statements on one line (colon)
+  "F401",    # unused import
   "FA",
   "FA100",
+  "I",
+  "ICN",
+  "PL",      # pylint
   "PLR6201",
+  "PT",
+  "Q",
+  "RSE",
+  "UP",      # pyupgrade
+  "W292",    # missing new line at end of file
+  "W293",    # blank line with whitespace
+  "W391",    # too many new lines at end of file
 ]
 
-ignore = [
+lint.ignore = [
   # "B019",    # use of lru_cache or cache
   # "PLR2004", # magic value in comparison
   # "E203",    # Whitespace before ':' # false positive on list slices
   # "PLR6301", # Method `…` could be a function or static method # false positive for no-self-use
+  "G002", # lazy logging could be f-string
 ]
 
 respect-gitignore = true
@@ -245,9 +266,9 @@ exclude = []
 
 line-length = 130
 cache-dir = ".cache/ruff"
-task-tags = ["todo", "TODO"]
+lint.task-tags = ["todo", "TODO"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "doc/*.py" = [
   "CPY001",  # Missing copyright notice at top of file
   "PTH118",  # `os.path.join()` should be replaced by `Path` with `/` operator,
@@ -273,24 +294,19 @@ task-tags = ["todo", "TODO"]
   "T201", # `print` found
 ]
 
-[tool.ruff.flake8-copyright]
-author = "Benjamin Thomas Schwertfeger"
-notice-rgx = "(?i)Copyright \\(C\\) \\d{4}"
-min-file-size = 1024
-
-[tool.ruff.flake8-quotes]
+[tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
 
-[tool.ruff.flake8-tidy-imports]
+[tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 
-[tool.ruff.flake8-bandit]
+[tool.ruff.lint.flake8-bandit]
 check-typed-exception = true
 
-[tool.ruff.flake8-type-checking]
+[tool.ruff.lint.flake8-type-checking]
 strict = true
 
-[tool.ruff.pep8-naming]
+[tool.ruff.lint.pep8-naming]
 ignore-names = [
   "i",
   "j",
@@ -305,7 +321,7 @@ ignore-names = [
   "QDM1",
 ]
 
-[tool.ruff.pylint]
+[tool.ruff.lint.pylint]
 max-args = 8
 max-branches = 15
 max-locals = 25
@@ -621,7 +637,7 @@ overgeneral-exceptions = ["builtin.BaseException", "builtin.Exception"]
 ignore-long-lines = "^\\s*(# )?<?https?://\\S+>?$"
 
 # Number of spaces of indent required inside a hanging or continued line.
-indent-after-parent = 4
+# indent-after-parent = 4
 
 # String used as indentation unit. This is usually "    " (4 spaces) or "\t" (1
 # tab).
