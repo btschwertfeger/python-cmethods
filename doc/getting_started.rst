@@ -1,3 +1,8 @@
+.. -*- coding: utf-8 -*-
+.. Copyright (C) 2023 Benjamin Thomas Schwertfeger
+.. GitHub: https://github.com/btschwertfeger
+..
+
 Getting Started
 ===============
 
@@ -72,8 +77,8 @@ example may help:
     2024/04/08 18:16:35     INFO | Applying quantile_delta_mapping ...
     2024/04/08 18:16:35     INFO | Saving result to quantile_delta_mapping.nc ...
 
-API Usage and Examples
-----------------------
+Programming Interface Usage and Examples
+----------------------------------------
 
 The `python-cmethods`_ module can be imported and applied as showing in the
 following examples. For more detailed description of the methods, please have a

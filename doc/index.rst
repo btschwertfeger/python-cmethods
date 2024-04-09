@@ -1,5 +1,7 @@
-.. python-cmethods documentation master file, created by
-   sphinx-quickstart on Mon Apr 10 10:04:20 2023.
+.. -*- coding: utf-8 -*-
+.. Copyright (C) 2023 Benjamin Thomas Schwertfeger
+.. GitHub: https://github.com/btschwertfeger
+..
 
 Welcome to python-cmethods's documentation!
 ===========================================

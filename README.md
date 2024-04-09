@@ -200,7 +200,7 @@ cmethods \
 2024/04/08 18:16:35     INFO | Saving result to quantile_delta_mapping.nc ...
 ```
 
-## 5. API Usage and Examples
+## 5. Programming Interface Usage and Examples
 
 ```python
 import xarray as xr
