@@ -11,8 +11,8 @@ The `python-cmethods`_ module can be installed using the package manager pip:
     python3 -m pip install python-cmethods
 
 
-Command-Line Interface
-----------------------
+Command-Line Interface Usage
+----------------------------
 
 The python-cmethods package provides a command-line interface for applying
 various bias correction methods out of the box.
@@ -28,6 +28,7 @@ Applying the cmethods tool on the provided example data using the linear scaling
 approach is shown below:
 
 .. code-block:: bash
+
     cmethods \
       --obs examples/input_data/observations.nc \
       --simh examples/input_data/control.nc \
@@ -47,6 +48,7 @@ For applying a distribution-based bias correction technique, the following
 example may help:
 
 .. code-block:: bash
+
     cmethods \
       --obs examples/input_data/observations.nc \
       --simh examples/input_data/control.nc \
@@ -64,7 +66,7 @@ example may help:
 
 
 API Usage and Examples
-------------------
+----------------------
 
 The `python-cmethods`_ module can be imported and applied as showing in the
 following examples. For more detailed description of the methods, please have a

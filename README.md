@@ -24,7 +24,7 @@ Welcome to python-cmethods, a powerful Python package designed for bias
 correction and adjustment of climate data. Built with a focus on ease of use and
 efficiency, python-cmethods offers a comprehensive suite of functions tailored
 for applying bias correction methods to climate model simulations and
-observational datasets.
+observational datasets via command-line interface and API.
 
 Please cite this project as described in
 https://zenodo.org/doi/10.5281/zenodo.7652755.

@@ -253,7 +253,7 @@ In the following the equations of Alex J. Cannon (2015) are shown and explained:
     modeled data of the control period The following images show this by using
     :math:`T` for temperatures.
 
-    .. figure:: ../_static/images/qm-cdf-plot-1.png
+    .. figure:: _static/images/qm-cdf-plot-1.png
         :width: 600
         :align: center
         :alt: Determination of the quantile value
@@ -265,7 +265,7 @@ In the following the equations of Alex J. Cannon (2015) are shown and explained:
     the control period to determine the bias-corrected value at time step
     :math:`i`.
 
-    .. figure:: ../_static/images/qm-cdf-plot-2.png
+    .. figure:: _static/images/qm-cdf-plot-2.png
         :width: 600
         :align: center
         :alt: Determination of the QM bias-corrected value

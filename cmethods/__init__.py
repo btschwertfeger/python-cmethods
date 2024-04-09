@@ -48,22 +48,20 @@ from cmethods.core import adjust
 
 __all__ = ["adjust"]
 
-formatter_settings = HelpFormatter.settings(
-    theme=HelpTheme(
-        invoked_command=Style(fg="bright_yellow"),
-        heading=Style(fg="bright_white", bold=True),
-        constraint=Style(fg="magenta"),
-        col1=Style(fg="bright_yellow"),
-    ),
-)
-
 
 @command(
     context_settings={
         "auto_envvar_prefix": "CMETHODS",
         "help_option_names": ["-h", "--help"],
     },
-    formatter_settings=formatter_settings,
+    formatter_settings=HelpFormatter.settings(
+        theme=HelpTheme(
+            invoked_command=Style(fg="bright_yellow"),
+            heading=Style(fg="bright_white", bold=True),
+            constraint=Style(fg="magenta"),
+            col1=Style(fg="bright_yellow"),
+        ),
+    ),
 )
 @version_option(message="%version%")
 @option(
