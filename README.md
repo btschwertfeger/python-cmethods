@@ -148,6 +148,11 @@ python3 -m pip install python-cmethods
 The python-cmethods package provides a command-line interface for applying
 various bias correction methods out of the box.
 
+Keep in mind that due to the various kinds of data and possibilities to
+pre-process those, the CLI only provides a basic application of the implemented
+techniques. For special parameters, adjustments, and data preparation, please
+use programming interface.
+
 Listing the parameters and their requirements is available by passing the
 `--help` option:
 

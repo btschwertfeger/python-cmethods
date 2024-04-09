@@ -173,6 +173,7 @@ def cli(**kwargs) -> None:
             kwargs[key] = xr.open_dataset(kwargs[key])
             if not isinstance(kwargs[key], xr.Dataset):
                 raise TypeError("The data sets must be type xarray.Dataset")
+
             if kwargs["variable"] not in kwargs[key]:
                 raise KeyError(
                     f"Variable '{kwargs['variable']}' is missing in the {message}",
