@@ -6,9 +6,20 @@
 Bias Correction Methods
 =======================
 
-Please note that the formulas are meant to be applied to a single time series.
-The python-cmethods package can apply these formulas to single and
-multidimensional data.
+General
+-------
+
+- Please note that the formulas are meant to be applied to a single time series.
+  The python-cmethods package can apply these formulas to single and
+  multidimensional data.
+- Selecting the appropriate number of quantiles for distribution-based
+  techniques is a challenging task. The number of quantiles determines the
+  number of bins of the probability density function and the cumulative
+  distribution function, which represent the distribution of the time series.
+  The number of quantiles should be large enough to capture the nuances of the
+  distribution functions but not excessively high, as this can result in a
+  straight-line distribution, which lead to artificial bias while interpolating.
+
 
 .. _linear-scaling:
 

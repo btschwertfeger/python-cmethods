@@ -10,15 +10,16 @@
 
 """This module is the configuration for the Sphinx documentation building process"""
 
-import os
 import sys
+from pathlib import Path
 
 project = "python-cmethods"
 copyright = "2023, Benjamin Thomas Schwertfeger"  # pylint: disable=redefined-builtin
 author = "Benjamin Thomas Schwertfeger"
 
 # to import the package
-sys.path.insert(0, os.path.abspath(".."))
+parent_directory = Path("..").resolve()
+sys.path.insert(0, str(parent_directory))
 
 # import links
 rst_epilog = ""
@@ -50,6 +51,5 @@ html_context = {
     "display_github": True,
     "github_user": "btschwertfeger",
     "github_repo": "python-cmethods",
-    "github_version": "master/docs/",
+    "github_version": "master/doc/",
 }
-# html_theme_options = {
