@@ -51,6 +51,5 @@ html_context = {
     "display_github": True,
     "github_user": "btschwertfeger",
     "github_repo": "python-cmethods",
-    "github_version": "master/docs/",
+    "github_version": "master/doc/",
 }
-# html_theme_options = {
