@@ -18,7 +18,7 @@ copyright = "2023, Benjamin Thomas Schwertfeger"  # pylint: disable=redefined-bu
 author = "Benjamin Thomas Schwertfeger"
 
 # to import the package
-sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath("..").resolve())
 
 # import links
 rst_epilog = ""
