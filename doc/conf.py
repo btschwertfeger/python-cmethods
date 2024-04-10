@@ -18,7 +18,7 @@ copyright = "2023, Benjamin Thomas Schwertfeger"  # pylint: disable=redefined-bu
 author = "Benjamin Thomas Schwertfeger"
 
 # to import the package
-parent_directory: Path = Path("..").resolve()
+parent_directory = Path("..").resolve()
 sys.path.insert(0, str(parent_directory))
 
 # import links
