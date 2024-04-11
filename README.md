@@ -243,54 +243,11 @@ Notes:
 - For the multiplicative techniques a maximum scaling factor of 10 is defined.
   This can be changed by passing the optional parameter `max_scaling_factor`.
 - Except for detrended quantile mapping, all implemented techniques can be
-  applied to single and multdimensional data sets by executing the
+  applied to single and multi-dimensional data sets by executing the
   `cmethods.adjust` function.
-
-## Examples (see repository on [GitHub](https://github.com/btschwertfeger/python-cmethods))
-
-Notebook with different methods and plots: `/examples/examples.ipynb`
-
-There is also an example script (`/examples/biasadjust.py`) that can be used to
-apply the available bias correction methods on 1- and 3-dimensional data sets
-(see `/examples/input_data/*.nc`).
-
-Help:
-
-```bash
-╰─ python3 biasadjust.py --help
-```
-
-(1.) Example - Quantile Mapping bias correction on the provided example data:
-
-```bash
-╰─ python3 biasadjust.py              \
-    --ref input_data/observations.nc  \
-    --contr input_data/control.nc     \
-    --scen input_data/scenario.nc     \
-    --kind "+"                        \
-    --variable "tas"                  \
-    --quantiles 10                    \
-    --method quantile_mapping
-```
-
-(2.) Example - Linear Scaling bias correction on the provided example data:
-
-```bash
-╰─ python3 biasadjust.py              \
-    --ref input_data/observations.nc  \
-    --contr input_data/control.nc     \
-    --scen input_data/scenario.nc     \
-    --kind "+"                        \
-    --variable "tas"                  \
-    --group "time.month"              \
-    --method linear_scaling
-```
-
-Notes:
-
-- Data sets must have the same spatial resolutions.
-- This script is far away from perfect - so please see it, as a starting point.
-  (:
+- A Jupyter notebook applying all those methods is provided here:
+  `/examples/examples.ipynb`
+- The example data is located at: `/examples/input_data/*.nc`
 
 <a name="notes"></a>
 
