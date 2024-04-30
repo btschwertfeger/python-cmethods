@@ -1,25 +1,15 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.5
+    rev: v0.4.2
     hooks:
       - id: ruff
-        args:
-          - --preview
-          - --fix
-          - --exit-non-zero-on-fix
+        args: [--fix]
+      - id: ruff-format
   - repo: https://github.com/pycqa/flake8
     rev: 7.0.0
     hooks:
       - id: flake8
         args: ["--select=E9,F63,F7,F82", "--show-source", "--statistics"]
-  - repo: https://github.com/pycqa/pylint
-    rev: v3.0.3
-    hooks:
-      - id: pylint
-        name: pylint
-        types: [python]
-        exclude: ^examples/|^tests/|^setup.py$
-        args: ["--rcfile=pyproject.toml"]
   # - repo: https://github.com/pre-commit/mirrors-mypy # FIXME
   #   rev: v1.8.0
   #   hooks:
@@ -67,10 +57,10 @@ repos:
       # - id: rst-inline-touching-normal
       - id: rst-directive-colons
       - id: text-unicode-replacement-char
-  - repo: https://github.com/psf/black
-    rev: 24.2.0
-    hooks:
-      - id: black
+  # - repo: https://github.com/psf/black
+  #   rev: 24.2.0
+  #   hooks:
+  #     - id: black
   # - repo: https://github.com/adamchainz/blacken-docs
   #   rev: 1.16.0
   #   hooks:

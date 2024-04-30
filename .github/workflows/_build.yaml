@@ -37,10 +37,13 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install build
 
+      - name: Install hdf5 (macOS)
+        if: runner.os == 'macOS'
+        run: brew install hdf5
+
       - name: Check git status (not Windows)
         if: runner.os != 'Windows'
         run: |
-          env
           if [[ -z "$(git status --porcelain)" ]]; then
             echo "No changes found."
           else

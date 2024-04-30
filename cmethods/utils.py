@@ -32,7 +32,7 @@ class UnknownMethodError(Exception):
 
 def check_adjust_called(
     function_name: str,
-    adjust_called: Optional[bool] = None,  # noqa: FBT001
+    adjust_called: Optional[bool] = None,
 ) -> None:
     """
     Displays a user warning in case a correction function was not called via
@@ -55,9 +55,7 @@ def check_xr_types(obs: XRData, simh: XRData, simp: XRData) -> None:
     """
     Checks if the parameters are in the correct type. **only used internally**
     """
-    phrase: str = (
-        "must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray"
-    )
+    phrase: str = "must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray"
 
     if not isinstance(obs, XRData_t):
         raise TypeError(f"'obs' {phrase}")

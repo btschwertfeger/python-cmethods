@@ -75,6 +75,7 @@ ruff:
 .PHONY: ruff-fix
 ruff-fix:
 	ruff check --fix --preview .
+	ruff format .
 
 ## changelog		Create the changelog
 ##
