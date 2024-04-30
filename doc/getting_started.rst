@@ -9,6 +9,9 @@ Getting Started
 Installation
 ------------
 
+(For optimal compatibility on macOS, ensure that 'hdf5' and 'netcdf' are
+pre-installed using Homebrew (``brew install hdf5 netcdf``).)
+
 The `python-cmethods`_ module can be installed using the package manager pip:
 
 .. code-block:: bash

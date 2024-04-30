@@ -8,6 +8,7 @@ VENV := venv
 PYTHON := $(VENV)/bin/python3
 TESTS := tests
 PYTEST_OPTS := -vv
+ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 .PHONY: help
 help:
@@ -82,7 +83,7 @@ ruff-fix:
 .PHONY: changelog
 changelog:
 	docker run -it --rm \
-		-v "$(PWD)":/usr/local/src/your-app/ \
+		-v $(ROOT_DIR):/usr/local/src/your-app/ \
 		githubchangeloggenerator/github-changelog-generator \
 		-u btschwertfeger \
 		-p python-cmethods \
