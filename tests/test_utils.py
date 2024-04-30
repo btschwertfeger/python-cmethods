@@ -222,8 +222,7 @@ def test_adjust_type_checking_failing() -> None:
     )
     with pytest.raises(
         TypeError,
-        match="'obs' must be type xarray.core.dataarray.Dataset"
-        " or xarray.core.dataarray.DataArray",
+        match="'obs' must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray",
     ):
         adjust(
             method="linear_scaling",

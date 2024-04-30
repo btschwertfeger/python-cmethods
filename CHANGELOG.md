@@ -2,11 +2,50 @@
 
 ## [Unreleased](https://github.com/btschwertfeger/python-cmethods/tree/HEAD)
 
-[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.0.2...HEAD)
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.2.1...HEAD)
 
 **Merged pull requests:**
 
-- Fix typos and update pre-commit hooks [\#64](https://github.com/btschwertfeger/python-cmethods/pull/64) ([btschwertfeger](https://github.com/btschwertfeger))
+- Bump actions/checkout from 4.1.2 to 4.1.4 [\#90](https://github.com/btschwertfeger/python-cmethods/pull/90) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/upload-artifact from 4.3.1 to 4.3.2 [\#89](https://github.com/btschwertfeger/python-cmethods/pull/89) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump codecov/codecov-action from 4.2.0 to 4.3.0 [\#87](https://github.com/btschwertfeger/python-cmethods/pull/87) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v2.2.1](https://github.com/btschwertfeger/python-cmethods/tree/v2.2.1) (2024-04-10)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.2.0...v2.2.1)
+
+**Merged pull requests:**
+
+- Fix missing function documentation [\#85](https://github.com/btschwertfeger/python-cmethods/pull/85) ([btschwertfeger](https://github.com/btschwertfeger))
+
+## [v2.2.0](https://github.com/btschwertfeger/python-cmethods/tree/v2.2.0) (2024-04-09)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.1.0...v2.2.0)
+
+**Implemented enhancements:**
+
+- Add a command-line interface [\#82](https://github.com/btschwertfeger/python-cmethods/issues/82)
+- Resolve "Add a command-line interface" [\#83](https://github.com/btschwertfeger/python-cmethods/pull/83) ([btschwertfeger](https://github.com/btschwertfeger))
+
+**Merged pull requests:**
+
+- Bump codecov/codecov-action from 4.1.0 to 4.2.0 [\#80](https://github.com/btschwertfeger/python-cmethods/pull/80) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/setup-python from 5.0.0 to 5.1.0 [\#79](https://github.com/btschwertfeger/python-cmethods/pull/79) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Adjust GitHub Action permissions [\#75](https://github.com/btschwertfeger/python-cmethods/pull/75) ([btschwertfeger](https://github.com/btschwertfeger))
+- Bump actions/upload-artifact from 3.1.0 to 4.3.1 [\#74](https://github.com/btschwertfeger/python-cmethods/pull/74) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/checkout from 3.1.0 to 4.1.2 [\#72](https://github.com/btschwertfeger/python-cmethods/pull/72) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump ossf/scorecard-action from 2.1.2 to 2.3.1 [\#71](https://github.com/btschwertfeger/python-cmethods/pull/71) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Update the documentation + project maintenance [\#70](https://github.com/btschwertfeger/python-cmethods/pull/70) ([btschwertfeger](https://github.com/btschwertfeger))
+- Add `scorecard.yml` workflow [\#69](https://github.com/btschwertfeger/python-cmethods/pull/69) ([btschwertfeger](https://github.com/btschwertfeger))
+
+## [v2.1.0](https://github.com/btschwertfeger/python-cmethods/tree/v2.1.0) (2024-03-10)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.0.2...v2.1.0)
+
+**Implemented enhancements:**
+
+- Adjustments using `adjust` require the input data of the control period to have the same size for the time dimension [\#66](https://github.com/btschwertfeger/python-cmethods/issues/66)
+- Resolve "Adjustments using `adjust` require the input data of the control period to have the same size for the time dimension" [\#67](https://github.com/btschwertfeger/python-cmethods/pull/67) ([btschwertfeger](https://github.com/btschwertfeger))
 
 ## [v2.0.2](https://github.com/btschwertfeger/python-cmethods/tree/v2.0.2) (2024-02-02)
 
@@ -14,8 +53,9 @@
 
 **Merged pull requests:**
 
-- Update documentation -- QM and QDM formulas [\#62](https://github.com/btschwertfeger/python-cmethods/pull/62) ([btschwertfeger](https://github.com/btschwertfeger))
 - Bump GitHub action versions [\#59](https://github.com/btschwertfeger/python-cmethods/pull/59) ([btschwertfeger](https://github.com/btschwertfeger))
+- Fix typos and update pre-commit hooks [\#64](https://github.com/btschwertfeger/python-cmethods/pull/64) ([btschwertfeger](https://github.com/btschwertfeger))
+- Update documentation -- QM and QDM formulas [\#62](https://github.com/btschwertfeger/python-cmethods/pull/62) ([btschwertfeger](https://github.com/btschwertfeger))
 
 ## [v2.0.1](https://github.com/btschwertfeger/python-cmethods/tree/v2.0.1) (2024-02-01)
 
