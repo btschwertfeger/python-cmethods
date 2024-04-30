@@ -57,8 +57,7 @@ def apply_ufunc(
             not isinstance(value, str) for value in kwargs["input_core_dims"].values()
         ):
             raise ValueError(
-                "input_core_dims must have three key-value pairs like: "
-                '{"obs": "time", "simh": "time", "simp": "time"}',
+                "input_core_dims must have three key-value pairs like: " '{"obs": "time", "simh": "time", "simp": "time"}',
             )
 
         input_core_dims = kwargs["input_core_dims"]
@@ -187,9 +186,7 @@ def adjust(
             **kwargs,
         )
 
-        result = (
-            monthly_result if result is None else xr.merge([result, monthly_result])
-        )
+        result = monthly_result if result is None else xr.merge([result, monthly_result])
 
     return result
 

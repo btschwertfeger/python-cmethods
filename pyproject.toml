@@ -222,6 +222,7 @@ lint.select = [
   # "TD",  # flake8-todos
   # "TRY", # tryceratops # specify exception messages in class; not important
 ]
+lint.extend-select = ["COM812"]
 lint.fixable = ["ALL"]
 
 lint.ignore = [
