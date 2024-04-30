@@ -6,23 +6,23 @@
 # pylint: disable=consider-using-f-string,logging-not-lazy
 
 r"""
-    Module providing the a method named "adjust" to apply different bias
-    correction techniques to time-series climate data.
+Module providing the a method named "adjust" to apply different bias
+correction techniques to time-series climate data.
 
-    Some variables used in this package:
+Some variables used in this package:
 
-    T = Temperatures ($T$)
-    X = Some climate variable ($X$)
-    h = historical
-    p = scenario; future; predicted
-    obs = observed data ($T_{obs,h}$)
-    simh = modeled data with same time period as obs ($T_{sim,h}$)
-    simp = data to correct (predicted simulated data) ($T_{sim,p}$)
-    F = Cumulative Distribution Function
-    \mu = mean
-    \sigma = standard deviation
-    i = index
-    _{m} = long-term monthly interval
+T = Temperatures ($T$)
+X = Some climate variable ($X$)
+h = historical
+p = scenario; future; predicted
+obs = observed data ($T_{obs,h}$)
+simh = modeled data with same time period as obs ($T_{sim,h}$)
+simp = data to correct (predicted simulated data) ($T_{sim,p}$)
+F = Cumulative Distribution Function
+\mu = mean
+\sigma = standard deviation
+i = index
+_{m} = long-term monthly interval
 """
 
 from __future__ import annotations
@@ -128,9 +128,7 @@ __all__ = ["adjust"]
         help="Temporal grouping",
     ),
     constraint=If(
-        Equal("method", "linear_scaling")
-        & Equal("method", "variance_scaling")
-        & Equal("method", "delta_method"),
+        Equal("method", "linear_scaling") & Equal("method", "variance_scaling") & Equal("method", "delta_method"),
         then=require_all,
     ),
 )

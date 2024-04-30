@@ -137,6 +137,9 @@ https://python-cmethods.readthedocs.io/en/stable/
 
 ## 3. Installation
 
+> For optimal compatibility on macOS, ensure that 'hdf5' and 'netcdf' are
+> pre-installed using Homebrew (`brew install hdf5 netcdf`).
+
 ```bash
 python3 -m pip install python-cmethods
 ```

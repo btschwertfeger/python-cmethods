@@ -159,9 +159,7 @@ def detrended_quantile_mapping(
                 xbins,
                 cdf_simh,
             )  # Eq. 1
-            X = (
-                get_inverse_of_cdf(cdf_obs, epsilon, xbins) + m_simp_mean - m_simh_mean
-            )  # Eq. 1
+            X = get_inverse_of_cdf(cdf_obs, epsilon, xbins) + m_simp_mean - m_simh_mean  # Eq. 1
 
         else:  # kind in cls.MULTIPLICATIVE:
             epsilon = np.interp(  # Eq. 2
