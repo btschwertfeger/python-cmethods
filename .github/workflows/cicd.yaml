@@ -35,7 +35,7 @@ jobs:
   ##    Python versions
   ##
   Build:
-    #needs: [Pre-Commit]
+    needs: [Pre-Commit]
     uses: ./.github/workflows/_build.yaml
     strategy:
       fail-fast: false
