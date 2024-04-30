@@ -37,9 +37,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install build
 
-      - name: Install hdf5 (macOS)
+      - name: Install hdf5 and netcdf (macOS)
         if: runner.os == 'macOS'
-        run: brew install hdf5
+        run: brew install hdf5 netcdf
 
       - name: Check git status (not Windows)
         if: runner.os != 'Windows'
