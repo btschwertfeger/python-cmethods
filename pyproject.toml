@@ -222,7 +222,6 @@ lint.select = [
   # "TD",  # flake8-todos
   # "TRY", # tryceratops # specify exception messages in class; not important
 ]
-lint.extend-select = ["COM812"]
 lint.fixable = ["ALL"]
 
 lint.ignore = [
@@ -230,8 +229,7 @@ lint.ignore = [
   # "PLR2004", # magic value in comparison
   # "E203",    # Whitespace before ':' # false positive on list slices
   # "PLR6301", # Method `…` could be a function or static method # false positive for no-self-use
-  "G002",   # lazy logging could be f-string
-  "ISC001", # implicit string concatenation
+  "G002", # lazy logging could be f-string
 ]
 
 respect-gitignore = true
