@@ -64,7 +64,7 @@ jobs:
           }
 
       - name: Build Linux
-        if: runner.os == 'macOS'
+        if: runner.os == 'linux'
         run: python -m build
 
       - name: Store the distribution packages
