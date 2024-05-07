@@ -11,7 +11,7 @@ authors = [
 maintainers = [
   { name = "Benjamin Thomas Schwertfeger", email = "contact@b-schwertfeger.de" },
 ]
-description = "Collection of bias correction procedures for single and multidimensional climate data"
+description = "A collection of bias correction techniques written in Python - for climate sciences."
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.8"
@@ -83,6 +83,7 @@ jupyter = ["venv-kernel"]
 dev = [
   # building
   "setuptools_scm",
+  "build",
   # documentation
   "sphinx",
   "sphinx-rtd-theme",
