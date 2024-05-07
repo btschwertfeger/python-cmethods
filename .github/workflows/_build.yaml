@@ -70,7 +70,7 @@ jobs:
       - name: Store the distribution packages
         uses: actions/upload-artifact@v3
         # upload artifacts with the oldest supported version
-        if: runner.python-version == '3.8'
+        if: ${{ inputs.python-version }} == '3.8'
         with:
           name: python-package-distributions
           path: dist/
