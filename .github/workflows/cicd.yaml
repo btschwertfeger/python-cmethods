@@ -98,9 +98,7 @@ jobs:
       - Test
       - CodeQL
     name: Upload current version to Test PyPI
-    uses: ./.github/workflows/_pypi_publish.yaml
-    with:
-      REPOSITORY_URL: https://test.pypi.org/legacy/
+    uses: ./.github/workflows/_pypi_test_publish.yaml
     secrets:
       API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
 
@@ -118,7 +116,5 @@ jobs:
       - CodeQL
     name: Upload the current release to PyPI
     uses: ./.github/workflows/_pypi_publish.yaml
-    with:
-      REPOSITORY_URL: https://upload.pypi.org/legacy/
     secrets:
       API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}

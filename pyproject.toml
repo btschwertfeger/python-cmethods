@@ -83,6 +83,7 @@ jupyter = ["venv-kernel"]
 dev = [
   # building
   "setuptools_scm",
+  "build",
   # documentation
   "sphinx",
   "sphinx-rtd-theme",

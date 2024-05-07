@@ -5,7 +5,7 @@
 #
 
 VENV := venv
-PYTHON := $(VENV)/bin/python3
+PYTHON := python
 TESTS := tests
 PYTEST_OPTS := -vv
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
@@ -18,7 +18,7 @@ help:
 ##
 .PHONY: build
 build:
-	$(PYTHON) -m pip wheel -w dist --no-deps .
+	$(PYTHON) -m build .
 
 ## dev		Installs the package in edit mode
 ##
