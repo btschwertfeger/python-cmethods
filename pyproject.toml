@@ -54,7 +54,7 @@ include-package-data = false
 
 [tool.setuptools.packages.find]
 include = ["cmethods*"]
-exclude = ["doc*", "tests*", "examples*", ".env"]
+exclude = ["doc*", "tests*", "examples*", ".env", "venv"]
 
 [tool.setuptools_scm]
 write_to = "cmethods/_version.py"
