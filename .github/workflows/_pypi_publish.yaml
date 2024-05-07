@@ -27,7 +27,7 @@ jobs:
       url: https://pypi.org/p/python-cmethods
     steps:
       - name: Download all the distributions
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: python-package-distributions
           path: dist/
