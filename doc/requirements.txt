@@ -1,4 +1,5 @@
 cloup
+ipython
 nbsphinx
 netCDF4>=1.6.1
 numpy
