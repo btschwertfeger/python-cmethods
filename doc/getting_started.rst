@@ -18,6 +18,8 @@ The `python-cmethods`_ module can be installed using the package manager pip:
 
     python3 -m pip install python-cmethods
 
+The package is also available via conda-forge. See
+`python_cmethods-feedstock`_ for more information.
 
 Command-Line Interface Usage
 ----------------------------

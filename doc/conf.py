@@ -38,6 +38,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.mathjax",
+    "nbsphinx",
 ]
 
 templates_path = ["_templates"]
