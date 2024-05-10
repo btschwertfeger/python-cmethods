@@ -4,6 +4,7 @@ nbsphinx
 netCDF4>=1.6.1
 numpy
 setuptools_scm
+shutil
 sphinx
 sphinx-rtd-theme
 xarray>=2022.11.0

@@ -88,6 +88,7 @@ dev = [
   "sphinx",
   "sphinx-rtd-theme",
   "nbsphinx",
+  "shutil",
   # linting
   "pylint",
   "flake8",
