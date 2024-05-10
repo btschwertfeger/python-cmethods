@@ -39,10 +39,11 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.mathjax",
     "nbsphinx",
+    "IPython.sphinxext.ipython_console_highlighting",
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "links.rst"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "links.rst", "**.ipynb_checkpoints"]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
