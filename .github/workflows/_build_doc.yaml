@@ -36,6 +36,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install .
           python -m pip install -r doc/requirements.txt
+          apt-get install pandoc
 
       - name: Build the documentation
         run: cd doc && make html
