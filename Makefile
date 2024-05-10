@@ -25,7 +25,7 @@ build:
 .PHONY: dev
 dev:
 	@git lfs install
-	$(PYTHON) -m pip install -e ".[dev,test]"
+	$(PYTHON) -m pip install -e ".[dev,test,jupyter,examples]"
 
 ## install		Install the package
 ##

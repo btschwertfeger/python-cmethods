@@ -12,6 +12,7 @@ Welcome to python-cmethods's documentation!
 
    introduction.rst
    getting_started.rst
+   examples.ipynb
    cli.rst
    cmethods.rst
    methods.rst

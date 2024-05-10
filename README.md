@@ -5,7 +5,7 @@
 [![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/btschwertfeger/python-cmethods)
 [![Generic badge](https://img.shields.io/badge/python-3.8_|_3.9_|_3.10_|_3.11|_3.12-blue.svg)](https://shields.io/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Downloads](https://pepy.tech/badge/python-cmethods)](https://pepy.tech/project/python-cmethods)
+[![PyPI Downloads](https://pepy.tech/badge/python-cmethods)](https://pepy.tech/project/python-cmethods)
 
 [![CI/CD](https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yaml/badge.svg?branch=master)](https://github.com/btschwertfeger/python-cmethods/actions/workflows/cicd.yaml)
 [![codecov](https://codecov.io/github/btschwertfeger/python-cmethods/branch/master/graph/badge.svg?token=OSO4PAABPD)](https://codecov.io/github/btschwertfeger/python-cmethods)
@@ -143,6 +143,10 @@ https://python-cmethods.readthedocs.io/en/stable/
 ```bash
 python3 -m pip install python-cmethods
 ```
+
+The package is also available via conda-forge. See
+[conda-forge/python_cmethods-feedstock](https://github.com/conda-forge/python_cmethods-feedstock/tree/main) for more
+information.
 
 <a name="examples"></a>
 

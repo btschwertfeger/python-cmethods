@@ -27,6 +27,14 @@ rst_epilog = ""
 with open("links.rst", encoding="utf-8") as f:
     rst_epilog += f.read()
 
+
+def setup(app) -> None:  # noqa: ARG001
+    from os.path import join
+    from shutil import copyfile
+
+    copyfile(join("..", "examples", "examples.ipynb"), "examples.ipynb")
+
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -38,10 +46,12 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.mathjax",
+    "nbsphinx",
+    "IPython.sphinxext.ipython_console_highlighting",
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "links.rst"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "links.rst", "**.ipynb_checkpoints"]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
