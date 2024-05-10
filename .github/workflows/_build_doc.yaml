@@ -36,7 +36,7 @@ jobs:
           python -m pip install --user --upgrade pip
           python -m pip install --user .
           python -m pip install --user -r doc/requirements.txt
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install pandoc
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y pandoc
 
       - name: Build the documentation
         run: cd doc && make html
