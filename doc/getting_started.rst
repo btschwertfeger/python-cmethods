@@ -149,16 +149,17 @@ dimensions of ``obs`` and ``simp`` have the length, but the time dimension of
     import xarray as xr
 
     obs = xr.open_dataset("examples/input_data/observations.nc")["tas"]
-    simp = xr.open_dataset("examples/input_data/control.nc")["tas"]
     simh = simp.copy(deep=True)[3650:]
+    simp = xr.open_dataset("examples/input_data/control.nc")["tas"]
 
     bc = adjust(
         method="quantile_mapping",
         obs=obs,
         simh=simh.rename({"time": "t_simh"}),
-        simp=simh,
+        simp=simp,
         kind="+",
-        input_core_dims={"obs": "time", "simh": "t_simh", "simp": "time"}
+        input_core_dims={"obs": "time", "simh": "t_simh", "simp": "time"},
+        n_quantiles=100,
     )
 
 In case you are applying a scaling based technique using grouping, you have to
@@ -172,15 +173,15 @@ adjust the group names accordingly to the time dimension names.
     import xarray as xr
 
     obs = xr.open_dataset("examples/input_data/observations.nc")["tas"]
-    simp = xr.open_dataset("examples/input_data/control.nc")["tas"]
     simh = simp.copy(deep=True)[3650:]
+    simp = xr.open_dataset("examples/input_data/control.nc")["tas"]
 
     bc = adjust(
         method="linear_scaling",
         obs=obs,
         simh=simh.rename({"time": "t_simh"}),
-        simp=simh,
+        simp=simp,
         kind="+",
         group={"obs": "time.month", "simh": "t_simh.month", "simp": "time.month"},
-        input_core_dims={"obs": "time", "simh": "t_simh", "simp": "time"}
+        input_core_dims={"obs": "time", "simh": "t_simh", "simp": "time"},
     )

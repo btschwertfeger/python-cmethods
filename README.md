@@ -108,6 +108,10 @@ Please refer to the official documentation for more information about these
 methods as well as sample scripts:
 https://python-cmethods.readthedocs.io/en/stable/
 
+## Best Practices and important Notes
+
+- The training data should have the same temporal resolution.
+
 - Except for the variance scaling, all methods can be applied on stochastic and
   non-stochastic climate variables. Variance scaling can only be applied on
   non-stochastic climate variables.
