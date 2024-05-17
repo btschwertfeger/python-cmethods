@@ -60,7 +60,7 @@ def apply_ufunc(
                 'input_core_dims must have three key-value pairs like: {"obs": "time", "simh": "time", "simp": "time"}',
             )
 
-        input_core_dims = kwargs["input_core_dims"]
+        input_core_dims = kwargs.pop("input_core_dims")
     else:
         input_core_dims = {"obs": "time", "simh": "time", "simp": "time"}
 
@@ -68,13 +68,13 @@ def apply_ufunc(
         __METHODS_FUNC__[method],
         obs,
         simh,
-        # Need to spoof a fake time axis since 'time' coord on full dataset is different
-        # than 'time' coord on training dataset.
+        # Need to spoof a fake time axis since 'time' coord on full dataset is
+        # different than 'time' coord on training dataset.
         simp.rename({input_core_dims["simp"]: "__t_simp__"}),
         dask="parallelized",
         vectorize=True,
-        # This will vectorize over the time dimension, so will submit each grid cell
-        # independently
+        # This will vectorize over the time dimension, so will submit each grid
+        # cell independently
         input_core_dims=[
             [input_core_dims["obs"]],
             [input_core_dims["simh"]],
@@ -89,9 +89,9 @@ def apply_ufunc(
     # Rename to proper coordinate name.
     result = result.rename({"__t_simp__": input_core_dims["simp"]})
 
-    # ufunc will put the core dimension to the end (time), so want to preserve original
-    # order where time is commonly first.
-    return result.transpose(*obs.dims)
+    # ufunc will put the core dimension to the end (time), so want to preserve
+    # original order where time is commonly first.
+    return result.transpose(*obs.rename({input_core_dims["obs"]: input_core_dims["simp"]}).dims)
 
 
 def adjust(
