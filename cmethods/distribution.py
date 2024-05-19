@@ -60,8 +60,8 @@ def quantile_mapping(
     wide = abs(global_max - global_min) / n_quantiles
     xbins = np.arange(global_min, global_max + wide, wide)
 
-    cdf_obs = get_cdf(obs, xbins)
-    cdf_simh = get_cdf(simh, xbins)
+    cdf_obs = get_cdf(obs, xbins) / len(obs)
+    cdf_simh = get_cdf(simh, xbins) / len(simh)
     cdf_simh = np.interp(
         cdf_simh,
         (cdf_simh.min(), cdf_simh.max()),
@@ -241,9 +241,9 @@ def quantile_delta_mapping(
         wide = abs(global_max - global_min) / n_quantiles
         xbins = np.arange(global_min, global_max + wide, wide)
 
-        cdf_obs = get_cdf(obs, xbins)
-        cdf_simh = get_cdf(simh, xbins)
-        cdf_simp = get_cdf(simp, xbins)
+        cdf_obs = get_cdf(obs, xbins) / len(obs)
+        cdf_simh = get_cdf(simh, xbins) / len(simh)
+        cdf_simp = get_cdf(simp, xbins) / len(simp)
 
         # calculate exact CDF values of $F_{sim,p}[T_{sim,p}(t)]$
         epsilon = np.interp(simp, xbins, cdf_simp)  # Eq. 1.1
@@ -261,9 +261,9 @@ def quantile_delta_mapping(
         wide = global_max / n_quantiles
         xbins = np.arange(global_min, global_max + wide, wide)
 
-        cdf_obs = get_cdf(obs, xbins)
-        cdf_simh = get_cdf(simh, xbins)
-        cdf_simp = get_cdf(simp, xbins)
+        cdf_obs = get_cdf(obs, xbins) / len(obs)
+        cdf_simh = get_cdf(simh, xbins) / len(simh)
+        cdf_simp = get_cdf(simp, xbins) / len(simp)
 
         epsilon = np.interp(simp, xbins, cdf_simp)  # Eq. 1.1
         QDM1 = get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 1.2
