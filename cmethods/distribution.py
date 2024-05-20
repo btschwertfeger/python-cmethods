@@ -62,11 +62,6 @@ def quantile_mapping(
 
     cdf_obs = get_cdf(obs, xbins)
     cdf_simh = get_cdf(simh, xbins)
-    cdf_simh = np.interp(
-        cdf_simh,
-        (cdf_simh.min(), cdf_simh.max()),
-        (cdf_obs.min(), cdf_obs.max()),
-    )
 
     if kind in ADDITIVE:
         epsilon = np.interp(simp, xbins, cdf_simh)  # Eq. 1
@@ -129,11 +124,6 @@ def detrended_quantile_mapping(
 
     cdf_obs = get_cdf(obs, xbins)
     cdf_simh = get_cdf(simh, xbins)
-    cdf_simh = np.interp(
-        cdf_simh,
-        (cdf_simh.min(), cdf_simh.max()),
-        (cdf_obs.min(), cdf_obs.max()),
-    )
 
     # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
     res = np.zeros(len(simp.values))

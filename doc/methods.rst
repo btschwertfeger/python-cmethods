@@ -171,7 +171,9 @@ The Delta Method bias correction technique can be applied on stochastic and
 non-stochastic climate variables to minimize deviations in the mean values
 between predicted and observed time-series of past and future time periods.
 
-This method requires that the time series can be grouped by ``time.month``.
+This method requires that the time series can be grouped by ``time.month`` while
+the reference data of the control period must have the same temporal resolution
+as the data that is going to be adjusted.
 
 Since the multiplicative scaling can result in very high scaling factors, a
 maximum scaling factor of 10 is set. This can be changed by passing the desired

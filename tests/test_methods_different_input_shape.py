@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2023 Benjamin Thomas Schwertfeger
+# Copyright (C) 2024 Benjamin Thomas Schwertfeger
 # GitHub: https://github.com/btschwertfeger
 #
 
 """
-Module implementing the unit tests for all implemented bias correction
-techniques.
+Module implementing the unit tests that check if the input data sets can have
+different shapes.
+
+TODO: Remove the copy-paste stuff here. That could be done way simpler.
 """
 
 from __future__ import annotations
@@ -14,13 +16,11 @@ from __future__ import annotations
 import pytest
 
 from cmethods import adjust
-from cmethods.distribution import detrended_quantile_mapping
-from cmethods.types import NPData_t, XRData_t
+from cmethods.types import XRData_t
 
-from .helper import is_1d_rmse_better, is_3d_rmse_better
+from .helper import is_1d_rmse_better
 
-GROUP: str = "time.month"
-N_QUANTILES: int = 100
+N_QUANTILES = 100
 
 
 @pytest.mark.parametrize(
@@ -29,22 +29,27 @@ N_QUANTILES: int = 100
         ("linear_scaling", "+"),
         ("linear_scaling", "*"),
         ("variance_scaling", "+"),
-        ("delta_method", "+"),
-        ("delta_method", "*"),
     ],
 )
-def test_1d_scaling(
+def test_1d_scaling_obs_shorter(
     datasets: dict,
     method: str,
     kind: str,
 ) -> None:
-    obsh: XRData_t = datasets[kind]["obsh"][:, 0, 0]
+    obsh: XRData_t = datasets[kind]["obsh"][:7300, 0, 0].rename({"time": "t_time"})  # 20/30 years
     obsp: XRData_t = datasets[kind]["obsp"][:, 0, 0]
     simh: XRData_t = datasets[kind]["simh"][:, 0, 0]
     simp: XRData_t = datasets[kind]["simp"][:, 0, 0]
 
     # not group
-    result: XRData_t = adjust(method=method, obs=obsh, simh=simh, simp=simp, kind=kind)
+    result: XRData_t = adjust(
+        method=method,
+        obs=obsh,
+        simh=simh,
+        simp=simp,
+        kind=kind,
+        input_core_dims={"obs": "t_time", "simh": "time", "simp": "time"},
+    )
     assert isinstance(result, XRData_t)
     assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
@@ -55,7 +60,8 @@ def test_1d_scaling(
         simh=simh,
         simp=simp,
         kind=kind,
-        group=GROUP,
+        group={"obs": "t_time.month", "simh": "time.month", "simp": "time.month"},
+        input_core_dims={"obs": "t_time", "simh": "time", "simp": "time"},
     )
     assert isinstance(result, XRData_t)
     assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
@@ -66,45 +72,45 @@ def test_1d_scaling(
     [
         ("linear_scaling", "+"),
         ("linear_scaling", "*"),
-        ("variance_scaling", "+"),
         ("delta_method", "+"),
         ("delta_method", "*"),
+        ("variance_scaling", "+"),
     ],
 )
-def test_3d_scaling(
+def test_1d_scaling_simh_shorter(
     datasets: dict,
     method: str,
     kind: str,
 ) -> None:
-    obsh: XRData_t = datasets[kind]["obsh"]
-    obsp: XRData_t = datasets[kind]["obsp"]
-    simh: XRData_t = datasets[kind]["simh"]
-    simp: XRData_t = datasets[kind]["simp"]
+    obsh: XRData_t = datasets[kind]["obsh"][:, 0, 0]
+    obsp: XRData_t = datasets[kind]["obsp"][:, 0, 0]
+    simh: XRData_t = datasets[kind]["simh"][:7300, 0, 0].rename({"time": "t_time"})  # 20/30 years
+    simp: XRData_t = datasets[kind]["simp"][:, 0, 0]
 
-    # not grouped
+    # not group
     result: XRData_t = adjust(
         method=method,
         obs=obsh,
         simh=simh,
         simp=simp,
         kind=kind,
+        input_core_dims={"obs": "time", "simh": "t_time", "simp": "time"},
     )
-
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
     # grouped
-    result: XRData_t = adjust(
+    result = adjust(
         method=method,
         obs=obsh,
         simh=simh,
         simp=simp,
         kind=kind,
-        group=GROUP,
+        group={"obs": "time.month", "simh": "t_time.month", "simp": "time.month"},
+        input_core_dims={"obs": "time", "simh": "t_time", "simp": "time"},
     )
-
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
 
 @pytest.mark.parametrize(
@@ -115,45 +121,43 @@ def test_3d_scaling(
         ("variance_scaling", "+"),
     ],
 )
-def test_3d_scaling_different_time_span(
+def test_1d_scaling_simp_shorter(
     datasets: dict,
     method: str,
     kind: str,
 ) -> None:
-    obsh: XRData_t = datasets[kind]["obsh"]
-    obsp: XRData_t = datasets[kind]["obsp"]
-    simh: XRData_t = datasets[kind]["simh"]
-    simp: XRData_t = datasets[kind]["simp"]
-    simh = simh.sel(time=slice(simh.time[1], None)).rename({"time": "t_simh"})
+    obsh: XRData_t = datasets[kind]["obsh"][:, 0, 0]
+    obsp: XRData_t = datasets[kind]["obsp"][:7300, 0, 0].rename({"time": "t_time"})  # 20/30 years
+    simh: XRData_t = datasets[kind]["simh"][:, 0, 0]
+    simp: XRData_t = datasets[kind]["simp"][:7300, 0, 0].rename({"time": "t_time"})  # 20/30 years
 
-    time_names = {"obs": "time", "simh": "t_simh", "simp": "time"}
-
-    # not grouped
+    # not group
     result: XRData_t = adjust(
         method=method,
         obs=obsh,
         simh=simh,
         simp=simp,
         kind=kind,
-        input_core_dims=time_names,
+        input_core_dims={"obs": "time", "simh": "time", "simp": "t_time"},
     )
-
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
     # grouped
-    result: XRData_t = adjust(
+    result = adjust(
         method=method,
         obs=obsh,
         simh=simh,
         simp=simp,
         kind=kind,
-        group={"obs": "time.month", "simh": "t_simh.month", "simp": "time.month"},
-        input_core_dims=time_names,
+        group={"obs": "time.month", "simh": "time.month", "simp": "t_time.month"},
+        input_core_dims={"obs": "time", "simh": "time", "simp": "t_time"},
     )
-
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
+
+
+# ---------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize(
@@ -165,12 +169,12 @@ def test_3d_scaling_different_time_span(
         ("quantile_delta_mapping", "*"),
     ],
 )
-def test_1d_distribution(
+def test_1d_distribution_obs_shorter(
     datasets: dict,
     method: str,
     kind: str,
 ) -> None:
-    obsh: XRData_t = datasets[kind]["obsh"][:, 0, 0]
+    obsh: XRData_t = datasets[kind]["obsh"][:7300, 0, 0].rename({"time": "t_time"})  # 20/30 years
     obsp: XRData_t = datasets[kind]["obsp"][:, 0, 0]
     simh: XRData_t = datasets[kind]["simh"][:, 0, 0]
     simp: XRData_t = datasets[kind]["simp"][:, 0, 0]
@@ -182,6 +186,7 @@ def test_1d_distribution(
         simp=simp,
         kind=kind,
         n_quantiles=N_QUANTILES,
+        input_core_dims={"obs": "t_time", "simh": "time", "simp": "time"},
     )
 
     assert isinstance(result, XRData_t)
@@ -197,15 +202,15 @@ def test_1d_distribution(
         ("quantile_delta_mapping", "*"),
     ],
 )
-def test_3d_distribution(
+def test_1d_distribution_simh_shorter(
     datasets: dict,
     method: str,
     kind: str,
 ) -> None:
-    obsh: XRData_t = datasets[kind]["obsh"]
-    obsp: XRData_t = datasets[kind]["obsp"]
-    simh: XRData_t = datasets[kind]["simh"]
-    simp: XRData_t = datasets[kind]["simp"]
+    obsh: XRData_t = datasets[kind]["obsh"][:, 0, 0]
+    obsp: XRData_t = datasets[kind]["obsp"][:, 0, 0]
+    simh: XRData_t = datasets[kind]["simh"][:7300, 0, 0].rename({"time": "t_time"})  # 20/30 years
+    simp: XRData_t = datasets[kind]["simp"][:, 0, 0]
 
     result: XRData_t = adjust(
         method=method,
@@ -214,10 +219,11 @@ def test_3d_distribution(
         simp=simp,
         kind=kind,
         n_quantiles=N_QUANTILES,
+        input_core_dims={"obs": "time", "simh": "t_time", "simp": "time"},
     )
 
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
 
 
 @pytest.mark.parametrize(
@@ -229,18 +235,15 @@ def test_3d_distribution(
         ("quantile_delta_mapping", "*"),
     ],
 )
-def test_3d_distribution_different_time_span(
+def test_1d_distribution_simp_shorter(
     datasets: dict,
     method: str,
     kind: str,
 ) -> None:
-    obsh: XRData_t = datasets[kind]["obsh"]
-    obsp: XRData_t = datasets[kind]["obsp"]
-    simh: XRData_t = datasets[kind]["simh"]
-    simp: XRData_t = datasets[kind]["simp"]
-
-    simh = simh.sel(time=slice(simh.time[1], None)).rename({"time": "t_simh"})
-    time_names = {"obs": "time", "simh": "t_simh", "simp": "time"}
+    obsh: XRData_t = datasets[kind]["obsh"][:, 0, 0]
+    obsp: XRData_t = datasets[kind]["obsp"][:7300, 0, 0].rename({"time": "t_time"})  # 20/30 years
+    simh: XRData_t = datasets[kind]["simh"][:, 0, 0]
+    simp: XRData_t = datasets[kind]["simp"][:7300, 0, 0].rename({"time": "t_time"})  # 20/30 years
 
     result: XRData_t = adjust(
         method=method,
@@ -249,46 +252,8 @@ def test_3d_distribution_different_time_span(
         simp=simp,
         kind=kind,
         n_quantiles=N_QUANTILES,
-        input_core_dims=time_names,
+        input_core_dims={"obs": "time", "simh": "time", "simp": "t_time"},
     )
 
     assert isinstance(result, XRData_t)
-    assert is_3d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
-
-
-def test_1d_detrended_quantile_mapping_add(datasets: dict) -> None:
-    kind: str = "+"
-    obsh: XRData_t = datasets[kind]["obsh"][:, 0, 0]
-    obsp: XRData_t = datasets[kind]["obsp"][:, 0, 0]
-    simh: XRData_t = datasets[kind]["simh"][:, 0, 0]
-    simp: XRData_t = datasets[kind]["simp"][:, 0, 0]
-
-    # not group
-    result: XRData_t = detrended_quantile_mapping(
-        obs=obsh,
-        simh=simh,
-        simp=simp,
-        kind=kind,
-        n_quantiles=N_QUANTILES,
-    )
-    assert isinstance(result, NPData_t)
-    assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
-
-
-def test_1d_detrended_quantile_mapping_mult(datasets: dict) -> None:
-    kind: str = "*"
-    obsh: XRData_t = datasets[kind]["obsh"][:, 0, 0]
-    obsp: XRData_t = datasets[kind]["obsp"][:, 0, 0]
-    simh: XRData_t = datasets[kind]["simh"][:, 0, 0]
-    simp: XRData_t = datasets[kind]["simp"][:, 0, 0]
-
-    # not group
-    result: XRData_t = detrended_quantile_mapping(
-        obs=obsh,
-        simh=simh,
-        simp=simp,
-        kind=kind,
-        n_quantiles=N_QUANTILES,
-    )
-    assert isinstance(result, NPData_t)
-    assert is_1d_rmse_better(result=result, obsp=obsp, simp=simp)
+    assert is_1d_rmse_better(result=result[kind], obsp=obsp, simp=simp)
