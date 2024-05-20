@@ -27,9 +27,9 @@ N_QUANTILES: int = 100
     ("method", "kind"),
     [
         ("linear_scaling", "+"),
+        ("linear_scaling", "*"),
         ("variance_scaling", "+"),
         ("delta_method", "+"),
-        ("linear_scaling", "*"),
         ("delta_method", "*"),
     ],
 )
@@ -65,9 +65,9 @@ def test_1d_scaling(
     ("method", "kind"),
     [
         ("linear_scaling", "+"),
+        ("linear_scaling", "*"),
         ("variance_scaling", "+"),
         ("delta_method", "+"),
-        ("linear_scaling", "*"),
         ("delta_method", "*"),
     ],
 )
@@ -111,8 +111,8 @@ def test_3d_scaling(
     ("method", "kind"),
     [
         ("linear_scaling", "+"),
-        ("variance_scaling", "+"),
         ("linear_scaling", "*"),
+        ("variance_scaling", "+"),
     ],
 )
 def test_3d_scaling_different_time_span(
@@ -160,8 +160,8 @@ def test_3d_scaling_different_time_span(
     ("method", "kind"),
     [
         ("quantile_mapping", "+"),
-        ("quantile_delta_mapping", "+"),
         ("quantile_mapping", "*"),
+        ("quantile_delta_mapping", "+"),
         ("quantile_delta_mapping", "*"),
     ],
 )
@@ -192,8 +192,8 @@ def test_1d_distribution(
     ("method", "kind"),
     [
         ("quantile_mapping", "+"),
-        ("quantile_delta_mapping", "+"),
         ("quantile_mapping", "*"),
+        ("quantile_delta_mapping", "+"),
         ("quantile_delta_mapping", "*"),
     ],
 )
@@ -224,8 +224,8 @@ def test_3d_distribution(
     ("method", "kind"),
     [
         ("quantile_mapping", "+"),
-        ("quantile_delta_mapping", "+"),
         ("quantile_mapping", "*"),
+        ("quantile_delta_mapping", "+"),
         ("quantile_delta_mapping", "*"),
     ],
 )

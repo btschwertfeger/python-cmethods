@@ -60,13 +60,8 @@ def quantile_mapping(
     wide = abs(global_max - global_min) / n_quantiles
     xbins = np.arange(global_min, global_max + wide, wide)
 
-    cdf_obs = get_cdf(obs, xbins) / len(obs)
-    cdf_simh = get_cdf(simh, xbins) / len(simh)
-    cdf_simh = np.interp(
-        cdf_simh,
-        (cdf_simh.min(), cdf_simh.max()),
-        (cdf_obs.min(), cdf_obs.max()),
-    )
+    cdf_obs = get_cdf(obs, xbins)
+    cdf_simh = get_cdf(simh, xbins)
 
     if kind in ADDITIVE:
         epsilon = np.interp(simp, xbins, cdf_simh)  # Eq. 1
@@ -129,11 +124,6 @@ def detrended_quantile_mapping(
 
     cdf_obs = get_cdf(obs, xbins)
     cdf_simh = get_cdf(simh, xbins)
-    cdf_simh = np.interp(
-        cdf_simh,
-        (cdf_simh.min(), cdf_simh.max()),
-        (cdf_obs.min(), cdf_obs.max()),
-    )
 
     # detrended => shift mean of $X_{sim,p}$ to range of $X_{sim,h}$ to adjust extremes
     res = np.zeros(len(simp.values))
@@ -241,9 +231,9 @@ def quantile_delta_mapping(
         wide = abs(global_max - global_min) / n_quantiles
         xbins = np.arange(global_min, global_max + wide, wide)
 
-        cdf_obs = get_cdf(obs, xbins) / len(obs)
-        cdf_simh = get_cdf(simh, xbins) / len(simh)
-        cdf_simp = get_cdf(simp, xbins) / len(simp)
+        cdf_obs = get_cdf(obs, xbins)
+        cdf_simh = get_cdf(simh, xbins)
+        cdf_simp = get_cdf(simp, xbins)
 
         # calculate exact CDF values of $F_{sim,p}[T_{sim,p}(t)]$
         epsilon = np.interp(simp, xbins, cdf_simp)  # Eq. 1.1
@@ -261,9 +251,9 @@ def quantile_delta_mapping(
         wide = global_max / n_quantiles
         xbins = np.arange(global_min, global_max + wide, wide)
 
-        cdf_obs = get_cdf(obs, xbins) / len(obs)
-        cdf_simh = get_cdf(simh, xbins) / len(simh)
-        cdf_simp = get_cdf(simp, xbins) / len(simp)
+        cdf_obs = get_cdf(obs, xbins)
+        cdf_simh = get_cdf(simh, xbins)
+        cdf_simp = get_cdf(simp, xbins)
 
         epsilon = np.interp(simp, xbins, cdf_simp)  # Eq. 1.1
         QDM1 = get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 1.2

@@ -7,6 +7,8 @@
 """
 Module implementing the unit tests that check if the input data sets can have
 different shapes.
+
+TODO: Remove the copy-paste stuff here. That could be done way simpler.
 """
 
 from __future__ import annotations
@@ -25,8 +27,8 @@ N_QUANTILES = 100
     ("method", "kind"),
     [
         ("linear_scaling", "+"),
-        ("variance_scaling", "+"),
         ("linear_scaling", "*"),
+        ("variance_scaling", "+"),
     ],
 )
 def test_1d_scaling_obs_shorter(
@@ -69,10 +71,10 @@ def test_1d_scaling_obs_shorter(
     ("method", "kind"),
     [
         ("linear_scaling", "+"),
-        ("variance_scaling", "+"),
-        ("delta_method", "+"),
         ("linear_scaling", "*"),
+        ("delta_method", "+"),
         ("delta_method", "*"),
+        ("variance_scaling", "+"),
     ],
 )
 def test_1d_scaling_simh_shorter(
@@ -115,8 +117,8 @@ def test_1d_scaling_simh_shorter(
     ("method", "kind"),
     [
         ("linear_scaling", "+"),
-        ("variance_scaling", "+"),
         ("linear_scaling", "*"),
+        ("variance_scaling", "+"),
     ],
 )
 def test_1d_scaling_simp_shorter(
@@ -162,8 +164,8 @@ def test_1d_scaling_simp_shorter(
     ("method", "kind"),
     [
         ("quantile_mapping", "+"),
-        ("quantile_delta_mapping", "+"),
         ("quantile_mapping", "*"),
+        ("quantile_delta_mapping", "+"),
         ("quantile_delta_mapping", "*"),
     ],
 )
@@ -195,8 +197,8 @@ def test_1d_distribution_obs_shorter(
     ("method", "kind"),
     [
         ("quantile_mapping", "+"),
-        ("quantile_delta_mapping", "+"),
         ("quantile_mapping", "*"),
+        ("quantile_delta_mapping", "+"),
         ("quantile_delta_mapping", "*"),
     ],
 )
@@ -228,8 +230,8 @@ def test_1d_distribution_simh_shorter(
     ("method", "kind"),
     [
         ("quantile_mapping", "+"),
-        ("quantile_delta_mapping", "+"),
         ("quantile_mapping", "*"),
+        ("quantile_delta_mapping", "+"),
         ("quantile_delta_mapping", "*"),
     ],
 )

@@ -149,11 +149,11 @@ def get_pdf(
         :linenos:
         :caption: Compute the probability density function :math:`P(x)`
 
-        >>> from cmethods import CMethods as cm
+        >>> from cmethods get_pdf
 
         >>> x = [1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9, 10]
         >>> xbins = [0, 3, 6, 10]
-        >>> print(cm.get_pdf(x=x, xbins=xbins))
+        >>> print(get_pdf(x=x, xbins=xbins))
         [2, 5, 5]
     """
     pdf, _ = np.histogram(x, xbins)
@@ -178,17 +178,18 @@ def get_cdf(
 
     .. code-block:: python
         :linenos:
-        :caption: Compute the cmmulative distribution function :math:`F(x)`
+        :caption: Compute the cumulative distribution function :math:`F(x)`
 
-        >>> from cmethods import CMethods as cm
+        >>> from cmethods.utils import get_cdf
 
         >>> x = [1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9, 10]
         >>> xbins = [0, 3, 6, 10]
-        >>> print(cm.get_cdf(x=x, xbins=xbins))
-        [0, 2, 7, 12]
+        >>> print(get_cdf(x=x, xbins=xbins))
+        [0.0, 0.16666667, 0.58333333, 1.]
     """
     pdf, _ = np.histogram(x, xbins)
-    return np.insert(np.cumsum(pdf), 0, 0.0)
+    cdf = np.insert(np.cumsum(pdf), 0, 0.0)
+    return cdf / cdf[-1]
 
 
 def get_inverse_of_cdf(
