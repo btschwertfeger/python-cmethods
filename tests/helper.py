@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+from functools import cache
 from typing import List
 
 import numpy as np
@@ -47,6 +48,7 @@ def is_3d_rmse_better(result, obsp, simp) -> bool:
     return (rmse_values_new_ds < rmse_values_old_ds).all()
 
 
+@cache
 def get_datasets(kind: str) -> tuple[xr.Dataset, xr.Dataset, xr.Dataset, xr.Dataset]:
     historical_time = xr.cftime_range(
         "1971-01-01",
