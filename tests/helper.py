@@ -118,7 +118,7 @@ def get_datasets(kind: str) -> tuple[xr.Dataset, xr.Dataset, xr.Dataset, xr.Data
         )
         obsh = get_dataset(data, historical_time, kind=kind)
         obsp = get_dataset(data * 1.02, historical_time, kind=kind)
-        simh = get_dataset(data * 0.98, historical_time, kind=kind)
-        simp = get_dataset(data * 0.90, future_time, kind=kind)
+        simh = get_dataset(data * 0.95, historical_time, kind=kind)
+        simp = get_dataset(data * 0.965, future_time, kind=kind)
 
     return obsh, obsp, simh, simp
