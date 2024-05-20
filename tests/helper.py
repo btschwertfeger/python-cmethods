@@ -9,7 +9,6 @@
 from __future__ import annotations
 
 from functools import cache
-from typing import List
 
 import numpy as np
 import xarray as xr
@@ -64,7 +63,7 @@ def get_datasets(kind: str) -> tuple[xr.Dataset, xr.Dataset, xr.Dataset, xr.Data
     )
     latitudes = np.arange(23, 27, 1)
 
-    def get_hist_temp_for_lat(lat: int) -> List[float]:
+    def get_hist_temp_for_lat(lat: int) -> list[float]:
         """Returns a fake interval time series by latitude value"""
         return 273.15 - (
             lat * np.cos(2 * np.pi * historical_time.dayofyear / 365)
@@ -73,7 +72,7 @@ def get_datasets(kind: str) -> tuple[xr.Dataset, xr.Dataset, xr.Dataset, xr.Data
             + 0.1 * (historical_time - historical_time[0]).days / 365
         )
 
-    def get_fake_hist_precipitation_data() -> List[float]:
+    def get_fake_hist_precipitation_data() -> list[float]:
         """Returns ratio based fake time series"""
         pr = (
             np.cos(2 * np.pi * historical_time.dayofyear / 365)
@@ -122,7 +121,7 @@ def get_datasets(kind: str) -> tuple[xr.Dataset, xr.Dataset, xr.Dataset, xr.Data
         )
         obsh = get_dataset(data, historical_time, kind=kind)
         obsp = get_dataset(data * 1.02, historical_time, kind=kind)
-        simh = get_dataset(data * 0.98, historical_time, kind=kind)
-        simp = get_dataset(data * 0.09, future_time, kind=kind)
+        simh = get_dataset(data * 0.95, historical_time, kind=kind)
+        simp = get_dataset(data * 0.965, future_time, kind=kind)
 
     return obsh, obsp, simh, simp

@@ -22,9 +22,9 @@ N_QUANTILES: int = 100
     ("method", "kind"),
     [
         ("linear_scaling", "+"),
+        ("linear_scaling", "*"),
         ("variance_scaling", "+"),
         ("delta_method", "+"),
-        ("linear_scaling", "*"),
         ("delta_method", "*"),
     ],
 )
@@ -67,8 +67,8 @@ def test_3d_scaling_zarr(
     ("method", "kind"),
     [
         ("quantile_mapping", "+"),
-        ("quantile_delta_mapping", "+"),
         ("quantile_mapping", "*"),
+        ("quantile_delta_mapping", "+"),
         ("quantile_delta_mapping", "*"),
     ],
 )
