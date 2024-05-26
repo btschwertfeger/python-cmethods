@@ -7,7 +7,7 @@
 
 .. _python-cmethods: https://github.com/btschwertfeger/python-cmethods
 
-.. _python_cmethods-feedstock: https://github.com/conda-forge/python_cmethods-feedstock/tree/main
+.. _python_cmethods-conda: https://anaconda.org/conda-forge/python_cmethods
 
 .. _python-cmethods/issues: https://github.com/btschwertfeger/python-cmethods/issues
 
