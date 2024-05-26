@@ -351,7 +351,7 @@ shift of :math:`X_{sim,p}(i)`:
 
     .. math::
 
-        X_{sim,p}^{*DT}(i) & = X_{sim,p}(i) + \Delta\mu \\[1pt]
+        X_{sim,p}^{*DT}(i) & = X_{sim,p}(i) - \mu X_{sim,p} \\[1pt]
         X_{sim,p}^{*DQM}(i) & = F_{obs,h}^{-1}\left\{F_{sim,h}\left[X_{sim,p}^{*DT}(i)\right]\right\}
 
 
@@ -359,8 +359,7 @@ shift of :math:`X_{sim,p}(i)`:
 
     .. math::
 
-        X_{sim,p}^{*DT}(i) & = X_{sim,p}(i) \cdot \Delta\mu \\[1pt]
-        X^{*DQM}_{sim,p}(i) & = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot X_{sim,p}^{*DT}(i)}{\mu{X_{sim,p}^{*DT}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}^{*DT}(i)}}{\mu{X_{sim,h}}}
+        X^{*DQM}_{sim,p}(i) & = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot X_{sim,p}(i)}{\mu{X_{sim,p}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}^{*DT}(i)}}{\mu{X_{sim,h}}}
 
 
 .. code-block:: python

@@ -144,12 +144,8 @@ def detrended_quantile_mapping(
         m_simp_mean = np.nanmean(m_simp)
 
         if kind in ADDITIVE:
-            epsilon = np.interp(
-                m_simp - m_simp_mean + m_simh_mean,
-                xbins,
-                cdf_simh,
-            )  # Eq. 1
-            X = get_inverse_of_cdf(cdf_obs, epsilon, xbins) + m_simp_mean - m_simh_mean  # Eq. 1
+            epsilon = np.interp(m_simp - m_simp_mean, xbins, cdf_simh)  # Eq. 1
+            X = get_inverse_of_cdf(cdf_obs, epsilon, xbins) + m_simp_mean  # Eq. 1
 
         else:  # kind in cls.MULTIPLICATIVE:
             epsilon = np.interp(  # Eq. 2
