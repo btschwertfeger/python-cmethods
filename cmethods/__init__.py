@@ -29,24 +29,34 @@ from __future__ import annotations
 
 import logging
 import sys
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from cloup import Context
 
 import cloup
 import xarray as xr
-from cloup import (
-    HelpFormatter,
-    HelpTheme,
-    Path,
-    Style,
-    command,
-    option,
-    option_group,
-    version_option,
-)
+from click import echo
+from cloup import HelpFormatter, HelpTheme, Path, Style, command, option, option_group
 from cloup.constraints import Equal, If, require_all
 
 from cmethods.core import adjust
 
 __all__ = ["adjust"]
+
+
+def print_version(
+    ctx: Context,
+    param: Any,  # noqa: ARG001
+    value: Any,
+) -> None:
+    """Prints the version of the package"""
+    if not value or ctx.resilient_parsing:
+        return
+    from importlib.metadata import version
+
+    echo(version("python-cmethods"))
+    ctx.exit()
 
 
 @command(
@@ -63,7 +73,13 @@ __all__ = ["adjust"]
         ),
     ),
 )
-@version_option(message="%version%")
+@option(
+    "--version",
+    is_flag=True,
+    callback=print_version,
+    expose_value=False,
+    is_eager=True,
+)
 @option(
     "--obs",
     "--observations",

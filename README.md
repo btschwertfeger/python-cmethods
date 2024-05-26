@@ -149,8 +149,8 @@ python3 -m pip install python-cmethods
 ```
 
 The package is also available via conda-forge. See
-[conda-forge/python_cmethods-feedstock](https://github.com/conda-forge/python_cmethods-feedstock/tree/main) for more
-information.
+[conda-forge/python_cmethods](https://anaconda.org/conda-forge/python_cmethods)
+for more information.
 
 <a name="examples"></a>
 

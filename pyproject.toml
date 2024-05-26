@@ -15,7 +15,13 @@ description = "A collection of bias correction techniques written in Python - fo
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.8"
-dependencies = ["xarray>=2022.11.0", "netCDF4>=1.6.1", "numpy", "cloup"]
+dependencies = [
+  "xarray>=2022.11.0",
+  "netCDF4>=1.6.1",
+  "numpy",
+  "click",
+  "cloup",
+]
 keywords = [
   "climate-science",
   "bias",
@@ -68,6 +74,7 @@ testpaths = ["tests"]
 [tool.pytest.ini_options]
 cache_dir = ".cache/pytest"
 markers = ["wip: Used to run a specific test by hand."]
+addopts = "--maxfail=1"
 
 [tool.coverage.run]
 source = ["cmethods"]
