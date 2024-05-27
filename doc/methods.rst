@@ -55,6 +55,12 @@ for both additive and multiplicative Linear Scaling are shown:
 
         X^{*LS}_{sim,p}(i) = X_{sim,p}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
 
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
+
 **Multiplicative**:
 
     The multiplicative Linear Scaling differs from the additive variant in such
@@ -63,6 +69,12 @@ for both additive and multiplicative Linear Scaling are shown:
     .. math::
 
         X^{*LS}_{sim,h}(i) = X_{sim,h}(i) \cdot \left[\frac{\mu_{m}(X_{obs,h}(i))}{\mu_{m}(X_{sim,h}(i))}\right]
+
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
 
 
 .. code-block:: python
@@ -118,6 +130,12 @@ deviation in the mean.
     X^{*LS}_{sim,h}(i) = X_{sim,h}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
 
     X^{*LS}_{sim,p}(i) = X_{sim,p}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
+
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
 
 **(2)** In the second step, the time-series are shifted to a zero mean. This
 enables the adjustment of the standard deviation in the following step.
@@ -202,6 +220,12 @@ for both additive and multiplicative Delta Method are shown:
 
         X^{*DM}_{sim,p}(i) = X_{obs,h}(i) + \mu_{m}(X_{sim,p}(i)) - \mu_{m}(X_{sim,h}(i))
 
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
+
 **Multiplicative**:
 
     The multiplicative variant behaves like the additive, but with the
@@ -211,6 +235,12 @@ for both additive and multiplicative Delta Method are shown:
     .. math::
 
         X^{*DM}_{sim,p}(i) = X_{obs,h}(i) \cdot \left[\frac{ \mu_{m}(X_{sim,p}(i)) }{ \mu_{m}(X_{sim,h}(i))}\right]
+
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
 
 .. code-block:: python
     :linenos:
@@ -352,16 +382,26 @@ shift of :math:`X_{sim,p}(i)`:
 
     .. math::
 
-        X_{sim,p}^{*DT}(i) & = X_{sim,p}(i) - \mu X_{sim,p} \\[1pt]
+        X_{sim,p}^{*DT}(i) & = X_{sim,p}(i) - \mu_m(X_{sim,p}(i)) \\[1pt]
         X_{sim,p}^{*DQM}(i) & = F_{obs,h}^{-1}\left\{F_{sim,h}\left[X_{sim,p}^{*DT}(i)\right]\right\}
 
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
 
 **Multiplicative**:
 
     .. math::
 
-        X^{*DQM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot X_{sim,p}(i)}{\mu{X_{sim,p}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}(i)}}{\mu{X_{sim,h}}}
+        X^{*DQM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu_m(X_{sim,h}(i)) \cdot X_{sim,p}(i)}{\mu_m(X_{sim,p}(i))}\right]\Biggr\}\frac{\mu_m(X_{sim,p}(i))}{\mu_m(X_{sim,h}(i))}
 
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
 
 .. code-block:: python
     :linenos:
