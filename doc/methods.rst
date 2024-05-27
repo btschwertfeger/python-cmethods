@@ -325,10 +325,11 @@ Detrended Quantile Mapping
 The Detrended Quantile Mapping bias correction technique can be used to minimize
 distributional biases between modeled and observed time-series climate data like
 the regular Quantile Mapping. Detrending means, that the values of
-:math:`X_{sim,p}` are shifted by the mean of :math:`X_{sim,h}` before the
-regular Quantile Mapping is applied. After the Quantile Mapping was applied, the
-mean is shifted back. Since it does not make sense to take the whole mean to
-rescale the data, the month-dependent long-term mean is used.
+:math:`X_{sim,p}` are shifted by the mean of :math:`X_{sim,p}` before the
+regular Quantile Mapping is applied. The shift is performed on a monthly basis.
+After the Quantile Mapping was applied, the mean is shifted back. Since it does
+not make sense to take the whole mean to rescale the data, the month-dependent
+long-term mean is used.
 
 This method must be applied on a 1-dimensional data set i.e., there is only one
 time-series passed for each of ``obs``, ``simh``, and ``simp``. This method
