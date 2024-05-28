@@ -55,6 +55,12 @@ for both additive and multiplicative Linear Scaling are shown:
 
         X^{*LS}_{sim,p}(i) = X_{sim,p}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
 
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
+
 **Multiplicative**:
 
     The multiplicative Linear Scaling differs from the additive variant in such
@@ -63,6 +69,12 @@ for both additive and multiplicative Linear Scaling are shown:
     .. math::
 
         X^{*LS}_{sim,h}(i) = X_{sim,h}(i) \cdot \left[\frac{\mu_{m}(X_{obs,h}(i))}{\mu_{m}(X_{sim,h}(i))}\right]
+
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
 
 
 .. code-block:: python
@@ -118,6 +130,12 @@ deviation in the mean.
     X^{*LS}_{sim,h}(i) = X_{sim,h}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
 
     X^{*LS}_{sim,p}(i) = X_{sim,p}(i) + \mu_{m}(X_{obs,h}(i)) - \mu_{m}(X_{sim,h}(i))
+
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
 
 **(2)** In the second step, the time-series are shifted to a zero mean. This
 enables the adjustment of the standard deviation in the following step.
@@ -202,6 +220,12 @@ for both additive and multiplicative Delta Method are shown:
 
         X^{*DM}_{sim,p}(i) = X_{obs,h}(i) + \mu_{m}(X_{sim,p}(i)) - \mu_{m}(X_{sim,h}(i))
 
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
+
 **Multiplicative**:
 
     The multiplicative variant behaves like the additive, but with the
@@ -211,6 +235,12 @@ for both additive and multiplicative Delta Method are shown:
     .. math::
 
         X^{*DM}_{sim,p}(i) = X_{obs,h}(i) \cdot \left[\frac{ \mu_{m}(X_{sim,p}(i)) }{ \mu_{m}(X_{sim,h}(i))}\right]
+
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
 
 .. code-block:: python
     :linenos:
@@ -325,10 +355,11 @@ Detrended Quantile Mapping
 The Detrended Quantile Mapping bias correction technique can be used to minimize
 distributional biases between modeled and observed time-series climate data like
 the regular Quantile Mapping. Detrending means, that the values of
-:math:`X_{sim,p}` are shifted by the mean of :math:`X_{sim,h}` before the
-regular Quantile Mapping is applied. After the Quantile Mapping was applied, the
-mean is shifted back. Since it does not make sense to take the whole mean to
-rescale the data, the month-dependent long-term mean is used.
+:math:`X_{sim,p}` are shifted by the mean of :math:`X_{sim,p}` before the
+regular Quantile Mapping is applied. The shift is performed on a monthly basis.
+After the Quantile Mapping was applied, the mean is shifted back. Since it does
+not make sense to take the whole mean to rescale the data, the month-dependent
+long-term mean is used.
 
 This method must be applied on a 1-dimensional data set i.e., there is only one
 time-series passed for each of ``obs``, ``simh``, and ``simp``. This method
@@ -351,17 +382,26 @@ shift of :math:`X_{sim,p}(i)`:
 
     .. math::
 
-        X_{sim,p}^{*DT}(i) & = X_{sim,p}(i) + \Delta\mu \\[1pt]
+        X_{sim,p}^{*DT}(i) & = X_{sim,p}(i) - \mu_m(X_{sim,p}(i)) \\[1pt]
         X_{sim,p}^{*DQM}(i) & = F_{obs,h}^{-1}\left\{F_{sim,h}\left[X_{sim,p}^{*DT}(i)\right]\right\}
 
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
 
 **Multiplicative**:
 
     .. math::
 
-        X_{sim,p}^{*DT}(i) & = X_{sim,p}(i) \cdot \Delta\mu \\[1pt]
-        X^{*DQM}_{sim,p}(i) & = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu{X_{sim,h}} \cdot X_{sim,p}^{*DT}(i)}{\mu{X_{sim,p}^{*DT}(i)}}\right]\Biggr\}\frac{\mu{X_{sim,p}^{*DT}(i)}}{\mu{X_{sim,h}}}
+        X^{*DQM}_{sim,p}(i) = F^{-1}_{obs,h}\Biggl\{F_{sim,h}\left[\frac{\mu_m(X_{sim,h}(i)) \cdot X_{sim,p}(i)}{\mu_m(X_{sim,p}(i))}\right]\Biggr\}\frac{\mu_m(X_{sim,p}(i))}{\mu_m(X_{sim,h}(i))}
 
+where:
+
+    .. math::
+
+        \mu_m(X\ldots(i)) = \text{long-term monthly mean of month related to day at index } i
 
 .. code-block:: python
     :linenos:
