@@ -9,14 +9,14 @@ Getting Started
 Installation
 ------------
 
-(For optimal compatibility on macOS, ensure that 'hdf5' and 'netcdf' are
-pre-installed using Homebrew (``brew install hdf5 netcdf``).)
-
 The `python-cmethods`_ module can be installed using the package manager pip:
 
 .. code-block:: bash
 
     python3 -m pip install python-cmethods
+
+If the installation fails due to missing HDF5 headers, ensure that 'hdf5' and
+'netcdf' are pre-installed, e.g. on macOS using: ``brew install hdf5 netcdf``.
 
 The package is also available via conda-forge. See
 `python_cmethods-conda`_ for more information.

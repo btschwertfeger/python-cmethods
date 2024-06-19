@@ -1,12 +1,12 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.2
+    rev: v0.4.9
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
   - repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
+    rev: 7.1.0
     hooks:
       - id: flake8
         args: ["--select=E9,F63,F7,F82", "--show-source", "--statistics"]
@@ -20,13 +20,13 @@ repos:
   #         - --install-types
   #         - --non-interactive
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+    rev: v2.3.0
     hooks:
       - id: codespell
         additional_dependencies:
           - tomli
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       # all available hooks can be found here: https://github.com/pre-commit/pre-commit-hooks/blob/main/.pre-commit-hooks.yaml
       - id: check-yaml

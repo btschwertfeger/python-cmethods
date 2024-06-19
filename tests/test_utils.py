@@ -85,7 +85,7 @@ def test_quantile_delta_mapping_all_nan() -> None:
 
 def test_nan_or_equal() -> None:
     assert nan_or_equal(0, 0)
-    assert nan_or_equal(np.NaN, np.NaN)
+    assert nan_or_equal(np.nan, np.nan)
     assert not nan_or_equal(0, 1)
 
 
