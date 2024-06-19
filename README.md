@@ -3,7 +3,7 @@
 <div align="center">
 
 [![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/btschwertfeger/python-cmethods)
-[![Generic badge](https://img.shields.io/badge/python-3.8_|_3.9_|_3.10_|_3.11|_3.12-blue.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/python-3.9_|_3.10_|_3.11|_3.12-blue.svg)](https://shields.io/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![PyPI Downloads](https://pepy.tech/badge/python-cmethods)](https://pepy.tech/project/python-cmethods)
 
@@ -141,8 +141,8 @@ https://python-cmethods.readthedocs.io/en/stable/
 
 ## 3. Installation
 
-> For optimal compatibility on macOS, ensure that 'hdf5' and 'netcdf' are
-> pre-installed using Homebrew (`brew install hdf5 netcdf`).
+> If the installation fails due to missing HDF5 headers, ensure that 'hdf5' and
+> 'netcdf' are pre-installed, e.g. on macOS using: `brew install hdf5 netcdf`.
 
 ```bash
 python3 -m pip install python-cmethods
