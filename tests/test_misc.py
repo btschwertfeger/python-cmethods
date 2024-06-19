@@ -30,28 +30,40 @@ def test_not_implemented_errors(
 ) -> None:
     caplog.set_level(logging.INFO)
 
-    with pytest.raises(
-        NotImplementedError,
-        match=re.escape(r"kind='/' not available for linear_scaling."),
-    ), pytest.warns(UserWarning, match="Do not call linear_scaling"):
+    with (
+        pytest.raises(
+            NotImplementedError,
+            match=re.escape(r"kind='/' not available for linear_scaling."),
+        ),
+        pytest.warns(UserWarning, match="Do not call linear_scaling"),
+    ):
         linear_scaling(obs=[], simh=[], simp=[], kind="/")
 
-    with pytest.raises(
-        NotImplementedError,
-        match=re.escape(r"kind='/' not available for variance_scaling."),
-    ), pytest.warns(UserWarning, match="Do not call variance_scaling"):
+    with (
+        pytest.raises(
+            NotImplementedError,
+            match=re.escape(r"kind='/' not available for variance_scaling."),
+        ),
+        pytest.warns(UserWarning, match="Do not call variance_scaling"),
+    ):
         variance_scaling(obs=[], simh=[], simp=[], kind="/")
 
-    with pytest.raises(
-        NotImplementedError,
-        match=re.escape(r"kind='/' not available for delta_method. "),
-    ), pytest.warns(UserWarning, match="Do not call delta_method"):
+    with (
+        pytest.raises(
+            NotImplementedError,
+            match=re.escape(r"kind='/' not available for delta_method. "),
+        ),
+        pytest.warns(UserWarning, match="Do not call delta_method"),
+    ):
         delta_method(obs=[], simh=[], simp=[], kind="/")
 
-    with pytest.raises(
-        NotImplementedError,
-        match=re.escape(r"kind='/' for quantile_mapping is not available."),
-    ), pytest.warns(UserWarning, match="Do not call quantile_mapping"):
+    with (
+        pytest.raises(
+            NotImplementedError,
+            match=re.escape(r"kind='/' for quantile_mapping is not available."),
+        ),
+        pytest.warns(UserWarning, match="Do not call quantile_mapping"),
+    ):
         quantile_mapping(
             obs=np.array(datasets["+"]["obsh"][:, 0, 0]),
             simh=np.array(datasets["+"]["simh"][:, 0, 0]),
@@ -71,10 +83,13 @@ def test_not_implemented_errors(
             n_quantiles=100,
         )
 
-    with pytest.raises(
-        NotImplementedError,
-        match=re.escape(r"kind='/' not available for quantile_delta_mapping."),
-    ), pytest.warns(UserWarning, match="Do not call quantile_delta_mapping"):
+    with (
+        pytest.raises(
+            NotImplementedError,
+            match=re.escape(r"kind='/' not available for quantile_delta_mapping."),
+        ),
+        pytest.warns(UserWarning, match="Do not call quantile_delta_mapping"),
+    ):
         quantile_delta_mapping(
             obs=np.array(datasets["+"]["obsh"][:, 0, 0]),
             simh=np.array(datasets["+"]["simh"][:, 0, 0]),
