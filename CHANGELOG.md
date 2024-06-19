@@ -1,14 +1,63 @@
 # Changelog
 
-## [Unreleased](https://github.com/btschwertfeger/python-cmethods/tree/HEAD)
+## [v2.2.5](https://github.com/btschwertfeger/python-cmethods/tree/v2.2.5) (2024-05-28)
 
-[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.2.1...HEAD)
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.2.4...v2.2.5)
 
 **Merged pull requests:**
 
+- Bump codecov/codecov-action from 4.4.0 to 4.4.1 [\#108](https://github.com/btschwertfeger/python-cmethods/pull/108) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Adjust the DQM formula [\#107](https://github.com/btschwertfeger/python-cmethods/pull/107) ([btschwertfeger](https://github.com/btschwertfeger))
+- Fix the --version flag [\#106](https://github.com/btschwertfeger/python-cmethods/pull/106) ([btschwertfeger](https://github.com/btschwertfeger))
+- Bump codecov/codecov-action from 4.3.1 to 4.4.0 [\#105](https://github.com/btschwertfeger/python-cmethods/pull/105) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump dependabot/fetch-metadata from 1.1.1 to 2.1.0 [\#104](https://github.com/btschwertfeger/python-cmethods/pull/104) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/checkout from 4.1.5 to 4.1.6 [\#103](https://github.com/btschwertfeger/python-cmethods/pull/103) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v2.2.4](https://github.com/btschwertfeger/python-cmethods/tree/v2.2.4) (2024-05-20)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.2.3...v2.2.4)
+
+**Fixed bugs:**
+
+- QDM not working with longer simp length [\#101](https://github.com/btschwertfeger/python-cmethods/issues/101)
+
+**Merged pull requests:**
+
+- Resolve "QDM not working with longer simp length" [\#102](https://github.com/btschwertfeger/python-cmethods/pull/102) ([btschwertfeger](https://github.com/btschwertfeger))
+
+## [v2.2.3](https://github.com/btschwertfeger/python-cmethods/tree/v2.2.3) (2024-05-17)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.2.2...v2.2.3)
+
+**Fixed bugs:**
+
+- A very small error [\#95](https://github.com/btschwertfeger/python-cmethods/issues/95)
+- The behavior for data sets with different temporal resolution are not uniform [\#99](https://github.com/btschwertfeger/python-cmethods/issues/99)
+
+**Merged pull requests:**
+
+- Bump actions/checkout from 4.1.4 to 4.1.5 [\#98](https://github.com/btschwertfeger/python-cmethods/pull/98) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump ossf/scorecard-action from 2.3.1 to 2.3.3 [\#97](https://github.com/btschwertfeger/python-cmethods/pull/97) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Resolve "The behavior for data sets with different temporal resolution are not uniform" [\#100](https://github.com/btschwertfeger/python-cmethods/pull/100) ([btschwertfeger](https://github.com/btschwertfeger))
+- Extend the documentation [\#96](https://github.com/btschwertfeger/python-cmethods/pull/96) ([btschwertfeger](https://github.com/btschwertfeger))
+
+## [v2.2.2](https://github.com/btschwertfeger/python-cmethods/tree/v2.2.2) (2024-05-07)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.2.1...v2.2.2)
+
+**Implemented enhancements:**
+
+- Add python-cmethods to the conda registry [\#17](https://github.com/btschwertfeger/python-cmethods/issues/17)
+
+**Merged pull requests:**
+
+- Bump codecov/codecov-action from 4.3.0 to 4.3.1 [\#93](https://github.com/btschwertfeger/python-cmethods/pull/93) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/upload-artifact from 4.3.2 to 4.3.3 [\#91](https://github.com/btschwertfeger/python-cmethods/pull/91) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump actions/checkout from 4.1.2 to 4.1.4 [\#90](https://github.com/btschwertfeger/python-cmethods/pull/90) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump actions/upload-artifact from 4.3.1 to 4.3.2 [\#89](https://github.com/btschwertfeger/python-cmethods/pull/89) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump codecov/codecov-action from 4.2.0 to 4.3.0 [\#87](https://github.com/btschwertfeger/python-cmethods/pull/87) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Update the publishing process [\#94](https://github.com/btschwertfeger/python-cmethods/pull/94) ([btschwertfeger](https://github.com/btschwertfeger))
+- Fix CI - Failing due to missing hdf5 and netcdf headers [\#92](https://github.com/btschwertfeger/python-cmethods/pull/92) ([btschwertfeger](https://github.com/btschwertfeger))
 
 ## [v2.2.1](https://github.com/btschwertfeger/python-cmethods/tree/v2.2.1) (2024-04-10)
 
