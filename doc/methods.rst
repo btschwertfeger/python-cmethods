@@ -92,7 +92,7 @@ where:
     >>> variable = "tas" # temperatures
     >>> result = adjust(
     ...     method="linear_scaling",
-    ...     obs=obs[variable],
+    ...     obs=obsh[variable],
     ...     simh=simh[variable],
     ...     simp=simp[variable],
     ...     kind="+",
@@ -173,7 +173,7 @@ enables the adjustment of the standard deviation in the following step.
     >>> variable = "tas" # temperatures
     >>> result = adjust(
     ...     method="variance_scaling",
-    ...     obs=obs[variable],
+    ...     obs=obsh[variable],
     ...     simh=simh[variable],
     ...     simp=simp[variable],
     ...     kind="+",
@@ -257,7 +257,7 @@ where:
     >>> variable = "tas" # temperatures
     >>> result = adjust(
     ...     method="delta_method",
-    ...     obs=obs[variable],
+    ...     obs=obsh[variable],
     ...     simh=simh[variable],
     ...     simp=simp[variable],
     ...     kind="+",
@@ -340,7 +340,7 @@ In the following the equations of Alex J. Cannon (2015) are shown and explained:
     >>> variable = "tas" # temperatures
     >>> qm_adjusted = adjust(
     ...     method="quantile_mapping",
-    ...     obs=obs[variable],
+    ...     obs=obsh[variable],
     ...     simh=simh[variable],
     ...     simp=simp[variable],
     ...     n_quantiles=250,
@@ -417,7 +417,7 @@ where:
     >>> simp = xr.open_dataset("path/to/the_dataset_to_adjust-scenario_period.nc")
     >>> variable = "tas" # temperatures
     >>> qm_adjusted = detrended_quantile_mapping(
-    ...     obs=obs[variable],
+    ...     obs=obsh[variable],
     ...     simh=simh[variable],
     ...     simp=simp[variable],
     ...     n_quantiles=250
@@ -520,7 +520,7 @@ following the additive and multiplicative variant are shown.
     >>> variable = "tas" # temperatures
     >>> qdm_adjusted = adjust(
     ...     method="quantile_delta_mapping",
-    ...     obs=obs[variable],
+    ...     obs=obsh[variable],
     ...     simh=simh[variable],
     ...     simp=simp[variable],
     ...     n_quantiles=250,

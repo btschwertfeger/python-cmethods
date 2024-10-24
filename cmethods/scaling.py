@@ -43,7 +43,7 @@ def linear_scaling(
     """
     check_adjust_called(
         function_name="linear_scaling",
-        adjust_called=kwargs.get("adjust_called", None),
+        adjust_called=kwargs.get("adjust_called"),
     )
     check_np_types(obs=obs, simh=simh, simp=simp)
 
@@ -85,7 +85,7 @@ def variance_scaling(
     """
     check_adjust_called(
         function_name="variance_scaling",
-        adjust_called=kwargs.get("adjust_called", None),
+        adjust_called=kwargs.get("adjust_called"),
     )
     check_np_types(obs=obs, simh=simp, simp=simp)
 
@@ -130,7 +130,7 @@ def delta_method(
     """
     check_adjust_called(
         function_name="delta_method",
-        adjust_called=kwargs.get("adjust_called", None),
+        adjust_called=kwargs.get("adjust_called"),
     )
     check_np_types(obs=obs, simh=simh, simp=simp)
 

@@ -53,7 +53,7 @@ def print_version(
     """Prints the version of the package"""
     if not value or ctx.resilient_parsing:
         return
-    from importlib.metadata import version
+    from importlib.metadata import version  # noqa: PLC0415
 
     echo(version("python-cmethods"))
     ctx.exit()

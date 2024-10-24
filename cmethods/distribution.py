@@ -42,7 +42,7 @@ def quantile_mapping(
     """
     check_adjust_called(
         function_name="quantile_mapping",
-        adjust_called=kwargs.get("adjust_called", None),
+        adjust_called=kwargs.get("adjust_called"),
     )
     check_np_types(obs=obs, simh=simh, simp=simp)
 
@@ -73,7 +73,7 @@ def quantile_mapping(
             xbins,
             cdf_simh,
             left=kwargs.get("val_min", 0.0),
-            right=kwargs.get("val_max", None),
+            right=kwargs.get("val_max"),
         )
         return get_inverse_of_cdf(cdf_obs, epsilon, xbins)  # Eq. 2
 
@@ -157,7 +157,7 @@ def detrended_quantile_mapping(
                 xbins,
                 cdf_simh,
                 left=kwargs.get("val_min", 0.0),
-                right=kwargs.get("val_max", None),
+                right=kwargs.get("val_max"),
             )
             X = np.interp(epsilon, cdf_obs, xbins) * ensure_dividable(
                 m_simp_mean,
@@ -205,7 +205,7 @@ def quantile_delta_mapping(
     """
     check_adjust_called(
         function_name="quantile_delta_mapping",
-        adjust_called=kwargs.get("adjust_called", None),
+        adjust_called=kwargs.get("adjust_called"),
     )
     check_np_types(obs=obs, simh=simh, simp=simp)
 
