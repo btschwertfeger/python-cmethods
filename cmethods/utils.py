@@ -32,7 +32,7 @@ class UnknownMethodError(Exception):
 
 def check_adjust_called(
     function_name: str,
-    adjust_called: Optional[bool] = None,
+    adjust_called: Optional[bool] = None,  # noqa: FBT001
 ) -> None:
     """
     Displays a user warning in case a correction function was not called via

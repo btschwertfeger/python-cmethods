@@ -250,8 +250,11 @@ cache-dir = ".cache/ruff"
 lint.task-tags = ["todo", "TODO"]
 
 [tool.ruff.lint.per-file-ignores]
+"cmethods/types.py" = [
+  "A005", # Shadowing builtin
+]
 "doc/*.py" = [
-  "CPY001",  # Missing copyright notice at top of file
+  # "CPY001",  # Missing copyright notice at top of file
   "PTH118",  # `os.path.join()` should be replaced by `Path` with `/` operator,
   "PTH123",  # `open()` should be replaced by `Path.open()`
   "PTH100",  # `os.path.abspath()` should be replaced by `Path.resolve()`

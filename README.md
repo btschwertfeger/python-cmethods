@@ -293,11 +293,13 @@ Notes:
 
 - First check if there is an existing issue or PR that addresses your
   problem/solution. If not - create one first - before creating a PR.
-- Typo fixes, project configuration, CI, documentation or style/formatting PRs will be
-  rejected. Please create an issue for that.
+- Typo fixes, project configuration, CI, documentation or style/formatting PRs
+  will be rejected. Please create an issue for that.
 - PRs must provide a reasonable, easy to understand and maintain solution for an
   existing problem. You may want to propose a solution when creating the issue
   to discuss the approach before creating a PR.
+- There is currently no need for the implementation of further bias correction
+  methods.
 
 <a name="references"></a>
 

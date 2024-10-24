@@ -11,7 +11,9 @@
 """This module is the configuration for the Sphinx documentation building process"""
 
 import sys
+from os.path import join
 from pathlib import Path
+from shutil import copyfile
 
 project = "python-cmethods"
 copyright = "2023, Benjamin Thomas Schwertfeger"  # pylint: disable=redefined-builtin
@@ -29,9 +31,6 @@ with open("links.rst", encoding="utf-8") as f:
 
 
 def setup(app) -> None:  # noqa: ARG001
-    from os.path import join
-    from shutil import copyfile
-
     copyfile(join("..", "examples", "examples.ipynb"), "examples.ipynb")
 
 

@@ -144,7 +144,7 @@ def adjust(
     #       to unrealistic monthly transitions. If such behavior is wanted,
     #       mock this function or apply ``CMethods.__apply_ufunc` directly
     #       on your data sets.
-    if kwargs.get("group", None) is None:
+    if kwargs.get("group") is None:
         return apply_ufunc(method, obs, simh, simp, **kwargs).to_dataset()
 
     if method not in SCALING_METHODS:

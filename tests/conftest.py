@@ -22,7 +22,7 @@ from .helper import get_datasets
 FIXTURE_DIR: str = os.path.join(os.path.dirname(__file__), "fixture")
 
 
-@pytest.fixture()
+@pytest.fixture
 def cli_runner() -> CliRunner:
     """Provide a cli-runner for testing the CLI"""
     return CliRunner()
@@ -43,7 +43,7 @@ def dask_cluster() -> Any:
     client.close()
 
 
-@pytest.fixture()
+@pytest.fixture
 def datasets() -> dict:
     obsh_add, obsp_add, simh_add, simp_add = get_datasets(kind="+")
     obsh_mult, obsp_mult, simh_mult, simp_mult = get_datasets(kind="*")
@@ -65,7 +65,7 @@ def datasets() -> dict:
 
 
 @lru_cache(maxsize=None)
-@pytest.fixture()
+@pytest.fixture
 def datasets_from_zarr() -> dict:
     return {
         "+": {
