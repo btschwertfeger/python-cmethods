@@ -17,7 +17,7 @@ on:
     types: [created]
 
 concurrency:
-  group: CICD-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -101,6 +101,8 @@ jobs:
       - CodeQL
     name: Upload current version to Test PyPI
     uses: ./.github/workflows/_pypi_test_publish.yaml
+    secrets:
+      API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
 
   ##    Upload the python-kraken-sdk to Production PyPI
   ##
@@ -116,3 +118,5 @@ jobs:
       - CodeQL
     name: Upload the current release to PyPI
     uses: ./.github/workflows/_pypi_publish.yaml
+    secrets:
+      API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
