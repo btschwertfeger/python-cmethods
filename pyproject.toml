@@ -99,7 +99,7 @@ dev = [
   # linting
   "pylint",
   "flake8",
-  "ruff==0.3.5",
+  "ruff",
   # typing
   "mypy",
 ]
@@ -107,6 +107,7 @@ test = [
   # testing
   "pytest",
   "pytest-cov",
+  "pytest-retry",
   "zarr",
   "dask[distributed]",
   "scikit-learn",
