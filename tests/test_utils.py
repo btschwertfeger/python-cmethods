@@ -25,8 +25,8 @@ from cmethods.distribution import (
 from cmethods.static import MAX_SCALING_FACTOR
 from cmethods.utils import (
     check_np_types,
-    check_xr_types,
     ensure_dividable,
+    ensure_xr_dataarray,
     get_adjusted_scaling_factor,
     get_pdf,
     nan_or_equal,
@@ -133,7 +133,7 @@ def test_xr_type_check() -> None:
     correct. No error should occur.
     """
     ds: xr.core.dataarray.Dataset = xr.core.dataarray.Dataset()
-    check_xr_types(obs=ds, simh=ds, simp=ds)
+    ensure_xr_dataarray(obs=ds, simh=ds, simp=ds)
 
 
 def test_type_check_failing() -> None:
@@ -142,7 +142,7 @@ def test_type_check_failing() -> None:
     have the correct type.
     """
 
-    phrase: str = "must be type list, np.ndarray or np.generic"
+    phrase: str = "must be type list, np.ndarray, or np.generic"
     with pytest.raises(TypeError, match=f"'obs' {phrase}"):
         check_np_types(obs=1, simh=[], simp=[])
 
@@ -177,7 +177,7 @@ def test_detrended_quantile_mapping_type_check_simp_failing(datasets: dict) -> N
     """n_quantiles must by type int"""
     with pytest.raises(
         TypeError,
-        match="'simp' must be type xarray.core.dataarray.DataArray",
+        match=r"'simp' must be type xarray.core.dataarray.DataArray",
     ):
         detrended_quantile_mapping(  # type: ignore[attr-defined]
             obs=datasets["+"]["obsh"][:, 0, 0],
@@ -222,7 +222,7 @@ def test_adjust_type_checking_failing() -> None:
     )
     with pytest.raises(
         TypeError,
-        match="'obs' must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray",
+        match=r"'obs' must be type 'xarray.core.dataarray.DataArray'.",
     ):
         adjust(
             method="linear_scaling",
@@ -233,7 +233,7 @@ def test_adjust_type_checking_failing() -> None:
         )
     with pytest.raises(
         TypeError,
-        match="'simh' must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray",
+        match=r"'simh' must be type 'xarray.core.dataarray.DataArray'.",
     ):
         adjust(
             method="linear_scaling",
@@ -245,7 +245,7 @@ def test_adjust_type_checking_failing() -> None:
 
     with pytest.raises(
         TypeError,
-        match="'simp' must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray",
+        match=r"'simp' must be type 'xarray.core.dataarray.DataArray'.",
     ):
         adjust(
             method="linear_scaling",

@@ -112,7 +112,7 @@ test = [
   "scikit-learn",
   "scipy",
 ]
-examples = ["click", "matplotlib"]
+examples = ["matplotlib"]
 
 [tool.codespell]
 check-filenames = true
