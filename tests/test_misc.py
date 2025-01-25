@@ -102,7 +102,7 @@ def test_not_implemented_errors(
 def test_adjust_failing_dqm(datasets: dict) -> None:
     with pytest.raises(
         ValueError,
-        match="This function is not available for detrended quantile mapping. "
+        match=r"This function is not available for detrended quantile mapping. "
         "Please use cmethods.CMethods.detrended_quantile_mapping",
     ):
         adjust(
@@ -118,7 +118,7 @@ def test_adjust_failing_dqm(datasets: dict) -> None:
 def test_adjust_failing_no_group_for_distribution(datasets: dict) -> None:
     with pytest.raises(
         ValueError,
-        match="Can't use group for distribution based methods.",
+        match=r"Can't use group for distribution based methods.",
     ):
         adjust(
             method="quantile_mapping",

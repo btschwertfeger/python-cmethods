@@ -173,8 +173,8 @@ def cli(**kwargs) -> None:
         datefmt="%Y/%m/%d %H:%M:%S",
         level=logging.INFO,
     )
-
-    logging.info("Loading data sets ...")
+    log = logging.getLogger(__name__)
+    log.info("Loading data sets ...")
     try:
         for key, message in zip(
             ("obs", "simh", "simp"),
@@ -194,15 +194,15 @@ def cli(**kwargs) -> None:
                 )
             kwargs[key] = kwargs[key][kwargs["variable"]]
     except (TypeError, KeyError) as exc:
-        logging.error(exc)
+        log.error(exc)
         sys.exit(1)
 
-    logging.info("Data sets loaded ...")
+    log.info("Data sets loaded ...")
     kwargs["n_quantiles"] = kwargs["quantiles"]
     del kwargs["quantiles"]
 
-    logging.info("Applying %s ..." % kwargs["method"])
+    log.info("Applying %s ...", kwargs["method"])
     result = adjust(**kwargs)
 
-    logging.info("Saving result to %s ..." % kwargs["output"])
+    log.info("Saving result to %s ...", kwargs["output"])
     result.to_netcdf(kwargs["output"])
