@@ -169,6 +169,8 @@ def adjust(
         obs_group = group["obs"]
         simh_group = group["simh"]
         simp_group = group["simp"]
+    else:
+        raise ValueError("'group' must be a string or a dict!")
 
     del kwargs["group"]
 
