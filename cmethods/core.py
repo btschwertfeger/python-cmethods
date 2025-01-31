@@ -21,7 +21,7 @@ from cmethods.scaling import delta_method as __delta_method
 from cmethods.scaling import linear_scaling as __linear_scaling
 from cmethods.scaling import variance_scaling as __variance_scaling
 from cmethods.static import SCALING_METHODS
-from cmethods.utils import UnknownMethodError, check_xr_types
+from cmethods.utils import UnknownMethodError, ensure_xr_dataarray
 
 if TYPE_CHECKING:
     from cmethods.types import XRData
@@ -37,16 +37,16 @@ __METHODS_FUNC__: Dict[str, Callable] = {
 
 def apply_ufunc(
     method: str,
-    obs: XRData,
-    simh: XRData,
-    simp: XRData,
+    obs: xr.xarray.core.dataarray.DataArray,
+    simh: xr.xarray.core.dataarray.DataArray,
+    simp: xr.xarray.core.dataarray.DataArray,
     **kwargs: dict,
-) -> XRData:
+) -> xr.xarray.core.dataarray.DataArray:
     """
     Internal function used to apply the bias correction technique to the
     passed input data.
     """
-    check_xr_types(obs=obs, simh=simh, simp=simp)
+    ensure_xr_dataarray(obs=obs, simh=simh, simp=simp)
     if method not in __METHODS_FUNC__:
         raise UnknownMethodError(method, __METHODS_FUNC__.keys())
 
@@ -96,11 +96,11 @@ def apply_ufunc(
 
 def adjust(
     method: str,
-    obs: XRData,
-    simh: XRData,
-    simp: XRData,
+    obs: xr.xarray.core.dataarray.DataArray,
+    simh: xr.xarray.core.dataarray.DataArray,
+    simp: xr.xarray.core.dataarray.DataArray,
     **kwargs,
-) -> XRData:
+) -> xr.xarray.core.dataarray.DataArray | xr.xarray.core.dataarray.Dataset:
     """
     Function to apply a bias correction technique on single and multidimensional
     data sets. For more information please refer to the method specific
@@ -119,19 +119,19 @@ def adjust(
     :param method: Technique to apply
     :type method: str
     :param obs: The reference/observational data set
-    :type obs: XRData
+    :type obs: xr.xarray.core.dataarray.DataArray
     :param simh: The modeled data of the control period
-    :type simh: XRData
+    :type simh: xr.xarray.core.dataarray.DataArray
     :param simp: The modeled data of the period to adjust
-    :type simp: XRData
+    :type simp: xr.xarray.core.dataarray.DataArray
     :param kwargs: Any other method-specific parameter (like
         ``n_quantiles`` and ``kind``)
     :type kwargs: dict
     :return: The bias corrected/adjusted data set
-    :rtype: XRData
+    :rtype: xr.xarray.core.dataarray.DataArray | xr.xarray.core.dataarray.Dataset
     """
     kwargs["adjust_called"] = True
-    check_xr_types(obs=obs, simh=simh, simp=simp)
+    ensure_xr_dataarray(obs=obs, simh=simh, simp=simp)
 
     if method == "detrended_quantile_mapping":  # noqa: PLR2004
         raise ValueError(
@@ -169,6 +169,8 @@ def adjust(
         obs_group = group["obs"]
         simh_group = group["simh"]
         simp_group = group["simp"]
+    else:
+        raise ValueError("'group' must be a string or a dict!")
 
     del kwargs["group"]
 

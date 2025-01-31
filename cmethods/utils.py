@@ -51,11 +51,11 @@ def check_adjust_called(
         )
 
 
-def check_xr_types(obs: XRData, simh: XRData, simp: XRData) -> None:
+def ensure_xr_dataarray(obs: XRData, simh: XRData, simp: XRData) -> None:
     """
     Checks if the parameters are in the correct type. **only used internally**
     """
-    phrase: str = "must be type xarray.core.dataarray.Dataset or xarray.core.dataarray.DataArray"
+    phrase: str = "must be type 'xarray.core.dataarray.DataArray'."
 
     if not isinstance(obs, XRData_t):
         raise TypeError(f"'obs' {phrase}")
@@ -73,7 +73,7 @@ def check_np_types(
     """
     Checks if the parameters are in the correct type. **only used internally**
     """
-    phrase: str = "must be type list, np.ndarray or np.generic"
+    phrase: str = "must be type list, np.ndarray, or np.generic"
 
     if not isinstance(obs, NPData_t):
         raise TypeError(f"'obs' {phrase}")
@@ -246,8 +246,8 @@ __all__ = [
     "UnknownMethodError",
     "check_adjust_called",
     "check_np_types",
-    "check_xr_types",
     "ensure_dividable",
+    "ensure_xr_dataarray",
     "get_adjusted_scaling_factor",
     "get_cdf",
     "get_inverse_of_cdf",

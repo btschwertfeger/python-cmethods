@@ -39,8 +39,15 @@ install:
 test:
 	$(PYTHON) -m pytest $(PYTEST_OPTS) $(TESTS)
 
-.PHONY: tests
+.PHONY: test
 tests: test
+
+## retest 	Rerun tests that failed before
+##
+.PHONY: retest
+retest:
+	$(PYTHON) -m pytest $(PYTEST_OPTS) --lf $(TESTS)
+
 
 ## wip  	Run tests marked as wip
 ##

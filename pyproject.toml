@@ -39,8 +39,11 @@ keywords = [
 classifiers = [
   "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
   "Programming Language :: Python",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Topic :: Utilities",
   "Topic :: Scientific/Engineering",
@@ -99,7 +102,7 @@ dev = [
   # linting
   "pylint",
   "flake8",
-  "ruff==0.3.5",
+  "ruff",
   # typing
   "mypy",
 ]
@@ -107,12 +110,13 @@ test = [
   # testing
   "pytest",
   "pytest-cov",
+  "pytest-retry",
   "zarr",
   "dask[distributed]",
   "scikit-learn",
   "scipy",
 ]
-examples = ["click", "matplotlib"]
+examples = ["matplotlib"]
 
 [tool.codespell]
 check-filenames = true
