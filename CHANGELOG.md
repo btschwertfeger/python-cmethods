@@ -1,5 +1,68 @@
 # Changelog
 
+## [Unreleased](https://github.com/btschwertfeger/python-cmethods/tree/HEAD)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.3.0...HEAD)
+
+**Fixed bugs:**
+
+- Update `cmethods.adjust`'s type annotations [\#155](https://github.com/btschwertfeger/python-cmethods/pull/155) ([btschwertfeger](https://github.com/btschwertfeger))
+
+**Closed issues:**
+
+- Create Jupyter Notebooks for possible strategies [\#135](https://github.com/btschwertfeger/python-cmethods/issues/135)
+
+**Merged pull requests:**
+
+- Bump dependabot/fetch-metadata from 2.2.0 to 2.3.0 [\#159](https://github.com/btschwertfeger/python-cmethods/pull/159) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/setup-python from 5.3.0 to 5.4.0 [\#156](https://github.com/btschwertfeger/python-cmethods/pull/156) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.28.0 to 3.28.1 [\#152](https://github.com/btschwertfeger/python-cmethods/pull/152) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add `release.yaml` [\#151](https://github.com/btschwertfeger/python-cmethods/pull/151) ([btschwertfeger](https://github.com/btschwertfeger))
+- Bump codecov/codecov-action from 5.1.1 to 5.1.2 [\#150](https://github.com/btschwertfeger/python-cmethods/pull/150) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.27.9 to 3.28.0 [\#149](https://github.com/btschwertfeger/python-cmethods/pull/149) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.27.6 to 3.27.9 [\#148](https://github.com/btschwertfeger/python-cmethods/pull/148) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump codecov/codecov-action from 4.6.0 to 5.1.1 [\#147](https://github.com/btschwertfeger/python-cmethods/pull/147) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.27.4 to 3.27.6 [\#146](https://github.com/btschwertfeger/python-cmethods/pull/146) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Do not rely on trusted publishing for PyPI upload [\#145](https://github.com/btschwertfeger/python-cmethods/pull/145) ([btschwertfeger](https://github.com/btschwertfeger))
+- Bump github/codeql-action from 3.27.1 to 3.27.4 [\#141](https://github.com/btschwertfeger/python-cmethods/pull/141) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.27.0 to 3.27.1 [\#140](https://github.com/btschwertfeger/python-cmethods/pull/140) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/checkout from 4.2.1 to 4.2.2 [\#138](https://github.com/btschwertfeger/python-cmethods/pull/138) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/setup-python from 5.2.0 to 5.3.0 [\#137](https://github.com/btschwertfeger/python-cmethods/pull/137) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.26.13 to 3.27.0 [\#136](https://github.com/btschwertfeger/python-cmethods/pull/136) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Update and apply Pre-Commit hooks [\#134](https://github.com/btschwertfeger/python-cmethods/pull/134) ([btschwertfeger](https://github.com/btschwertfeger))
+- Bump actions/checkout from 4.1.7 to 4.2.1 [\#132](https://github.com/btschwertfeger/python-cmethods/pull/132) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.26.11 to 3.26.13 [\#131](https://github.com/btschwertfeger/python-cmethods/pull/131) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump codecov/codecov-action from 4.5.0 to 4.6.0 [\#130](https://github.com/btschwertfeger/python-cmethods/pull/130) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.26.8 to 3.26.11 [\#129](https://github.com/btschwertfeger/python-cmethods/pull/129) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Move CITATION file to top-level [\#126](https://github.com/btschwertfeger/python-cmethods/pull/126) ([btschwertfeger](https://github.com/btschwertfeger))
+- Add CITATION file [\#125](https://github.com/btschwertfeger/python-cmethods/pull/125) ([btschwertfeger](https://github.com/btschwertfeger))
+- Update project settings [\#124](https://github.com/btschwertfeger/python-cmethods/pull/124) ([btschwertfeger](https://github.com/btschwertfeger))
+- Bump github/codeql-action from 3.26.7 to 3.26.8 [\#123](https://github.com/btschwertfeger/python-cmethods/pull/123) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.26.6 to 3.26.7 [\#122](https://github.com/btschwertfeger/python-cmethods/pull/122) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/setup-python from 5.1.1 to 5.2.0 [\#121](https://github.com/btschwertfeger/python-cmethods/pull/121) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.26.5 to 3.26.6 [\#120](https://github.com/btschwertfeger/python-cmethods/pull/120) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.26.2 to 3.26.5 [\#119](https://github.com/btschwertfeger/python-cmethods/pull/119) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.26.0 to 3.26.2 [\#118](https://github.com/btschwertfeger/python-cmethods/pull/118) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.25.15 to 3.26.0 [\#117](https://github.com/btschwertfeger/python-cmethods/pull/117) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 2.2.4 to 3.25.15 [\#116](https://github.com/btschwertfeger/python-cmethods/pull/116) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump ossf/scorecard-action from 2.3.3 to 2.4.0 [\#115](https://github.com/btschwertfeger/python-cmethods/pull/115) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/setup-python from 5.1.0 to 5.1.1 [\#114](https://github.com/btschwertfeger/python-cmethods/pull/114) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump dependabot/fetch-metadata from 2.1.0 to 2.2.0 [\#113](https://github.com/btschwertfeger/python-cmethods/pull/113) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/checkout from 4.1.6 to 4.1.7 [\#110](https://github.com/btschwertfeger/python-cmethods/pull/110) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v2.3.0](https://github.com/btschwertfeger/python-cmethods/tree/v2.3.0) (2024-06-19)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.2.5...v2.3.0)
+
+**Implemented enhancements:**
+
+- Drop Python 3.8 Support [\#111](https://github.com/btschwertfeger/python-cmethods/issues/111)
+
+**Merged pull requests:**
+
+- Bump codecov/codecov-action from 4.4.1 to 4.5.0 [\#109](https://github.com/btschwertfeger/python-cmethods/pull/109) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Resolve "Drop Python 3.8 support" [\#112](https://github.com/btschwertfeger/python-cmethods/pull/112) ([btschwertfeger](https://github.com/btschwertfeger))
+
 ## [v2.2.5](https://github.com/btschwertfeger/python-cmethods/tree/v2.2.5) (2024-05-28)
 
 [Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.2.4...v2.2.5)
@@ -73,7 +136,7 @@
 
 **Implemented enhancements:**
 
-- Add a command-line interface [\#82](https://github.com/btschwertfeger/python-cmethods/issues/82)
+- Add a command-line interface  [\#82](https://github.com/btschwertfeger/python-cmethods/issues/82)
 - Resolve "Add a command-line interface" [\#83](https://github.com/btschwertfeger/python-cmethods/pull/83) ([btschwertfeger](https://github.com/btschwertfeger))
 
 **Merged pull requests:**
@@ -112,7 +175,7 @@
 
 **Closed issues:**
 
-- The latest documentation still describes the legacy max_scaling_factor [\#60](https://github.com/btschwertfeger/python-cmethods/issues/60)
+- The latest documentation still describes the legacy max\_scaling\_factor [\#60](https://github.com/btschwertfeger/python-cmethods/issues/60)
 
 **Merged pull requests:**
 
@@ -160,7 +223,7 @@
 
 **Merged pull requests:**
 
-- Clarified difference between stochastic and non-stochastic climate variables in doc and readme [\#36](https://github.com/btschwertfeger/python-cmethods/pull/36) ([btschwertfeger](https://github.com/btschwertfeger))
+- Clarified difference between stochastic and non-stochastic climate variables in doc and readme  [\#36](https://github.com/btschwertfeger/python-cmethods/pull/36) ([btschwertfeger](https://github.com/btschwertfeger))
 - Fix typos [\#38](https://github.com/btschwertfeger/python-cmethods/pull/38) ([btschwertfeger](https://github.com/btschwertfeger))
 
 ## [v1.0.1](https://github.com/btschwertfeger/python-cmethods/tree/v1.0.1) (2023-04-17)
@@ -174,7 +237,7 @@
 
 **Fixed bugs:**
 
-- Multiplicative Quantile Delta Mapping is not applying scaling where the delta is infinite [\#32](https://github.com/btschwertfeger/python-cmethods/issues/32)
+- Multiplicative Quantile Delta Mapping is not applying scaling where the delta is infinite  [\#32](https://github.com/btschwertfeger/python-cmethods/issues/32)
 - Fixed PyPI repository URL [\#16](https://github.com/btschwertfeger/python-cmethods/pull/16) ([btschwertfeger](https://github.com/btschwertfeger))
 - Fixed bug where division lead to nan or inf values [\#33](https://github.com/btschwertfeger/python-cmethods/pull/33) ([btschwertfeger](https://github.com/btschwertfeger))
 
@@ -194,7 +257,7 @@
 
 **Breaking changes:**
 
-- Remove the unnecessary `CMethods.py` module to access the CMethods class more easily [\#10](https://github.com/btschwertfeger/python-cmethods/issues/10)
+- Remove the unnecessary `CMethods.py` module to access the CMethods  class more easily [\#10](https://github.com/btschwertfeger/python-cmethods/issues/10)
 
 **Implemented enhancements:**
 
@@ -219,7 +282,7 @@
 
 **Breaking changes:**
 
-- adjust_3d forces group to be "time.month" if group is set to the default \(None\) [\#5](https://github.com/btschwertfeger/python-cmethods/issues/5)
+- adjust\_3d forces group to be "time.month" if group is set to the default \(None\) [\#5](https://github.com/btschwertfeger/python-cmethods/issues/5)
 
 **Implemented enhancements:**
 
@@ -277,4 +340,6 @@
 
 [Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/41c1837e5d23c300656c8ee2ce0079d6a8baac2f...v0.5)
 
-\* _This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)_
+
+
+\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)*

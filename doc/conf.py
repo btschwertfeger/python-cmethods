@@ -1,4 +1,9 @@
-# -*- coding: utf-8 -*-
+# -*- mode: python; coding: utf-8 -*-
+#
+# Copyright (C) 2023 Benjamin Thomas Schwertfeger
+# All rights reserved.
+# https://github.com/btschwertfeger
+#
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
