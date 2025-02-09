@@ -1,7 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# Copyright (C) 2023 Benjamin Thomas Schwertfeger
-# GitHub: https://github.com/btschwertfeger
+# -*- mode: python; coding: utf-8 -*-
+#
+# Copyright (C) 2024 Benjamin Thomas Schwertfeger
+# All rights reserved.
+# https://github.com/btschwertfeger
 #
 
-# This file is required for being able to import from ".".
+# This file is required for the codecov CI/CD job.
