@@ -7,7 +7,7 @@
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.3
+    rev: v0.11.0
     hooks:
       - id: ruff
         args:
@@ -25,7 +25,7 @@ repos:
   #         - --install-types
   #         - --non-interactive
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.0
+    rev: v2.4.1
     hooks:
       - id: codespell
         additional_dependencies: [tomli]
@@ -68,12 +68,12 @@ repos:
       - id: rst-directive-colons
       - id: text-unicode-replacement-char
   - repo: https://github.com/PyCQA/isort # TODO: remove as soon as ruff is stable
-    rev: 5.13.2
+    rev: 6.0.1
     hooks:
       - id: isort
         args: [--profile=black]
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.8.2
+    rev: 1.8.3
     hooks:
       - id: bandit
         exclude: "^tests/.*|examples/.*"

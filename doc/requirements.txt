@@ -1,9 +1,10 @@
-cloup
+click~=8.1
+cloup~=3.0
 ipython
 nbsphinx
 netCDF4>=1.6.1
 numpy
 setuptools_scm
-sphinx
+sphinx<8.2.0 # doesn't work with nbsphinx
 sphinx-rtd-theme
 xarray>=2022.11.0

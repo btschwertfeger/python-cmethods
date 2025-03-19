@@ -26,8 +26,8 @@ dependencies = [
   "xarray>=2022.11.0",
   "netCDF4>=1.6.1",
   "numpy",
-  "click",
-  "cloup",
+  "click~=8.1",
+  "cloup~=3.0",
 ]
 keywords = [
   "climate-science",
