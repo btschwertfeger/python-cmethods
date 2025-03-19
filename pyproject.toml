@@ -102,10 +102,6 @@ dev = [
   # building
   "setuptools_scm",
   "build",
-  # documentation
-  "sphinx",
-  "sphinx-rtd-theme",
-  "nbsphinx",
   # linting
   "pylint",
   "flake8",
