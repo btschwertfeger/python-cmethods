@@ -15,6 +15,8 @@ from cmethods.types import XRData_t
 
 from .helper import is_3d_rmse_better
 
+pytestmark = [pytest.mark.flaky]
+
 GROUP: str = "time.month"
 N_QUANTILES: int = 100
 

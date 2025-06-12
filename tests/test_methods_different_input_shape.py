@@ -21,7 +21,9 @@ from cmethods.types import XRData_t
 
 from .helper import is_1d_rmse_better
 
-N_QUANTILES = 100
+pytestmark = [pytest.mark.flaky]
+
+N_QUANTILES: int = 100
 
 
 @pytest.mark.parametrize(

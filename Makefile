@@ -72,7 +72,6 @@ wip:
 ##
 .PHONY: coverage
 coverage:
-	@rm .cache/tests/*.log || true
 	$(PYTEST) $(PYTEST_COV_OPTS) $(TEST_DIR)
 
 ## doc		Build the documentation
