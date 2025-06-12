@@ -20,6 +20,7 @@ maintainers = [
 ]
 description = "A collection of bias correction techniques written in Python - for climate sciences."
 readme = "README.md"
+license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
 requires-python = ">=3.9"
 dependencies = [
@@ -62,15 +63,16 @@ classifiers = [
 cmethods = "cmethods:cli"
 
 [project.urls]
-"Homepage" = "https://github.com/btschwertfeger/python-cmethods"
+Homepage = "https://github.com/btschwertfeger/python-cmethods"
 "Bug Tracker" = "https://github.com/btschwertfeger/python-cmethods/issues"
+Documentation = "https://python-cmethods.readthedocs.io/en/stable/"
 
 [tool.setuptools]
 include-package-data = false
 
 [tool.setuptools.packages.find]
 include = ["cmethods*"]
-exclude = ["doc*", "tests*", "examples*", ".env", "venv"]
+exclude = ["doc*", "tests*", "examples*", ".env", ".venv"]
 
 [tool.setuptools_scm]
 write_to = "cmethods/_version.py"
@@ -83,7 +85,10 @@ testpaths = ["tests"]
 
 [tool.pytest.ini_options]
 cache_dir = ".cache/pytest"
-markers = ["wip: Used to run a specific test by hand."]
+markers = [
+  "wip: Used to run a specific test by hand.",
+  "flaky: Use to retry flaky tests",
+]
 addopts = "--maxfail=1"
 
 [tool.coverage.run]
@@ -200,6 +205,7 @@ lint.select = [
   "BLE",   # blind-except
   "C4",    # flake8-comprehensions
   "COM",   # flake8-commas
+  "CPY",    # flake8-copyright
   "E",     # pycodestyle
   "F",     # pyflakes
   "FA",    # flake8-future-annotations
@@ -254,6 +260,11 @@ exclude = []
 line-length = 130
 cache-dir = ".cache/ruff"
 lint.task-tags = ["todo", "TODO"]
+
+[tool.ruff.lint.flake8-copyright]
+author = "Benjamin Thomas Schwertfeger"
+notice-rgx = "(?i)Copyright \\(C\\) \\d{4}"
+min-file-size = 1024
 
 [tool.ruff.lint.per-file-ignores]
 "cmethods/types.py" = [

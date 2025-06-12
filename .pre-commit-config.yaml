@@ -7,7 +7,7 @@
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.0
+    rev: v0.11.13
     hooks:
       - id: ruff
         args:
@@ -29,6 +29,10 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies: [tomli]
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -85,4 +89,8 @@ repos:
           - --max-average=B
           - --max-modules=B
           - --max-absolute=C
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.3.3
+    hooks:
+      - id: prettier
 exclude: '\.nc$|^tests/fixture/|\.ipynb$'

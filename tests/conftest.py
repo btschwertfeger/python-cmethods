@@ -10,7 +10,6 @@
 from __future__ import annotations
 
 import os
-from functools import lru_cache
 from typing import Any
 
 import pytest
@@ -65,7 +64,6 @@ def datasets() -> dict:
     }
 
 
-@lru_cache(maxsize=None)
 @pytest.fixture
 def datasets_from_zarr() -> dict:
     return {
