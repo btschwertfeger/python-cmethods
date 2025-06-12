@@ -6,35 +6,47 @@
 # https://github.com/btschwertfeger
 #
 
-VENV := venv
+UV := uv
 PYTHON := python
+PYTEST := $(UV) run pytest
 TESTS := tests
-PYTEST_OPTS := -vv
-ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+PYTEST_OPTS := -vv --junit-xml=pytest.xml
+PYTEST_COV_OPTS := $(PYTEST_OPTS) --cov=cmethods --cov-report=xml:coverage.xml --cov-report=term
 
+## ======= M A K E F I L E - T A R G E T S =====================================
+## help           Show this help message
+##
 .PHONY: help
 help:
 	@grep "^##" Makefile | sed -e "s/##//"
 
-## build		Builds python-cmethods
+## ======= B U I L D I N G =====================================================
+## build		Builds the package
 ##
 .PHONY: build
 build:
 	$(PYTHON) -m build .
+
+## rebuild 	Rebuild the package
+##
+.PHONY: rebuild
+rebuild: clean build
+
+## ======= I N S T A L L A T I O N =============================================
+## install	Install the package
+##
+.PHONY: install
+install: check-uv
+	$(UV) pip install .
 
 ## dev		Installs the package in edit mode
 ##
 .PHONY: dev
 dev:
 	@git lfs install
-	$(PYTHON) -m pip install -e ".[dev,test,jupyter,examples]" -r doc/requirements.txt
+	$(UV) pip install -e ".[dev,test,jupyter,examples]" -r doc/requirements.txt
 
-## install		Install the package
-##
-.PHONY: install
-install:
-	$(PYTHON) -m pip install .
-
+## ======= T E S T I N G =======================================================
 ## test		Run the unit tests
 ##
 .PHONY: test
@@ -50,12 +62,18 @@ tests: test
 retest:
 	$(PYTHON) -m pytest $(PYTEST_OPTS) --lf $(TESTS)
 
-
 ## wip  	Run tests marked as wip
 ##
 .PHONY: wip
 wip:
 	$(PYTHON) -m pytest $(PYTEST_OPTS) -m "wip" $(TESTS)
+
+## coverage       Run all tests and generate the coverage report
+##
+.PHONY: coverage
+coverage:
+	@rm .cache/tests/*.log || true
+	$(PYTEST) $(PYTEST_COV_OPTS) $(TEST_DIR)
 
 ## doc		Build the documentation
 ##
@@ -69,7 +87,8 @@ doc:
 doctest:
 	cd doc && make doctest
 
-## pre-commit		Pre-Commit
+## ======= M I S C E L A N I O U S =============================================
+## pre-commit	Run the pre-commit targets
 ##
 .PHONY: pre-commit
 pre-commit:
@@ -92,7 +111,7 @@ ruff-fix:
 .PHONY: changelog
 changelog:
 	docker run -it --rm \
-		-v $(ROOT_DIR):/usr/local/src/your-app/ \
+		-v $(PWD):/usr/local/src/your-app/ \
 		githubchangeloggenerator/github-changelog-generator \
 		-u btschwertfeger \
 		-p python-cmethods \
@@ -115,3 +134,12 @@ clean:
 	find tests -name "__pycache__" | xargs rm -rf
 	find cmethods -name "__pycache__" | xargs rm -rf
 	find examples -name "__pycache__" | xargs rm -rf
+
+## check-uv       Check if uv is installed
+##
+.PHONY: check-uv
+check-uv:
+	@if ! command -v $(UV) >/dev/null; then \
+		echo "Error: uv is not installed. Please visit https://github.com/astral-sh/uv for installation instructions."; \
+		exit 1; \
+	fi
