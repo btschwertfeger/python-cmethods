@@ -1,0 +1,8 @@
+dask[distributed]
+pytest
+pytest-cov
+pytest-retry
+scikit-learn
+scipy
+venv-kernel
+zarr

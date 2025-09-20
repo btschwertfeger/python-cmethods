@@ -26,7 +26,7 @@ efficiency, python-cmethods offers a comprehensive suite of functions tailored
 for applying bias correction methods to climate model simulations and
 observational datasets via command-line interface and API.
 
-Please cite this project as described in
+If you use this project, cite it as described in
 https://zenodo.org/doi/10.5281/zenodo.7652755.
 
 ## Table of Contents

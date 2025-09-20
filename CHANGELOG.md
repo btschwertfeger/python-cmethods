@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/btschwertfeger/python-cmethods/tree/HEAD)
 
-[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.3.0...HEAD)
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.3.1...HEAD)
+
+**Merged pull requests:**
+
+- Bump github/codeql-action from 3.29.2 to 3.29.5 in the all group [\#171](https://github.com/btschwertfeger/python-cmethods/pull/171) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.28.18 to 3.29.2 in the all group [\#170](https://github.com/btschwertfeger/python-cmethods/pull/170) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Update project settings [\#169](https://github.com/btschwertfeger/python-cmethods/pull/169) ([btschwertfeger](https://github.com/btschwertfeger))
+- Bump the all group with 4 updates [\#168](https://github.com/btschwertfeger/python-cmethods/pull/168) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump the all group with 3 updates [\#167](https://github.com/btschwertfeger/python-cmethods/pull/167) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v2.3.1](https://github.com/btschwertfeger/python-cmethods/tree/v2.3.1) (2025-04-01)
+
+[Full Changelog](https://github.com/btschwertfeger/python-cmethods/compare/v2.3.0...v2.3.1)
 
 **Fixed bugs:**
 
@@ -11,10 +23,16 @@
 **Closed issues:**
 
 - Create Jupyter Notebooks for possible strategies [\#135](https://github.com/btschwertfeger/python-cmethods/issues/135)
+- Parts of the pyproject.toml are deprecated [\#164](https://github.com/btschwertfeger/python-cmethods/issues/164)
 
 **Merged pull requests:**
 
+- Bump the all group with 2 updates [\#166](https://github.com/btschwertfeger/python-cmethods/pull/166) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump the all group with 3 updates [\#162](https://github.com/btschwertfeger/python-cmethods/pull/162) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.28.8 to 3.28.9 in the all group [\#161](https://github.com/btschwertfeger/python-cmethods/pull/161) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump dependabot/fetch-metadata from 2.2.0 to 2.3.0 [\#159](https://github.com/btschwertfeger/python-cmethods/pull/159) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump codecov/codecov-action from 5.1.2 to 5.3.1 [\#158](https://github.com/btschwertfeger/python-cmethods/pull/158) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 3.28.1 to 3.28.8 [\#157](https://github.com/btschwertfeger/python-cmethods/pull/157) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump actions/setup-python from 5.3.0 to 5.4.0 [\#156](https://github.com/btschwertfeger/python-cmethods/pull/156) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump github/codeql-action from 3.28.0 to 3.28.1 [\#152](https://github.com/btschwertfeger/python-cmethods/pull/152) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Add `release.yaml` [\#151](https://github.com/btschwertfeger/python-cmethods/pull/151) ([btschwertfeger](https://github.com/btschwertfeger))
@@ -23,20 +41,15 @@
 - Bump github/codeql-action from 3.27.6 to 3.27.9 [\#148](https://github.com/btschwertfeger/python-cmethods/pull/148) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump codecov/codecov-action from 4.6.0 to 5.1.1 [\#147](https://github.com/btschwertfeger/python-cmethods/pull/147) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump github/codeql-action from 3.27.4 to 3.27.6 [\#146](https://github.com/btschwertfeger/python-cmethods/pull/146) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Do not rely on trusted publishing for PyPI upload [\#145](https://github.com/btschwertfeger/python-cmethods/pull/145) ([btschwertfeger](https://github.com/btschwertfeger))
 - Bump github/codeql-action from 3.27.1 to 3.27.4 [\#141](https://github.com/btschwertfeger/python-cmethods/pull/141) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump github/codeql-action from 3.27.0 to 3.27.1 [\#140](https://github.com/btschwertfeger/python-cmethods/pull/140) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump actions/checkout from 4.2.1 to 4.2.2 [\#138](https://github.com/btschwertfeger/python-cmethods/pull/138) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump actions/setup-python from 5.2.0 to 5.3.0 [\#137](https://github.com/btschwertfeger/python-cmethods/pull/137) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump github/codeql-action from 3.26.13 to 3.27.0 [\#136](https://github.com/btschwertfeger/python-cmethods/pull/136) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Update and apply Pre-Commit hooks [\#134](https://github.com/btschwertfeger/python-cmethods/pull/134) ([btschwertfeger](https://github.com/btschwertfeger))
 - Bump actions/checkout from 4.1.7 to 4.2.1 [\#132](https://github.com/btschwertfeger/python-cmethods/pull/132) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump github/codeql-action from 3.26.11 to 3.26.13 [\#131](https://github.com/btschwertfeger/python-cmethods/pull/131) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump codecov/codecov-action from 4.5.0 to 4.6.0 [\#130](https://github.com/btschwertfeger/python-cmethods/pull/130) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump github/codeql-action from 3.26.8 to 3.26.11 [\#129](https://github.com/btschwertfeger/python-cmethods/pull/129) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Move CITATION file to top-level [\#126](https://github.com/btschwertfeger/python-cmethods/pull/126) ([btschwertfeger](https://github.com/btschwertfeger))
-- Add CITATION file [\#125](https://github.com/btschwertfeger/python-cmethods/pull/125) ([btschwertfeger](https://github.com/btschwertfeger))
-- Update project settings [\#124](https://github.com/btschwertfeger/python-cmethods/pull/124) ([btschwertfeger](https://github.com/btschwertfeger))
 - Bump github/codeql-action from 3.26.7 to 3.26.8 [\#123](https://github.com/btschwertfeger/python-cmethods/pull/123) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump github/codeql-action from 3.26.6 to 3.26.7 [\#122](https://github.com/btschwertfeger/python-cmethods/pull/122) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump actions/setup-python from 5.1.1 to 5.2.0 [\#121](https://github.com/btschwertfeger/python-cmethods/pull/121) ([dependabot[bot]](https://github.com/apps/dependabot))
@@ -49,6 +62,14 @@
 - Bump actions/setup-python from 5.1.0 to 5.1.1 [\#114](https://github.com/btschwertfeger/python-cmethods/pull/114) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump dependabot/fetch-metadata from 2.1.0 to 2.2.0 [\#113](https://github.com/btschwertfeger/python-cmethods/pull/113) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump actions/checkout from 4.1.6 to 4.1.7 [\#110](https://github.com/btschwertfeger/python-cmethods/pull/110) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Resolve "Parts of the pyproject.toml are deprecated" [\#165](https://github.com/btschwertfeger/python-cmethods/pull/165) ([btschwertfeger](https://github.com/btschwertfeger))
+- Fix the documentation build [\#163](https://github.com/btschwertfeger/python-cmethods/pull/163) ([btschwertfeger](https://github.com/btschwertfeger))
+- Update copyright headers [\#160](https://github.com/btschwertfeger/python-cmethods/pull/160) ([btschwertfeger](https://github.com/btschwertfeger))
+- Do not rely on trusted publishing for PyPI upload [\#145](https://github.com/btschwertfeger/python-cmethods/pull/145) ([btschwertfeger](https://github.com/btschwertfeger))
+- Update and apply Pre-Commit hooks [\#134](https://github.com/btschwertfeger/python-cmethods/pull/134) ([btschwertfeger](https://github.com/btschwertfeger))
+- Move CITATION file to top-level [\#126](https://github.com/btschwertfeger/python-cmethods/pull/126) ([btschwertfeger](https://github.com/btschwertfeger))
+- Add CITATION file [\#125](https://github.com/btschwertfeger/python-cmethods/pull/125) ([btschwertfeger](https://github.com/btschwertfeger))
+- Update project settings [\#124](https://github.com/btschwertfeger/python-cmethods/pull/124) ([btschwertfeger](https://github.com/btschwertfeger))
 
 ## [v2.3.0](https://github.com/btschwertfeger/python-cmethods/tree/v2.3.0) (2024-06-19)
 
