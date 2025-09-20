@@ -75,7 +75,7 @@ include = ["cmethods*"]
 exclude = ["doc*", "tests*", "examples*", ".env", ".venv"]
 
 [tool.setuptools_scm]
-write_to = "cmethods/_version.py"
+version_file = "cmethods/_version.py"
 version_scheme = "guess-next-dev"
 local_scheme = "no-local-version"
 
@@ -99,31 +99,6 @@ concurrency = ["multiprocessing"]
 [tool.coverage.report]
 exclude_lines = ["coverage: disable", "if TYPE_CHECKING:"]
 skip_empty = true
-
-[project.optional-dependencies]
-jupyter = ["venv-kernel"]
-dev = [
-  # building
-  "setuptools_scm",
-  "build",
-  # linting
-  "pylint",
-  "flake8",
-  "ruff",
-  # typing
-  "mypy",
-]
-test = [
-  # testing
-  "pytest",
-  "pytest-cov",
-  "pytest-retry",
-  "zarr",
-  "dask[distributed]",
-  "scikit-learn",
-  "scipy",
-]
-examples = ["matplotlib"]
 
 [tool.codespell]
 check-filenames = true

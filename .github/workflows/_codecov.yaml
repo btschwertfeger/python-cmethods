@@ -47,7 +47,7 @@ jobs:
         run: python -m pip install --upgrade pip
 
       - name: Install package
-        run: python -m pip install ".[dev,test]"
+        run: python -m pip install . -r requirements-dev.txt
 
       - name: Generate coverage report
         run: pytest --retries 1 --cov --cov-report=xml

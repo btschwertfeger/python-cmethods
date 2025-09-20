@@ -44,7 +44,7 @@ install: check-uv
 .PHONY: dev
 dev:
 	@git lfs install
-	$(UV) pip install -e ".[dev,test,jupyter,examples]" -r doc/requirements.txt
+	$(UV) pip install -e . -r doc/requirements.txt -r requirements-dev.txt
 
 ## ======= T E S T I N G =======================================================
 ## test		Run the unit tests
@@ -124,9 +124,9 @@ changelog:
 clean:
 	rm -rf .mypy_cache .pytest_cache .cache \
 		build/ dist/ python_cmethods.egg-info \
-		docs/_build \
 		examples/.ipynb_checkpoints .ipynb_checkpoints \
-		doc/_build
+		doc/_build \
+		.coverage* pytest.xml
 
 	rm -f .coverage cmethods/_version.py
 
