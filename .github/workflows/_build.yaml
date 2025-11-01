@@ -72,7 +72,7 @@ jobs:
         run: python -m build
 
       - name: Store the distribution packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         # upload artifacts with the oldest supported version
         if: runner.os == 'linux' && inputs.python-version == '3.9'
         with:
