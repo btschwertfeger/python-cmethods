@@ -51,6 +51,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Topic :: Utilities",
   "Topic :: Scientific/Engineering",
@@ -82,14 +83,12 @@ local_scheme = "no-local-version"
 [tool.pytest]
 junit_family = "xunit2"
 testpaths = ["tests"]
-
-[tool.pytest.ini_options]
 cache_dir = ".cache/pytest"
 markers = [
   "wip: Used to run a specific test by hand.",
   "flaky: Use to retry flaky tests",
 ]
-addopts = "--maxfail=1"
+addopts = ["--maxfail=1"]
 
 [tool.coverage.run]
 source = ["cmethods"]
