@@ -115,7 +115,6 @@ https://python-cmethods.readthedocs.io/en/stable/
 - Except for the variance scaling, all methods can be applied on stochastic and
   non-stochastic climate variables. Variance scaling can only be applied on
   non-stochastic climate variables.
-
   - Non-stochastic climate variables are those that can be predicted with
     relative certainty based on factors such as location, elevation, and season.
     Examples of non-stochastic climate variables include air temperature, air
