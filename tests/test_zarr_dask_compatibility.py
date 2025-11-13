@@ -37,7 +37,7 @@ def test_3d_scaling_zarr(
     kind: str,
     dask_cluster: Any,  # noqa: ARG001
 ) -> None:
-    variable: str = "tas" if kind == "+" else "pr"  # noqa: PLR2004
+    variable: str = "tas" if kind == "+" else "pr"
     obsh: xr.DataArray = datasets_from_zarr[kind]["obsh"][variable]
     obsp: xr.DataArray = datasets_from_zarr[kind]["obsp"][variable]
     simh: xr.DataArray = datasets_from_zarr[kind]["simh"][variable]
@@ -81,7 +81,7 @@ def test_3d_distribution_zarr(
     kind: str,
     dask_cluster: Any,  # noqa: ARG001
 ) -> None:
-    variable: str = "tas" if kind == "+" else "pr"  # noqa: PLR2004
+    variable: str = "tas" if kind == "+" else "pr"
     obsh: XRData_t = datasets_from_zarr[kind]["obsh"][variable]
     obsp: XRData_t = datasets_from_zarr[kind]["obsp"][variable]
     simh: XRData_t = datasets_from_zarr[kind]["simh"][variable]
