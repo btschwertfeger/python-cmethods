@@ -246,7 +246,7 @@ def adjust(
             **kwargs,
         )
 
-        result = monthly_result if result is None else xr.merge([result, monthly_result])
+        result = monthly_result if result is None else xr.merge([result, monthly_result], compat="no_conflicts", join="outer")
 
     return _add_cmethods_metadata(result, method, **metadata_kwargs)
 

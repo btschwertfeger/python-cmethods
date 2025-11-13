@@ -3,6 +3,7 @@ matplotlib
 pytest
 pytest-cov
 pytest-retry
+pytest-xdist
 scikit-learn
 scipy
 venv-kernel

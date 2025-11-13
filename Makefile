@@ -10,7 +10,7 @@ UV := uv
 PYTHON := python
 PYTEST := $(UV) run pytest
 TESTS := tests
-PYTEST_OPTS := -vv --junit-xml=pytest.xml
+PYTEST_OPTS := -vv -x -n auto --junit-xml=pytest.xml
 PYTEST_COV_OPTS := $(PYTEST_OPTS) --cov=cmethods --cov-report=xml:coverage.xml --cov-report=term
 
 ## ======= M A K E F I L E - T A R G E T S =====================================
