@@ -1,4 +1,5 @@
 dask[distributed]
+matplotlib
 pytest
 pytest-cov
 pytest-retry

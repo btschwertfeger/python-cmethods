@@ -15,8 +15,10 @@ from typing import Any
 
 import numpy as np
 import pytest
+import xarray as xr
 
 from cmethods import adjust
+from cmethods.core import _add_cmethods_metadata
 from cmethods.distribution import (
     detrended_quantile_mapping,
     quantile_delta_mapping,
@@ -130,3 +132,70 @@ def test_adjust_failing_no_group_for_distribution(datasets: dict) -> None:
             n_quantiles=100,
             group="time.month",
         )
+
+
+def test_add_cmethods_metadata_with_dataarray() -> None:
+    """Test that _add_cmethods_metadata adds correct attributes to a DataArray"""
+    data = xr.DataArray(
+        np.array([1, 2, 3, 4, 5]),
+        dims=["time"],
+        coords={"time": np.arange(5)},
+    )
+
+    result = _add_cmethods_metadata(
+        data,
+        method="linear_scaling",
+        kind="+",
+        n_quantiles=100,
+        group="time.month",
+    )
+
+    assert "cmethods_version" in result.attrs
+    assert "cmethods_method" in result.attrs
+    assert "cmethods_timestamp" in result.attrs
+    assert "cmethods_source" in result.attrs
+
+    assert result.attrs["cmethods_method"] == "linear_scaling"
+    assert result.attrs["cmethods_kind"] == "+"
+    assert result.attrs["cmethods_n_quantiles"] == "100"
+    assert result.attrs["cmethods_group"] == "time.month"
+    assert result.attrs["cmethods_source"] == "https://github.com/btschwertfeger/python-cmethods"
+    assert "UTC" in result.attrs["cmethods_timestamp"]
+
+
+def test_add_cmethods_metadata_with_dataset() -> None:
+    """Test that _add_cmethods_metadata adds correct attributes to a Dataset"""
+    data = xr.Dataset(
+        {
+            "temperature": xr.DataArray(
+                np.array([1, 2, 3, 4, 5]),
+                dims=["time"],
+                coords={"time": np.arange(5)},
+            ),
+        },
+    )
+
+    result = _add_cmethods_metadata(data, method="quantile_mapping")
+
+    assert "cmethods_version" in result.attrs
+    assert "cmethods_method" in result.attrs
+    assert "cmethods_timestamp" in result.attrs
+    assert "cmethods_source" in result.attrs
+    assert result.attrs["cmethods_method"] == "quantile_mapping"
+
+
+def test_add_cmethods_metadata_optional_params() -> None:
+    """Test that _add_cmethods_metadata handles optional parameters correctly"""
+    data = xr.DataArray(
+        np.array([1, 2, 3]),
+        dims=["time"],
+        coords={"time": np.arange(3)},
+    )
+
+    result = _add_cmethods_metadata(data, method="variance_scaling")
+
+    assert "cmethods_method" in result.attrs
+    assert result.attrs["cmethods_method"] == "variance_scaling"
+    assert "cmethods_kind" not in result.attrs
+    assert "cmethods_n_quantiles" not in result.attrs
+    assert "cmethods_group" not in result.attrs

@@ -101,7 +101,7 @@ def get_datasets(kind: str) -> tuple[xr.Dataset, xr.Dataset, xr.Dataset, xr.Data
             .to_dataset(name=kind)
         )
 
-    if kind == "+":  # noqa: PLR2004
+    if kind == "+":
         some_data = [get_hist_temp_for_lat(val) for val in latitudes]
         data = np.array(
             [
