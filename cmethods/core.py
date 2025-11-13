@@ -25,6 +25,7 @@ correction techniques.
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Callable, Dict, Optional
 
 import xarray as xr
@@ -47,6 +48,46 @@ __METHODS_FUNC__: Dict[str, Callable] = {
     "quantile_mapping": __quantile_mapping,
     "quantile_delta_mapping": __quantile_delta_mapping,
 }
+
+
+def _add_cmethods_metadata(
+    result: xr.Dataset | xr.DataArray,
+    method: str,
+    **kwargs,
+) -> xr.Dataset | xr.DataArray:
+    """
+    Add metadata to the result indicating it was processed by python-cmethods.
+
+    :param result: The bias-corrected dataset or dataarray
+    :param method: The method used for bias correction
+    :param kwargs: Additional method parameters
+    :return: Result with added metadata
+    """
+    try:
+        from importlib.metadata import version  # noqa: PLC0415
+
+        pkg_version = version("python-cmethods")
+    except Exception:  # noqa: BLE001
+        pkg_version = "unknown"
+
+    attrs_to_add = {
+        "cmethods_version": pkg_version,
+        "cmethods_method": method,
+        "cmethods_timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
+        "cmethods_source": "https://github.com/btschwertfeger/python-cmethods",
+    }
+
+    if kind := kwargs.get("kind"):
+        attrs_to_add["cmethods_kind"] = kind
+    if n_quantiles := kwargs.get("n_quantiles"):
+        attrs_to_add["cmethods_n_quantiles"] = str(n_quantiles)
+    if group := kwargs.get("group"):
+        attrs_to_add["cmethods_group"] = str(group)
+
+    if isinstance(result, (xr.Dataset, xr.DataArray)):
+        result.attrs.update(attrs_to_add)
+
+    return result
 
 
 def apply_ufunc(
@@ -144,6 +185,8 @@ def adjust(
     :return: The bias corrected/adjusted data set
     :rtype: xr.xarray.core.dataarray.DataArray | xr.xarray.core.dataarray.Dataset
     """
+    metadata_kwargs = {k: v for k, v in kwargs.items() if k in {"kind", "n_quantiles", "group"}}
+
     kwargs["adjust_called"] = True
     ensure_xr_dataarray(obs=obs, simh=simh, simp=simp)
 
@@ -159,7 +202,8 @@ def adjust(
     #       mock this function or apply ``CMethods.__apply_ufunc` directly
     #       on your data sets.
     if kwargs.get("group") is None:
-        return apply_ufunc(method, obs, simh, simp, **kwargs).to_dataset()
+        result = apply_ufunc(method, obs, simh, simp, **kwargs).to_dataset()
+        return _add_cmethods_metadata(result, method, **metadata_kwargs)
 
     if method not in SCALING_METHODS:
         raise ValueError(
@@ -204,7 +248,7 @@ def adjust(
 
         result = monthly_result if result is None else xr.merge([result, monthly_result])
 
-    return result
+    return _add_cmethods_metadata(result, method, **metadata_kwargs)
 
 
 __all__ = ["adjust"]
