@@ -57,7 +57,8 @@ jobs:
       os: ubuntu-latest
       python-version: "3.11"
 
-  ##    Run the unit tests for Python 3.8 until 3.11
+  ##    Run the unit tests for Python 3.9 until 3.14 and upload the
+  ##    coverage statistics to codecov
   ##
   Test:
     needs: [Pre-Commit]
@@ -71,19 +72,8 @@ jobs:
     with:
       os: ${{ matrix.os }}
       python-version: ${{ matrix.python-version }}
-
-  ##    Generates and uploads the coverage statistics to codecov
-  ##
-  CodeCov:
-    if: |
-      (success() && github.actor == 'btschwertfeger')
-      && (github.event_name == 'push' || github.event_name == 'release')
-    needs: [Pre-Commit]
-    uses: ./.github/workflows/_codecov.yaml
-    with:
-      os: ubuntu-latest
-      python-version: "3.11"
-    secrets: inherit
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   ##    Uploads the package to test.pypi.org on master if triggered by
   ##    a regular commit/push.
