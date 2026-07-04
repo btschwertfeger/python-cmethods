@@ -54,7 +54,9 @@ jobs:
         run: python -m pip install --user . -r requirements-dev.txt
 
       - name: Run unit tests
-        run: pytest -vv --retries 1 -n auto --cov --cov-report=xml tests
+        run: >
+          pytest -vv --retries 1 -n auto --cov --cov-report=xml
+          --junitxml=junit-unittests.xml -o junit_family=legacy tests
 
       - name: Upload coverage to Codecov
         if: |
@@ -69,5 +71,23 @@ jobs:
           env_vars: OS,PYTHON
           fail_ci_if_error: true
           flags: unittests
+          report_type: coverage
+          name: codecov-umbrella
+          verbose: true
+
+      - name: Upload test results to Codecov
+        if: |
+          inputs.os == 'ubuntu-latest'
+          && inputs.python-version == '3.11'
+          && github.actor == 'btschwertfeger'
+          && (github.event_name == 'push' || github.event_name == 'release')
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: junit-unittests.xml
+          env_vars: OS,PYTHON
+          fail_ci_if_error: true
+          flags: unittests
+          report_type: test_results
           name: codecov-umbrella
           verbose: true
