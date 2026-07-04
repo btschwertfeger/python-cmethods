@@ -78,6 +78,10 @@ jobs:
   ##    Uploads the package to test.pypi.org on master if triggered by
   ##    a regular commit/push.
   ##
+  ##    Trusted Publishing does not support reusable workflows, so the publish
+  ##    step runs inline here rather than in a called workflow. See
+  ##    https://github.com/pypi/warehouse/issues/11096
+  ##
   UploadTestPyPI:
     if: |
       (
@@ -92,11 +96,29 @@ jobs:
       - Test
       - CodeQL
     name: Upload current version to Test PyPI
-    uses: ./.github/workflows/_pypi_test_publish.yaml
-    secrets:
-      API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # IMPORTANT: this permission is mandatory for OIDC publishing
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/python-cmethods
+    steps:
+      - name: Download all the distributions
+        uses: actions/download-artifact@v8
+        with:
+          name: python-package-distributions
+          path: dist/
 
-  ##    Upload the python-kraken-sdk to Production PyPI
+      - name: Publish package distributions to Test PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  ##    Upload the python-cmethods package to Production PyPI
+  ##
+  ##    Trusted Publishing does not support reusable workflows, so the publish
+  ##    step runs inline here rather than in a called workflow. See
+  ##    https://github.com/pypi/warehouse/issues/11096
   ##
   UploadPyPI:
     if: |
@@ -109,6 +131,20 @@ jobs:
       - Test
       - CodeQL
     name: Upload the current release to PyPI
-    uses: ./.github/workflows/_pypi_publish.yaml
-    secrets:
-      API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # IMPORTANT: this permission is mandatory for OIDC publishing
+    environment:
+      name: pypi
+      url: https://pypi.org/p/python-cmethods
+    steps:
+      - name: Download all the distributions
+        uses: actions/download-artifact@v8
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://upload.pypi.org/legacy/
