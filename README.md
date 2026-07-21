@@ -26,8 +26,8 @@ efficiency, python-cmethods offers a comprehensive suite of functions tailored
 for applying bias correction methods to climate model simulations and
 observational datasets via command-line interface and API.
 
-If you use this project, cite it as described in
-https://zenodo.org/doi/10.5281/zenodo.7652755.
+If you use this project, please cite it as described in the
+[Citation](#citation) section below.
 
 ## Table of Contents
 
@@ -38,6 +38,7 @@ https://zenodo.org/doi/10.5281/zenodo.7652755.
 5. [ Notes ](#notes)
 6. [ Contribution ](#contribution)
 7. [ References ](#references)
+8. [ Citation ](#citation)
 
 <a name="about"></a>
 
@@ -315,3 +316,36 @@ Notes:
   https://github.com/btschwertfeger/python-cmethods/issues/47. I appreciate all
   the valuable suggestions provided throughout the implementation of the
   subsequent changes.
+
+<a name="citation"></a>
+
+## 8. Citation
+
+If you use python-cmethods in your research, please cite the software through its
+Zenodo archive. The DOI below is the concept DOI that always resolves to the
+latest release.
+
+> Benjamin Thomas Schwertfeger. _python-cmethods: A collection of bias correction
+> techniques written in Python - for climate sciences_. Zenodo.
+> https://doi.org/10.5281/zenodo.7652755
+
+```bibtex
+@software{python_cmethods,
+  author    = {Schwertfeger, Benjamin Thomas},
+  title     = {{python-cmethods: A collection of bias correction techniques written in Python - for climate sciences}},
+  year      = {2023},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.7652755},
+  url       = {https://github.com/btschwertfeger/python-cmethods}
+}
+```
+
+To cite the exact version you used, replace the concept DOI with the
+version-specific DOI shown on the corresponding
+[Zenodo record](https://doi.org/10.5281/zenodo.7652755).
+
+**Which project should I cite?** python-cmethods is the Python package. If you
+used the C++ command-line tool instead, cite
+[BiasAdjustCXX](https://github.com/btschwertfeger/BiasAdjustCXX) and its SoftwareX
+paper (https://doi.org/10.1016/j.softx.2023.101379). That paper describes the C++
+tool, not this Python package, so it is not the right reference for python-cmethods.
