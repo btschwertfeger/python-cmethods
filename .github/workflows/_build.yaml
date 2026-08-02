@@ -37,6 +37,7 @@ jobs:
             github.com:443
             pypi.org:443
             release-assets.githubusercontent.com:443
+            pkg-containers.githubusercontent.com:443
 
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
