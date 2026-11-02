@@ -3,7 +3,7 @@
 <div align="center">
 
 [![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/btschwertfeger/python-cmethods)
-[![Generic badge](https://img.shields.io/badge/python-3.9_|_3.10_|_3.11|_3.12|_3.13-blue.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/python-3.11_|_3.12_|_3.13_|_3.14_|_3.15-blue.svg)](https://shields.io/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![PyPI Downloads](https://pepy.tech/badge/python-cmethods)](https://pepy.tech/project/python-cmethods)
 

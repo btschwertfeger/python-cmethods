@@ -36,7 +36,7 @@
                            :target: https://github.com/btschwertfeger/python-cmethods
 .. |License badge|          image:: https://img.shields.io/badge/License-GPLv3-orange.svg
                            :target: https://www.gnu.org/licenses/gpl-3.0
-.. |PyVersions badge|       image:: https://img.shields.io/badge/python-3.9_|_3.10_|_3.11|_3.12|_3.13-blue.svg
+.. |PyVersions badge|       image:: https://img.shields.io/badge/python-3.11_|_3.12_|_3.13_|_3.14_|_3.15-blue.svg
                            :target: https://github.com/btschwertfeger/python-cmethods
 .. |Downloads badge|        image:: https://static.pepy.tech/personalized-badge/python-cmethods?period=total&units=abbreviation&left_color=grey&right_color=orange&left_text=downloads
                            :target: https://pepy.tech/project/python-cmethods

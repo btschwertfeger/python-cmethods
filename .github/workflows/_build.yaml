@@ -87,7 +87,7 @@ jobs:
       - name: Store the distribution packages
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         # upload artifacts with the oldest supported version
-        if: runner.os == 'linux' && inputs.python-version == '3.9'
+        if: runner.os == 'linux' && inputs.python-version == '3.11'
         with:
           name: python-package-distributions
           path: dist/
