@@ -64,10 +64,10 @@ def _add_cmethods_metadata(
     :return: Result with added metadata
     """
     try:
-        from importlib.metadata import version  # noqa: PLC0415
+        from importlib.metadata import version  # ruff: ignore[import-outside-top-level]
 
         pkg_version = version("python-cmethods")
-    except Exception:  # noqa: BLE001
+    except Exception:  # ruff: ignore[blind-except]
         pkg_version = "unknown"
 
     attrs_to_add = {
@@ -190,7 +190,7 @@ def adjust(
     kwargs["adjust_called"] = True
     ensure_xr_dataarray(obs=obs, simh=simh, simp=simp)
 
-    if method == "detrended_quantile_mapping":  # noqa: PLR2004
+    if method == "detrended_quantile_mapping":  # ruff: ignore[magic-value-comparison]
         raise ValueError(
             "This function is not available for detrended quantile mapping."
             " Please use cmethods.CMethods.detrended_quantile_mapping",
