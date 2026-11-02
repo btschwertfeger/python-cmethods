@@ -48,7 +48,7 @@ with open("links.rst", encoding="utf-8") as f:
     rst_epilog += f.read()
 
 
-def setup(app) -> None:  # noqa: ARG001
+def setup(app) -> None:  # ruff: ignore[unused-function-argument]
     copyfile(join("..", "examples", "examples.ipynb"), "examples.ipynb")
 
 

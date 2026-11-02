@@ -43,7 +43,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.11", "3.12", "3.13", "3.14", "3.15"]
     with:
       os: ${{ matrix.os }}
       python-version: ${{ matrix.python-version }}
@@ -57,7 +57,7 @@ jobs:
       os: ubuntu-latest
       python-version: "3.11"
 
-  ##    Run the unit tests for Python 3.9 until 3.14 and upload the
+  ##    Run the unit tests for Python 3.11 until 3.15 and upload the
   ##    coverage statistics to codecov
   ##
   Test:
@@ -68,7 +68,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.11", "3.12", "3.13", "3.14", "3.15"]
     with:
       os: ${{ matrix.os }}
       python-version: ${{ matrix.python-version }}
