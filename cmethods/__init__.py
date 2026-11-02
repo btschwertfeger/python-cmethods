@@ -59,21 +59,21 @@ from cmethods.core import adjust
 __all__ = ["adjust"]
 
 
-def print_version(
+def print_version(  # ruff: ignore[non-empty-init-module]
     ctx: Context,
-    param: Any,  # noqa: ARG001
+    param: Any,  # ruff: ignore[unused-function-argument]
     value: Any,
 ) -> None:
     """Prints the version of the package"""
     if not value or ctx.resilient_parsing:
         return
-    from importlib.metadata import version  # noqa: PLC0415
+    from importlib.metadata import version  # ruff: ignore[import-outside-top-level]
 
     echo(version("python-cmethods"))
     ctx.exit()
 
 
-@command(
+@command(  # ruff: ignore[non-empty-init-module]
     context_settings={
         "auto_envvar_prefix": "CMETHODS",
         "help_option_names": ["-h", "--help"],
@@ -147,7 +147,7 @@ def print_version(
     "--output",
     required=True,
     type=str,
-    callback=lambda _, __, value: (value if value.endswith(".nc") else f"{value}.nc"),
+    callback=lambda _, __, value: value if value.endswith(".nc") else f"{value}.nc",
     help="Output file name",
 )
 @option_group(
@@ -189,7 +189,7 @@ def cli(**kwargs) -> None:
     )
     log = logging.getLogger(__name__)
     log.info("Loading data sets ...")
-    try:
+    try:  # ruff: ignore[too-many-statements-in-try-clause]
         for key, message in zip(
             ("obs", "simh", "simp"),
             (
